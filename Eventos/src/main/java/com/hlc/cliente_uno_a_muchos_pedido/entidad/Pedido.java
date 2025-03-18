@@ -4,13 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-
-
-import jakarta.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "pedidos")

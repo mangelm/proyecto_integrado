@@ -6,9 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import com.hlc.cliente_uno_a_muchos_pedido.entidad.Cliente;
 import com.hlc.cliente_uno_a_muchos_pedido.entidad.Producto;
-import com.hlc.cliente_uno_a_muchos_pedido.excepcion.RecursoNoEncontradoException;
 import com.hlc.cliente_uno_a_muchos_pedido.servicio.ProductoServicio;
 
 import jakarta.validation.Valid;

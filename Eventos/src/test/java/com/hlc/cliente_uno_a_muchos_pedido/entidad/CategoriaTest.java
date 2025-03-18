@@ -1,7 +1,6 @@
 package com.hlc.cliente_uno_a_muchos_pedido.entidad;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 
@@ -16,7 +15,6 @@ import jakarta.validation.ValidatorFactory;
 class CategoriaTest {
 	
 	private Categoria categoria;
-	private Producto producto;
 	private Validator validator;
 	
 	@BeforeEach

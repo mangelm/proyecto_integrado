@@ -3,12 +3,7 @@ package com.hlc.cliente_uno_a_muchos_pedido.controlador.error;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.http.HttpStatus;
-import com.hlc.cliente_uno_a_muchos_pedido.excepcion.RecursoNoEncontradoException;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;

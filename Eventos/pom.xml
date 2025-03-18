@@ -8,11 +8,11 @@
 		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.hlc</groupId>
-	<artifactId>Pedidos</artifactId>
+	<groupId>com.integra</groupId>
+	<artifactId>Eventos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>cliente_uno_a_muchos_pedido</name>
-	<description>Cliente realiza Pedidos incluye Productos pertenece a Categoria-</description>
+	<name>Evento de catering</name>
+	<description>Se pueden añadir eventos de catering</description>
 	<url/>
 	<licenses>
 		<license/>
