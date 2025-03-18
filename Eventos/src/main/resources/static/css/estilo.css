@@ -1,0 +1,43 @@
+/* Estilos para los estados */
+body {
+    background-image: url('../image/blue-sky-2661470_1920.jpg');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	
+}
+.recogido {
+    background-color: #d4edda; /* Verde claro */
+    color: #155724;
+}
+
+.preparado {
+    background-color: #fff3cd; /* Amarillo claro */
+    color: #856404;
+}
+
+.pendiente {
+    background-color: #f8d7da; /* Rojo claro */
+    color: #721c24;
+}
+
+/* Iconos según el estado */
+.estado-icono::before {
+    content: "📦"; /* Icono por defecto */
+    margin-right: 8px;
+}
+
+.recogido .estado-icono::before {
+    content: "✅"; /* Icono para Recogido */
+    color: green;
+}
+
+.preparado .estado-icono::before {
+    content: "⚠️"; /* Icono para Preparado */
+    color: orange;
+}
+
+.pendiente .estado-icono::before {
+    content: "⏳"; /* Icono para Pendiente */
+    color: red;
+}
