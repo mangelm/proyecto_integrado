@@ -1,0 +1,14 @@
+<!-- Fragmento con el formulario de selección de categorías -->
+<div th:fragment="select_categoria">
+    <form th:action="@{/productos/categoria}" method="get">
+        <label for="nombre">Seleccione una categoría:</label>
+        <select id="nombre" name="nombre">
+            <!-- Recorremos la lista de categorías y mostramos cada una como opción -->
+            <option th:each="cat : ${categorias}"
+                    th:value="${cat.nombre}"
+                    th:text="${cat.nombre}">
+            </option>
+        </select>
+        <button type="submit">Buscar</button>
+    </form>
+</div>
