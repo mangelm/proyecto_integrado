@@ -100,6 +100,4 @@ public class Evento {
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
     private List<ConsumoProducto> consumos;
     
-    
-    
 }

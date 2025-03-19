@@ -1,4 +1,4 @@
-package com.hlc.gestioneventos.controller.error;
+package com.gestioneventos.controller.error;
 
 
 import org.springframework.boot.web.servlet.error.ErrorController;
