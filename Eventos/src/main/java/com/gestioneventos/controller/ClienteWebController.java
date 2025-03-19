@@ -1,5 +1,7 @@
 package com.gestioneventos.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,5 +23,29 @@ public class ClienteWebController {
 	private static final String VISTA_CREAR = "clientes/crear";
 	private static final String REDIRECT_LISTADO = "redirect:clientes";
 	
+	@GetMapping
+    public String listarClientes(Model model) {
+        List<Cliente> clientes = clienteService.obtenerTodosLosClientes();
+        model.addAttribute("clientes", clientes);
+        return VISTA_LISTA;
+    }
 	
+	@GetMapping("/crear")
+    public String mostrarFormularioCreacion(Model model) {
+        model.addAttribute("cliente", new Cliente());
+        return VISTA_CREAR;
+    }
+	
+	
+	@PostMapping("/guardar")
+    public String guardarCliente(@ModelAttribute Cliente cliente) {
+        clienteService.crearCliente(cliente);
+        return REDIRECT_LISTADO;
+    }
+	
+	@GetMapping("/eliminar/{id}")
+    public String eliminarCliente(@PathVariable Long id) {
+        clienteService.eliminarCliente(id);
+        return REDIRECT_LISTADO;
+    }
 }
