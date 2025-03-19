@@ -21,6 +21,13 @@ public class Evento {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+    
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
+    private List<ConsumoProducto> consumos;
+    
     public Long getId() {
 		return id;
 	}
@@ -93,11 +100,6 @@ public class Evento {
 		this.consumos = consumos;
 	}
 
-	@ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
-    
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
-    private List<ConsumoProducto> consumos;
+	
     
 }

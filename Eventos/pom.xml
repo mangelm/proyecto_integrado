@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.2</version>
+        <version>3.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.integra</groupId>
+	<groupId>com.gestioneventos</groupId>
 	<artifactId>Eventos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Evento de catering</name>
-	<description>Se pueden añadir eventos de catering</description>
+	<name>gestioneventos</name>
+	<description>Gestion de eventos de Catering</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -54,11 +54,6 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -68,27 +63,29 @@
 		    <artifactId>javafaker</artifactId>
 		    <version>1.0.2</version>
 		</dependency>
-
-		<dependency>
-		    <groupId>mysql</groupId>
-		    <artifactId>mysql-connector-java</artifactId>
-		    <version>8.0.29</version> <!-- Versión actual de MySQL Connector/J -->
-		</dependency>
-
+		 <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version> <!-- Versión más reciente de MySQL Connector/J -->
+        </dependency>
 	</dependencies>
 
 	<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.3.2</version> <!-- Cambia a una versión más reciente -->
-        </plugin>
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-    </plugins>
-</build>
+		<plugins>
+			<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-resources-plugin</artifactId>
+		   	<version>3.1.0</version>
+		    <configuration>
+		        <encoding>UTF-8</encoding>
+		    </configuration>
+			</plugin>
+	
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

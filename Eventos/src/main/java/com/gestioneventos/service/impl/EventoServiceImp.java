@@ -24,14 +24,12 @@ public class EventoServiceImp implements EventoService {
 		return eventoRepository.findAll();
 	}
 	
-	
 	@Override
 	public Evento obtenerEventoPorId(Long id) {
 		 return eventoRepository.findById(id)
 	                .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado con ID: " + id));
 	}
 
-	
 	@Override
 	public Evento actualizarEvento(Long id, Evento evento) {
 		Evento existente = obtenerEventoPorId(id);
@@ -43,8 +41,6 @@ public class EventoServiceImp implements EventoService {
 	public void eliminarEvento(Long id) {
 		Evento evento = obtenerEventoPorId(id);
 		eventoRepository.delete(evento);
-		
 	}
-
 
 }
