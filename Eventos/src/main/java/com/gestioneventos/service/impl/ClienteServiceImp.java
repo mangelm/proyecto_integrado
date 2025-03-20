@@ -2,6 +2,7 @@ package com.gestioneventos.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.exception.RecursoNoEncontradoException;
@@ -12,6 +13,7 @@ import com.gestioneventos.service.ClienteService;
 @Service
 public class ClienteServiceImp implements ClienteService {
 	
+	@Autowired
 	private ClienteRepository clienteRepository;
 	
 	@Override

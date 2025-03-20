@@ -2,13 +2,18 @@ package com.gestioneventos.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.model.Producto;
 import com.gestioneventos.repository.ProductoRepository;
 import com.gestioneventos.service.ProductoService;
 
+@Service
 public class ProductoServiceImp implements ProductoService {
 	
+	@Autowired
 	private ProductoRepository productoRepository;
 	
 	@Override

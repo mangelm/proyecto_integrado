@@ -1,4 +1,4 @@
-package com.gestioneventos.controller;
+package com.gestioneventos.controller.web;
 
 import java.util.List;
 

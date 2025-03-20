@@ -2,6 +2,7 @@ package com.gestioneventos.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.model.Evento;
@@ -12,6 +13,7 @@ import com.gestioneventos.exception.*;
 @Service
 public class EventoServiceImp implements EventoService {
 	
+	@Autowired
 	private EventoRepository eventoRepository;
 	
 	@Override
