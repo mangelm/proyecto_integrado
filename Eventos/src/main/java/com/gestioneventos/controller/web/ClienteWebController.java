@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.gestioneventos.model.Cliente;
-import com.gestioneventos.repository.ClienteRepository;
 import com.gestioneventos.service.ClienteService;
 
 @Controller

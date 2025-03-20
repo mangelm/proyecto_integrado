@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gestioneventos.model.Cliente;
 import com.gestioneventos.service.ClienteService;
-import com.gestioneventos.service.impl.ClienteServiceImp;
 
 @RestController
 @RequestMapping("/api/clientes")
