@@ -24,32 +24,32 @@
                 </div>
             </div>
 
+            <!-- Campo Apellido -->
+            <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="apellido" th:field="*{apellido}" >
+                <div th:if="${#fields.hasErrors('apellido')}" class="text-danger">
+                    <span th:each="error : ${#fields.errors('apellido')}" th:text="${error}"></span>
+                </div>
+            </div>
+			
+			<!-- Campo Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}" >
+                <div th:if="${#fields.hasErrors('email')}" class="text-danger">
+                    <span th:each="error : ${#fields.errors('email')}" th:text="${error}"></span>
+                </div>
+            </div>
+
             <!-- Campo Teléfono -->
             <div class="mb-3">
                 <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" class="form-control" id="telefono" th:field="*{telefono}" >
+                <input type="number" class="form-control" id="telefono" th:field="*{telefono}" >
                 <div th:if="${#fields.hasErrors('telefono')}" class="text-danger">
                     <span th:each="error : ${#fields.errors('telefono')}" th:text="${error}"></span>
                 </div>
             </div>
-
-            <!-- Campo Dirección -->
-            <div class="mb-3">
-                <label for="direccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="direccion" th:field="*{direccion}" >
-                <div th:if="${#fields.hasErrors('direccion')}" class="text-danger">
-                    <span th:each="error : ${#fields.errors('direccion')}" th:text="${error}"></span>
-                </div>
-            </div>
-			
-			<!-- Campo Eventos -->
-			<div class="mb-3">
-               <label for="evento" class="form-label">Evento</label>
-               <input type="text" class="form-control" id="evento" th:field="*{evento}" >
-               <div th:if="${#fields.hasErrors('evento')}" class="text-danger">
-                   <span th:each="error : ${#fields.errors('evento')}" th:text="${error}"></span>
-               </div>
-           </div>
 
             <!-- Botones -->
             <div class="mb-3">

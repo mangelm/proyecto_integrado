@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Eventos</title>
+</head>
+<body>
+    <h1>Eventos</h1>
+    <table border="1">
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+        <tr th:each="evento : ${eventos}">
+            <td th:text="${evento.nombre}"></td>
+            <td th:text="${evento.fecha}"></td>
+            <td>
+                <a th:href="@{'/eventos/eliminar/' + ${evento.id}}">Eliminar</a>
+            </td>
+        </tr>
+    </table>
+    <a href="/eventos/crear">Crear nuevo evento</a>
+</body>
+</html>
