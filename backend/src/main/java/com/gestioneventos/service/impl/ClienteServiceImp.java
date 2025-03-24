@@ -3,6 +3,8 @@ package com.gestioneventos.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.exception.RecursoNoEncontradoException;
@@ -43,6 +45,11 @@ public class ClienteServiceImp implements ClienteService {
 	public void eliminarCliente(Long id) {
 		Cliente cliente = obtenerClientePorId(id);
 		clienteRepository.delete(cliente);
+	}
+
+	@Override
+	public Page<Cliente> obtenerTodosLosClientes(Pageable pageable) {
+		return clienteRepository.findAll(pageable);
 	}
 
 }

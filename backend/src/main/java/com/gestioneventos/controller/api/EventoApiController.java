@@ -3,6 +3,7 @@ package com.gestioneventos.controller.api;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import com.gestioneventos.model.Evento;
 import com.gestioneventos.service.EventoService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/eventos")
 public class EventoApiController {
 	
@@ -63,17 +65,4 @@ public class EventoApiController {
         return ResponseEntity.noContent().build();
     }
     
-    /*
-    @PostMapping("/{id}/productos")
-    public ResponseEntity<Evento> agregarProductosAEvento(@PathVariable Long id, @RequestBody List<Long> productoIds) {
-        Evento evento = eventoService.agregarProductos(id, productoIds).orElse(null);
-        return (evento != null) ? ResponseEntity.ok(evento) : ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/{id}/estado")
-    public ResponseEntity<Evento> cambiarEstadoEvento(@PathVariable Long id, @RequestParam String estado) {
-        Evento evento = eventoService.cambiarEstado(id, estado).orElse(null);
-        return (evento != null) ? ResponseEntity.ok(evento) : ResponseEntity.notFound().build();
-    }
-    */
 }
