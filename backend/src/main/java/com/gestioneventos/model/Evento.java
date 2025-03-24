@@ -25,9 +25,9 @@ public class Evento {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    @JsonManagedReference  // Esto asegura que la relación cliente se serializa correctamente
     private Cliente cliente;
     
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)

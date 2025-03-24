@@ -1,34 +1,30 @@
 package com.gestioneventos.controller.api;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.service.EventoService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", 
+            methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
+            allowedHeaders = {"*"},
+            allowCredentials = "true",
+            maxAge = 3600)
 @RequestMapping("/api/eventos")
 public class EventoApiController {
-	
-	@Autowired
+
+    @Autowired
     private EventoService eventoService;
 
-	@GetMapping
+    @GetMapping
     public ResponseEntity<Page<Evento>> listarEventos(
         @RequestParam(defaultValue = "0") int page, 
         @RequestParam(defaultValue = "20") int size) {
@@ -39,41 +35,35 @@ public class EventoApiController {
         return ResponseEntity.ok(eventos);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<Evento> obtenerEvento(@PathVariable Long id) {
-        Evento evento = eventoService.obtenerEventoPorId(id);
-        return (evento != null) ? ResponseEntity.ok(evento) : ResponseEntity.notFound().build();
+        try {
+            Evento evento = eventoService.obtenerEventoPorId(id);
+            return ResponseEntity.ok(evento);
+        } catch (RecursoNoEncontradoException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public Evento crearEvento(@RequestBody Evento evento) {
-        return eventoService.crearEvento(evento);
+    public ResponseEntity<Evento> crearEvento(@RequestBody Evento evento) {
+        Evento nuevoEvento = eventoService.crearEvento(evento);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEvento);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento eventoDetalles) {
-        Evento evento = eventoService.obtenerEventoPorId(id);
-        if (evento == null) {
-            return ResponseEntity.notFound().build();
-        }
-        evento.setNombre(eventoDetalles.getNombre());
-        evento.setFecha(eventoDetalles.getFecha());
-        evento.setCantidadPersonas(eventoDetalles.getCantidadPersonas());
-        evento.setEspacio(eventoDetalles.getEspacio());
-        evento.setHorario(eventoDetalles.getHorario());
-        evento.setEstado(eventoDetalles.getEstado());
-        return ResponseEntity.ok(eventoService.crearEvento(evento));
+    @PutMapping("/eventos/{id}")
+    public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
+        Evento eventoActualizado = eventoService.actualizarEvento(id, evento);
+        return ResponseEntity.ok(eventoActualizado); // Respuesta con el evento actualizado
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEvento(@PathVariable Long id) {
-        Evento evento = eventoService.obtenerEventoPorId(id);
-        if (evento == null) {
+        try {
+            eventoService.eliminarEvento(id);
+            return ResponseEntity.noContent().build();
+        } catch (RecursoNoEncontradoException e) {
             return ResponseEntity.notFound().build();
         }
-        eventoService.eliminarEvento(id);
-        return ResponseEntity.noContent().build();
     }
-    
 }
