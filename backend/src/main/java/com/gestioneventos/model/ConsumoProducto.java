@@ -19,12 +19,12 @@ public class ConsumoProducto {
 
 	@ManyToOne
 	@JoinColumn(name = "evento_id")
-	@JsonBackReference
+	@JsonBackReference("evento-consumos")
 	private Evento evento;
 
 	@ManyToOne
 	@JoinColumn(name = "producto_id")
-	@JsonBackReference
+	@JsonBackReference("producto-consumos")
 	private Producto producto;
 
 	private Integer cantidad;

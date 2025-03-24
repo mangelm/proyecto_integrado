@@ -38,7 +38,7 @@ export default function EditarEvento() {
             horario,
             estado,
         };
-    
+        
         try {
             const response = await fetch(`http://localhost:8100/api/eventos/${id}`, {
                 method: "PUT",

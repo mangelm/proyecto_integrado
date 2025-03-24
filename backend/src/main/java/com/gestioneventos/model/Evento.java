@@ -3,6 +3,7 @@ package com.gestioneventos.model;
 import java.sql.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
@@ -25,13 +26,13 @@ public class Evento {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
-    @JsonManagedReference
+    @JsonBackReference("cliente-eventos")
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
     
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("evento-consumos")
     private List<ConsumoProducto> consumos;
     
     public Long getId() {

@@ -13,11 +13,7 @@ import com.gestioneventos.model.Evento;
 import com.gestioneventos.service.EventoService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173", 
-            methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
-            allowedHeaders = {"*"},
-            allowCredentials = "true",
-            maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/eventos")
 public class EventoApiController {
 
@@ -51,11 +47,15 @@ public class EventoApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEvento);
     }
 
-    @PutMapping("/eventos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
+        System.out.println("Solicitud PUT recibida para ID: " + id);
+        System.out.println("Datos recibidos: " + evento);
+        
         Evento eventoActualizado = eventoService.actualizarEvento(id, evento);
-        return ResponseEntity.ok(eventoActualizado); // Respuesta con el evento actualizado
+        return ResponseEntity.ok(eventoActualizado);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEvento(@PathVariable Long id) {

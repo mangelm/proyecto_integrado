@@ -6,17 +6,25 @@ export default function GestionEventos() {
   const [page, setPage] = useState(0); // Página actual
   const [size] = useState(20); // Tamaño de la página (5 eventos por página)
   const [totalPages, setTotalPages] = useState(0); // Total de páginas
+  // Indicador de carga
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Realizar la solicitud al backend con los parámetros de paginación
-    fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setEventos(data.content); // Los eventos están en "content"
-        setTotalPages(data.totalPages); // Total de páginas
-      })
-      .catch((error) => console.error("Error fetching eventos:", error));
-  }, [page, size]);
+useEffect(() => {
+  setLoading(true); // Inicia el indicador de carga
+  fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
+    .then((response) => response.json())
+    .then((data) => {
+      setEventos(data.content);
+      setTotalPages(data.totalPages);
+    })
+    .catch((error) => console.error("Error fetching eventos:", error))
+    .finally(() => setLoading(false)); // Detiene el indicador de carga
+}, [page, size]);
+
+// Renderizar mientras carga
+if (loading) {
+  return <div className="text-center">Cargando eventos...</div>;
+}
 
   // Funciones para cambiar de página
   const handlePrevPage = () => {

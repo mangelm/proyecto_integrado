@@ -2,7 +2,7 @@ package com.gestioneventos.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -16,7 +16,7 @@ public class Cliente {
     private String email;
     private String telefono;
     
-    @JsonBackReference // Evita la serialización de eventos al serializar un cliente
+    @JsonManagedReference("cliente-eventos")
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Evento> eventos;
 

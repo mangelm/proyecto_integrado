@@ -1,18 +1,23 @@
 import React from 'react';
-import { Link } from "react-router-dom";;
+import { Link } from 'react-router-dom'; // Aquí agregamos el import de Link
 
 export default function Navbar() {
     return (
-        <nav className="bg-gray-800 text-white p-4 flex justify-between">
-            <div className="text-lg font-bold">Gestión de Eventos</div>
-            <div className="flex space-x-4">
-                <Link to="/panel-administracion" className="hover:text-gray-300">Administración</Link>
-                <Link to="/eventos" className="hover:text-gray-300">Eventos</Link>
-                <Link to="/productos" className="hover:text-gray-300">Productos</Link>
-                <Link to="/clientes" className="hover:text-gray-300">Clientes</Link>
-                <Link to="/estadisticas" className="hover:text-gray-300">Estadísticas</Link>
+        <div className="p-6 bg-white rounded-lg shadow-md">
+            <h1 className="text-2xl font-bold mb-4">Panel de Administración</h1>
+            <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-500 text-white rounded-lg shadow">
+                    <Link to="/eventos">
+                        <h2 className="text-lg font-semibold">Gestión de Eventos</h2>
+                    </Link>
+                </div>
+                <div className="p-4 bg-green-500 text-white rounded-lg shadow">
+                    <h2 className="text-lg font-semibold">Gestión de Productos</h2>
+                </div>
+                <div className="p-4 bg-yellow-500 text-white rounded-lg shadow">
+                    <h2 className="text-lg font-semibold">Gestión de Clientes</h2>
+                </div>
             </div>
-        </nav>
+        </div>
     );
-};
-
+}
