@@ -3,6 +3,8 @@ package com.gestioneventos.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.model.Evento;
@@ -43,6 +45,11 @@ public class EventoServiceImp implements EventoService {
 	public void eliminarEvento(Long id) {
 		Evento evento = obtenerEventoPorId(id);
 		eventoRepository.delete(evento);
+	}
+
+	@Override
+	public Page<Evento> obtenerTodosLosEventos(Pageable pageable) {
+		return eventoRepository.findAll(pageable);
 	}
 
 }

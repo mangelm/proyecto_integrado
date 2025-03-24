@@ -2,6 +2,8 @@ package com.gestioneventos.model;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,10 +19,12 @@ public class ConsumoProducto {
 
 	@ManyToOne
 	@JoinColumn(name = "evento_id")
+	@JsonBackReference
 	private Evento evento;
 
 	@ManyToOne
 	@JoinColumn(name = "producto_id")
+	@JsonBackReference
 	private Producto producto;
 
 	private Integer cantidad;
