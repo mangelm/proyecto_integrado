@@ -4,27 +4,26 @@ import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom
 export default function GestionEventos() {
   const [eventos, setEventos] = useState([]);
   const [page, setPage] = useState(0); // Página actual
-  const [size] = useState(20); // Tamaño de la página (5 eventos por página)
+  const [size] = useState(20); // Tamaño de la página (20 eventos por página)
   const [totalPages, setTotalPages] = useState(0); // Total de páginas
-  // Indicador de carga
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Indicador de carga
 
-useEffect(() => {
-  setLoading(true); // Inicia el indicador de carga
-  fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
-    .then((response) => response.json())
-    .then((data) => {
-      setEventos(data.content);
-      setTotalPages(data.totalPages);
-    })
-    .catch((error) => console.error("Error fetching eventos:", error))
-    .finally(() => setLoading(false)); // Detiene el indicador de carga
-}, [page, size]);
+  useEffect(() => {
+    setLoading(true); // Inicia el indicador de carga
+    fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setEventos(data.content);
+        setTotalPages(data.totalPages);
+      })
+      .catch((error) => console.error("Error fetching eventos:", error))
+      .finally(() => setLoading(false)); // Detiene el indicador de carga
+  }, [page, size]);
 
-// Renderizar mientras carga
-if (loading) {
-  return <div className="text-center">Cargando eventos...</div>;
-}
+  // Renderizar mientras carga
+  if (loading) {
+    return <div className="text-center">Cargando eventos...</div>;
+  }
 
   // Funciones para cambiar de página
   const handlePrevPage = () => {
@@ -37,6 +36,26 @@ if (loading) {
     if (page < totalPages - 1) {
       setPage(page + 1);
     }
+  };
+
+  // Ir a la primera página
+  const handleFirstPage = () => {
+    setPage(0);
+  };
+
+  // Ir a la última página
+  const handleLastPage = () => {
+    setPage(totalPages - 1);
+  };
+
+  // Avanzar de x en x
+  const handleNextValue = (value) => {
+    setPage((prevPage) => Math.min(prevPage + value, totalPages - 1));
+  };
+
+  // Retroceder de x en x
+  const handlePrevValue = (value) => {
+    setPage((prevPage) => Math.max(prevPage - value, 0));
   };
 
   // Función para eliminar un evento
@@ -126,21 +145,57 @@ if (loading) {
 
       {/* Paginación */}
       <div className="mt-4 flex justify-between items-center">
-        <button 
-          onClick={handlePrevPage} 
-          disabled={page === 0}
-          className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
-        >
-          Anterior
-        </button>
-        <span className="text-sm font-medium text-gray-700">{`Página ${page + 1} de ${totalPages}`}</span>
-        <button 
-          onClick={handleNextPage} 
-          disabled={page === totalPages - 1}
-          className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
-        >
-          Siguiente
-        </button>
+        <div>
+          <button 
+            onClick={handleFirstPage} 
+            disabled={page === 0}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+          >
+            Primero
+          </button>
+          <button 
+            onClick={handlePrevValue(5)} 
+            disabled={page <= 4}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+          >
+            -5
+          </button>
+        </div>
+
+        <div>
+          <button 
+            onClick={handlePrevPage} 
+            disabled={page === 0}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+          >
+            Anterior
+          </button>
+          <span className="text-sm font-medium text-gray-700">{`Página ${page + 1} de ${totalPages}`}</span>
+          <button 
+            onClick={handleNextPage} 
+            disabled={page === totalPages - 1}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+          >
+            Siguiente
+          </button>
+        </div>
+
+        <div>
+          <button 
+            onClick={handleNextValue(5)} 
+            disabled={page >= totalPages - 5}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+          >
+            +5
+          </button>
+          <button 
+            onClick={handleLastPage} 
+            disabled={page === totalPages - 1}
+            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+          >
+            Último
+          </button>
+        </div>
       </div>
     </div>
   );

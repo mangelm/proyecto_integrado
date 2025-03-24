@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +42,10 @@ public class EventoApiController {
 
     @PostMapping
     public ResponseEntity<Evento> crearEvento(@RequestBody Evento evento) {
-        Evento nuevoEvento = eventoService.crearEvento(evento);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEvento);
+        System.out.println("Recibiendo solicitud POST para crear un evento: " + evento);
+        return ResponseEntity.ok(eventoService.crearEvento(evento));
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {

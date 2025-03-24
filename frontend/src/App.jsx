@@ -5,6 +5,7 @@ import Navbar from "./components/common/Navbar";
 import PanelAdministracion from "./pages/PanelAdministracion";
 import Eventos from "./pages/Eventos";
 import EditarEvento from "./pages/EditarEvento";
+import CrearEvento from "./pages/CrearEvento";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<PanelAdministracion />} />
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/eventos/editar/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
+          <Route path="/eventos/crear/" element={<CrearEvento />} /> {/* Ruta para crear */}
         </Routes>
       </div>
     </Router>
