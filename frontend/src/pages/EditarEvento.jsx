@@ -59,7 +59,6 @@ export default function EditarEvento() {
             }
         } catch (error) {
             console.error("Error al editar el evento:", error);
-            alert("Error al editar el evento. Por favor verifica la consola para más detalles.");
         }
     };
     

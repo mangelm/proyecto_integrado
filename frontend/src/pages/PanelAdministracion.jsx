@@ -18,7 +18,9 @@ export default function PanelAdministracion() {
             </Link>
         </div>
         <div className="p-4 bg-yellow-500 text-white rounded-lg shadow">
-            <h2 className="text-lg font-semibold">Gestión de Clientes</h2>
+            <Link to={`/clientes`}>
+                <h2 className="text-lg font-semibold">Gestión de Clientes</h2>
+            </Link>
         </div>
         </div>
     </div>

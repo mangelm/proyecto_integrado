@@ -200,6 +200,12 @@ export default function GestionProductos() {
                 </button>
                 </div>
             </div>
+            <br></br>
+            <Link to={`/`}>
+                <button className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition duration-300 mr-2">
+                    Volver a la página principal
+                </button>
+            </Link>
         </div>
     );
 }

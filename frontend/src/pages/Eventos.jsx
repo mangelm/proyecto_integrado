@@ -131,6 +131,11 @@ export default function GestionEventos() {
                   >
                     Eliminar
                   </button>
+                  <Link to={`/eventos/${evento.id}`}>
+                    <button className="bg-black text-white p-2 rounded-lg hover:bg-gray-900 transition duration-300 mr-2">
+                      Detalles
+                    </button>
+                  </Link>
                 </td>
               </tr>
             ))
@@ -198,6 +203,12 @@ export default function GestionEventos() {
           </button>
         </div>
       </div>
+      <br></br>
+      <Link to={`/`}>
+        <button className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition duration-300 mr-2">
+          Volver a la página principal
+        </button>
+      </Link>
     </div>
   );
 }
