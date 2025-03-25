@@ -2,16 +2,16 @@ import './app.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PanelAdministracion from "./pages/PanelAdministracion";
-import GestionEventos from "./pages/Eventos";
-import EditarEvento from "./pages/EditarEvento";
-import CrearEvento from "./pages/CrearEvento";
-import GestionProductos from './pages/Productos';
-import CrearProducto from './pages/CrearProducto';
-import EditarProducto from './pages/EditarProducto';
-import GestionClientes from './pages/Clientes';
-import CrearCliente from './pages/CrearCliente';
-import EditarCliente from './pages/EditarCliente';
-import DetallesEvento from './pages/DetallesEvento';
+import GestionEventos from "./components/eventos/Eventos";
+import EditarEvento from "./components/eventos/EditarEvento";
+import CrearEvento from "./components/eventos/CrearEvento";
+import GestionProductos from './components/productos/Productos';
+import CrearProducto from './components/productos/CrearProducto';
+import EditarProducto from './components/productos/EditarProducto';
+import GestionClientes from './components/clientes/Clientes';
+import CrearCliente from './components/clientes/CrearCliente';
+import EditarCliente from './components/clientes/EditarCliente';
+import DetallesEvento from './components/eventos/DetallesEvento';
 
 function App() {
   return (
