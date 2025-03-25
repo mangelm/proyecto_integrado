@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+import { Link } from "react-router-dom"; 
 
 export default function GestionEventos() {
   const [eventos, setEventos] = useState([]);
   const [page, setPage] = useState(0); // Página actual
-  const [size] = useState(20); // Tamaño de la página (20 eventos por página)
+  const [size] = useState(10); // Tamaño de la página 
+  const [paginationValue] = useState(2);
   const [totalPages, setTotalPages] = useState(0); // Total de páginas
   const [loading, setLoading] = useState(false); // Indicador de carga
 
@@ -49,13 +50,13 @@ export default function GestionEventos() {
   };
 
   // Avanzar de x en x
-  const handleNextValue = (value) => {
-    setPage((prevPage) => Math.min(prevPage + value, totalPages - 1));
+  const handleNextValue = (paginationValue) => {
+    setPage((prevPage) => Math.min(prevPage + paginationValue, totalPages - 1));
   };
 
   // Retroceder de x en x
-  const handlePrevValue = (value) => {
-    setPage((prevPage) => Math.max(prevPage - value, 0));
+  const handlePrevValue = (paginationValue) => {
+    setPage((prevPage) => Math.max(prevPage - paginationValue, 0));
   };
 
   // Función para eliminar un evento
@@ -154,11 +155,11 @@ export default function GestionEventos() {
             Primero
           </button>
           <button 
-            onClick={handlePrevValue(5)} 
+            onClick={() => handlePrevValue(paginationValue)} 
             disabled={page <= 4}
             className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
           >
-            -5
+            -{paginationValue}
           </button>
         </div>
 
@@ -182,11 +183,11 @@ export default function GestionEventos() {
 
         <div>
           <button 
-            onClick={handleNextValue(5)} 
-            disabled={page >= totalPages - 5}
+            onClick={() => handleNextValue(paginationValue)}
+            disabled={page >= totalPages - paginationValue}
             className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
           >
-            +5
+            +{paginationValue}
           </button>
           <button 
             onClick={handleLastPage} 

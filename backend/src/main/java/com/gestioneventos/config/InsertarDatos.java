@@ -30,6 +30,7 @@ import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
 import com.github.javafaker.Faker;
 
+//Componente que genera datos de prueba
 @Component
 public class InsertarDatos implements CommandLineRunner {
 

@@ -22,17 +22,19 @@ public class ClienteServiceImp implements ClienteService {
 	public Cliente crearCliente(Cliente cliente) {
 		return clienteRepository.save(cliente);
 	}
-
+	
 	@Override
 	public List<Cliente> obtenerTodosLosClientes() {
 		return clienteRepository.findAll();
 	}
+	
 
 	@Override
 	public Cliente obtenerClientePorId(Long id) {
 		return clienteRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado con ID: " + id));
 	}
+	
 
 	@Override
 	public Cliente actualizarCliente(Long id, Cliente cliente) {
@@ -40,13 +42,13 @@ public class ClienteServiceImp implements ClienteService {
 		existente.setNombre(cliente.getNombre());
 		return clienteRepository.save(existente);
 	}
-
+	
 	@Override
 	public void eliminarCliente(Long id) {
 		Cliente cliente = obtenerClientePorId(id);
 		clienteRepository.delete(cliente);
 	}
-
+	
 	@Override
 	public Page<Cliente> obtenerTodosLosClientes(Pageable pageable) {
 		return clienteRepository.findAll(pageable);

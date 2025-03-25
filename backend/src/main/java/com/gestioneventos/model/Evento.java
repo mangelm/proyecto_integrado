@@ -26,11 +26,13 @@ public class Evento {
     @Enumerated(EnumType.STRING)
     private Estado estado;
     
+    //Para gestionar la relacion y que no serialize los clientes
     @JsonBackReference("cliente-eventos")
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
     
+    //Para gestionar la relacion y que no serialize los consumos
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
     @JsonManagedReference("evento-consumos")
     private List<ConsumoProducto> consumos;

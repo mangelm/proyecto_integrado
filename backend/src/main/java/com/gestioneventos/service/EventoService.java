@@ -7,7 +7,10 @@ import org.springframework.data.domain.Pageable;
 
 import com.gestioneventos.model.Evento;
 
+
+//Interfaz creada para que siempre se cumpla la misma estructura en cuanto a funciones y parametros
 public interface EventoService {
+	//Metodos para implementar
 	Evento crearEvento(Evento evento);
 	List<Evento> obtenerTodosLosEventos();
 	Evento obtenerEventoPorId(Long id);

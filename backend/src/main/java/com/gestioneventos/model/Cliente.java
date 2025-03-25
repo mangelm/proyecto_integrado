@@ -16,6 +16,7 @@ public class Cliente {
     private String email;
     private String telefono;
     
+    //Para gestionar la relacion y que no serialize los eventos
     @JsonManagedReference("cliente-eventos")
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Evento> eventos;

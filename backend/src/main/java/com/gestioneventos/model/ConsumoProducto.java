@@ -16,12 +16,14 @@ public class ConsumoProducto {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
+	//Para gestionar la relacion y que no serialize los eventos
 	@ManyToOne
 	@JoinColumn(name = "evento_id")
 	@JsonBackReference("evento-consumos")
 	private Evento evento;
-
+	
+	//Para gestionar la relacion y que no serialize los productos
 	@ManyToOne
 	@JoinColumn(name = "producto_id")
 	@JsonBackReference("producto-consumos")

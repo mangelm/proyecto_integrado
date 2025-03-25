@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 
-
-export default function Navbar() {
+export default function PanelAdministracion() {
 
     return (
     <div className="p-6 bg-white rounded-lg shadow-md">
@@ -13,7 +13,9 @@ export default function Navbar() {
                 </Link>
         </div>
         <div className="p-4 bg-green-500 text-white rounded-lg shadow">
-            <h2 className="text-lg font-semibold">Gestión de Productos</h2>
+            <Link to={`/productos`}>
+                <h2 className="text-lg font-semibold">Gestión de Productos</h2>
+            </Link>
         </div>
         <div className="p-4 bg-yellow-500 text-white rounded-lg shadow">
             <h2 className="text-lg font-semibold">Gestión de Clientes</h2>
