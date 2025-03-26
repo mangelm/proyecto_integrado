@@ -87,9 +87,9 @@ export default function GestionClientes() {
         <div className="mb-4">
             {/* Botón para crear cliente, que redirige a la página de creación */}
             <Link to="/clientes/crear">
-            <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
-                Crear Cliente
-            </button>
+                <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                    Crear Cliente
+                </button>
             </Link>
         </div>
 

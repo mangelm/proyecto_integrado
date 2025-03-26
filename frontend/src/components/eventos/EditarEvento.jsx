@@ -160,14 +160,14 @@ export default function EditarEvento() {
                 <div className="flex justify-between items-center">
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white p-2 rounded"
+                        className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded"
                     >
                         Guardar Cambios
                     </button>
                     <button
                         type="button"
                         onClick={() => navigate("/eventos")}
-                        className="bg-gray-300 text-black p-2 rounded"
+                        className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded"
                     >
                         Cancelar
                     </button>

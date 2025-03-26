@@ -132,7 +132,7 @@ export default function GestionEventos() {
                     Eliminar
                   </button>
                   <Link to={`/eventos/${evento.id}`}>
-                    <button className="bg-black text-white p-2 rounded-lg hover:bg-gray-900 transition duration-300 mr-2">
+                    <button className="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-900 transition duration-300 mr-2">
                       Detalles
                     </button>
                   </Link>
