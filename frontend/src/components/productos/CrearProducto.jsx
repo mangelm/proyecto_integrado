@@ -10,14 +10,25 @@ export default function CrearProducto() {
     const [categoria, setCategoria] = useState("");
     const navigate = useNavigate();
 
+    const sanitizeInput = (value, type) => {
+        if (type === "text") {
+            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+        }
+        if (type === "number") {
+            return value.replace(/[^0-9]/g, ""); // Solo números
+        }
+        return value;
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const nuevoProducto = {
-            nombre,
-            descripcion,
-            precio,
-            impuesto,
+            nombre: sanitizeInput(nombre,"text"),
+            descripcion: sanitizeInput(descripcion,"text"),
+            precio: sanitizeInput(descripcion,"number"),
+            impuesto: sanitizeInput(descripcion,"number"),
             disponible,
             categoria,
         };
@@ -63,7 +74,7 @@ export default function CrearProducto() {
                     <input 
                         type="text" id="nombre" 
                         value={nombre} 
-                        onChange={(e) => setNombre(e.target.value)}
+                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" />
                 </div>
@@ -77,7 +88,7 @@ export default function CrearProducto() {
                     <input 
                         type="text" 
                         id="descripcion" 
-                        value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
+                        value={descripcion} onChange={(e) => setDescripcion(sanitizeInput(e.target.value,"text"))}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -94,7 +105,7 @@ export default function CrearProducto() {
                             type="number" 
                             id="precio" 
                             value={precio} 
-                            onChange={(e) => setPrecio(e.target.value)}
+                            onChange={(e) => setPrecio(sanitizeInput(e.target.value,"number"))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -111,7 +122,7 @@ export default function CrearProducto() {
                             type="number" 
                             id="impuesto" 
                             value={impuesto} 
-                            onChange={(e) => setImpuesto(e.target.value)}
+                            onChange={(e) => setImpuesto(sanitizeInput(e.target.value,"number"))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />

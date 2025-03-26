@@ -1,3 +1,9 @@
+# Creando Base de datos y usuario de prueba
+
+create database eventos;
+create user 'administrador'@'localhost' identified by '1234';
+grant all privileges on eventos.* to administrador;
+
 # Estadísticas de ocupación
 SELECT e.espacio, e.horario, COUNT(*) AS total_eventos
 FROM evento e

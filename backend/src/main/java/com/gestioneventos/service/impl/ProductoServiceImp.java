@@ -70,5 +70,6 @@ public class ProductoServiceImp implements ProductoService {
 	public Page<Producto> obtenerTodosLosProductos(Pageable pageable) {
 		return productoRepository.findAll(pageable);
 	}
+	
 
 }

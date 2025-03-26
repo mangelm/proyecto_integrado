@@ -23,12 +23,35 @@ export default function EditarCliente() {
             .catch((error) => console.error("Error al cargar el cliente:", error));
     }, [id]);
 
+    const sanitizeInput = (value, type) => {
+        if (type === "text") {
+            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+        }
+        if (type === "number") {
+            return value.replace(/[^0-9]/g, ""); // Solo números
+        }
+        return value;
+    };
+
+    // Formatear teléfono a xxx-xxx-xxx
+    const formatearNumeroTelefono = (value) => {
+        const remplazandoNumero = value.replace(/\D/g, "").slice(0, 9); // Solo números, máx 9 dígitos
+        return remplazandoNumero.replace(/(\d{3})(\d{3})(\d{0,3})/, (_, p1, p2, p3) => 
+            p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+        );
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        
+        if (telefono.replace(/\D/g, "").length !== 9) {
+            alert("El teléfono debe tener exactamente 9 dígitos.");
+            return;
+        }
+
         const clienteActualizado = {
-            nombre,
-            apellido,
+            nombre: sanitizeInput(nombre,"text"),
+            apellido: sanitizeInput(nombre,"text"),
             email,
             telefono,
         };
@@ -56,8 +79,6 @@ export default function EditarCliente() {
         }
     };
     
-    
-
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
             <h1 className="text-2xl font-bold mb-4">Editar Cliente</h1>
@@ -68,7 +89,7 @@ export default function EditarCliente() {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
+                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -80,7 +101,7 @@ export default function EditarCliente() {
                         type="text"
                         id="apellido"
                         value={apellido}
-                        onChange={(e) => setApellido(e.target.value)}
+                        onChange={(e) => setApellido(sanitizeInput(e.target.value,"text"))}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -104,7 +125,7 @@ export default function EditarCliente() {
                         type="phone"
                         id="telefono"
                         value={telefono}
-                        onChange={(e) => setTelefono(e.target.value)}
+                        onChange={(e) => setTelefono(formatearNumeroTelefono(e.target.value))}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -119,7 +140,7 @@ export default function EditarCliente() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/eventos")}
+                        onClick={() => navigate("/clientes")}
                         className="bg-gray-300 text-black p-2 rounded"
                     >
                         Cancelar

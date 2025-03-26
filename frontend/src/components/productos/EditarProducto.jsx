@@ -27,14 +27,24 @@ export default function EditarProducto() {
             .catch((error) => console.error("Error al cargar el producto:", error));
     }, [id]);
 
+    const sanitizeInput = (value, type) => {
+        if (type === "text") {
+            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+        }
+        if (type === "number") {
+            return value.replace(/[^0-9]/g, ""); // Solo números
+        }
+        return value;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     
         const productoActualizado = {
-            nombre,
-            descripcion,
-            precio,
-            impuesto,
+            nombre: sanitizeInput(nombre,"text"),
+            descripcion: sanitizeInput(descripcion,"text"),
+            precio: sanitizeInput(descripcion,"number"),
+            impuesto: sanitizeInput(descripcion,"number"),
             disponible,
             categoria,
         };
@@ -75,7 +85,7 @@ export default function EditarProducto() {
                             type="text"
                             id="nombre"
                             value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
+                            onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
                             required
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                         />
@@ -87,7 +97,7 @@ export default function EditarProducto() {
                             type="text"
                             id="descripcion"
                             value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
+                            onChange={(e) => setDescripcion(sanitizeInput(e.target.value,"text"))}
                             required
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                         />
@@ -99,7 +109,7 @@ export default function EditarProducto() {
                             type="number"
                             id="precio"
                             value={precio}
-                            onChange={(e) => setPrecio(e.target.value)}
+                            onChange={(e) => setPrecio(sanitizeInput(e.target.value,"number"))}
                             required
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                         />
@@ -111,7 +121,7 @@ export default function EditarProducto() {
                             type="number"
                             id="impuesto"
                             value={impuesto}
-                            onChange={(e) => setImpuesto(e.target.value)}
+                            onChange={(e) => setImpuesto(sanitizeInput(e.target.value,"number"))}
                             required
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                         />

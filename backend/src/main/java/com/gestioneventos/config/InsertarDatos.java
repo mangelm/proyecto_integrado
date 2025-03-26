@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +63,7 @@ public class InsertarDatos implements CommandLineRunner {
                 cliente.setNombre(faker.name().firstName());
                 cliente.setApellido(faker.name().lastName());
                 cliente.setEmail(faker.internet().emailAddress());
-                cliente.setTelefono(faker.phoneNumber().cellPhone());
+                cliente.setTelefono(generarTelefonoFormato());
                 clientes.add(cliente);
             }
             clienteRepository.saveAll(clientes);
@@ -130,5 +129,12 @@ public class InsertarDatos implements CommandLineRunner {
             logger.error("❌ Error durante la inicialización de datos: {}", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private String generarTelefonoFormato() {
+        int parte1 = random.nextInt(900) + 100;
+        int parte2 = random.nextInt(900) + 100;
+        int parte3 = random.nextInt(900) + 100;
+        return String.format("%d-%d-%d", parte1, parte2, parte3);
     }
 }

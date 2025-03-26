@@ -12,6 +12,7 @@ import GestionClientes from './components/clientes/Clientes';
 import CrearCliente from './components/clientes/CrearCliente';
 import EditarCliente from './components/clientes/EditarCliente';
 import DetallesEvento from './components/eventos/DetallesEvento';
+import Estadisticas from './components/estadisticas/Estadisticas';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/clientes" element={<GestionClientes />} />
           <Route path="/clientes/editar/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
           <Route path="/clientes/crear/" element={<CrearCliente/>} /> {/* Ruta para crear */}
+          <Route path="/estadisticas" element={<Estadisticas />} />
         </Routes>
       </div>
     </Router>

@@ -10,6 +10,16 @@ export default function CrearEvento() {
     const [estado, setEstado] = useState("");
     const navigate = useNavigate();
 
+    const sanitizeInput = (value, type) => {
+        if (type === "text") {
+            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+        }
+        if (type === "number") {
+            return value.replace(/[^0-9]/g, ""); // Solo números
+        }
+        return value;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -19,10 +29,10 @@ export default function CrearEvento() {
         }
 
         const nuevoEvento = {
-            nombre,
+            nombre: sanitizeInput(nombre,"text"),
             fecha,
-            cantidadPersonas,
-            espacio,
+            cantidadPersonas: sanitizeInput(cantidadPersonas,"number"),
+            espacio: sanitizeInput(espacio,"text"),
             horario,
             estado,
         };
@@ -67,7 +77,7 @@ export default function CrearEvento() {
                         type="text" 
                         id="nombre" 
                         value={nombre} 
-                        onChange={(e) => setNombre(e.target.value)}
+                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -101,7 +111,7 @@ export default function CrearEvento() {
                             type="number" 
                             id="cantidad_personas" 
                             value={cantidadPersonas}
-                            onChange={(e) => setCantidadPersonas(e.target.value)}
+                            onChange={(e) => setCantidadPersonas(sanitizeInput(e.target.value,"number"))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -118,7 +128,7 @@ export default function CrearEvento() {
                             type="text" 
                             id="espacio" 
                             value={espacio} 
-                            onChange={(e) => setEspacio(e.target.value)}
+                            onChange={(e) => setEspacio(sanitizeInput(e.target.value,"text"))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
