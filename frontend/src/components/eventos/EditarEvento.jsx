@@ -43,7 +43,7 @@ export default function EditarEvento() {
         const eventoActualizado = {
             nombre: sanitizeInput(nombre,"text"),
             fecha,
-            cantidadPersonas: sanitizeInput(cantidadPersonas,"number"),
+            cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio: sanitizeInput(espacio,"text"),
             horario,
             estado,
@@ -84,7 +84,7 @@ export default function EditarEvento() {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setNombre(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -108,7 +108,7 @@ export default function EditarEvento() {
                         type="number"
                         id="cantidad_personas"
                         value={cantidadPersonas}
-                        onChange={(e) => setCantidadPersonas(sanitizeInput(e.target.value,"number"))}
+                        onChange={(e) => setCantidadPersonas(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -120,7 +120,7 @@ export default function EditarEvento() {
                         type="text"
                         id="espacio"
                         value={espacio}
-                        onChange={(e) => setEspacio(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setEspacio(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />

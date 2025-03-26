@@ -6,8 +6,8 @@ export default function CrearEvento() {
     const [fecha, setFecha] = useState("");
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
-    const [horario, setHorario] = useState("");
-    const [estado, setEstado] = useState("");
+    const [horario, setHorario] = useState("MAÑANA");
+    const [estado, setEstado] = useState("PENDIENTE");
     const navigate = useNavigate();
 
     const sanitizeInput = (value, type) => {
@@ -31,7 +31,7 @@ export default function CrearEvento() {
         const nuevoEvento = {
             nombre: sanitizeInput(nombre,"text"),
             fecha,
-            cantidadPersonas: sanitizeInput(cantidadPersonas,"number"),
+            cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio: sanitizeInput(espacio,"text"),
             horario,
             estado,
@@ -77,7 +77,7 @@ export default function CrearEvento() {
                         type="text" 
                         id="nombre" 
                         value={nombre} 
-                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setNombre(e.target.value)}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -111,7 +111,7 @@ export default function CrearEvento() {
                             type="number" 
                             id="cantidad_personas" 
                             value={cantidadPersonas}
-                            onChange={(e) => setCantidadPersonas(sanitizeInput(e.target.value,"number"))}
+                            onChange={(e) => setCantidadPersonas(e.target.value)}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -128,7 +128,7 @@ export default function CrearEvento() {
                             type="text" 
                             id="espacio" 
                             value={espacio} 
-                            onChange={(e) => setEspacio(sanitizeInput(e.target.value,"text"))}
+                            onChange={(e) => setEspacio(e.target.value)}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -149,7 +149,6 @@ export default function CrearEvento() {
                         required 
                         className="mt-1 w-full p-2 border rounded-md"
                     >
-                        <option value="">Selecciona un horario</option>
                         <option value="MAÑANA">MAÑANA</option>
                         <option value="TARDE">TARDE</option>
                         <option value="NOCHE">NOCHE</option>
@@ -170,7 +169,6 @@ export default function CrearEvento() {
                         required 
                         className="mt-1 w-full p-2 border rounded-md"
                     >
-                        <option value="">Selecciona un estado</option>
                         <option value="PENDIENTE">PENDIENTE</option>
                         <option value="CONFIRMADO">CONFIRMADO</option>
                         <option value="CANCELADO">CANCELADO</option>

@@ -6,8 +6,8 @@ export default function CrearProducto() {
     const [descripcion, setDescripcion] = useState("");
     const [precio, setPrecio] = useState("");
     const [impuesto, setImpuesto] = useState("");
-    const [disponible, setDisponible] = useState("");
-    const [categoria, setCategoria] = useState("");
+    const [disponible, setDisponible] = useState(false);
+    const [categoria, setCategoria] = useState("BEBIDA");
     const navigate = useNavigate();
 
     const sanitizeInput = (value, type) => {
@@ -19,16 +19,19 @@ export default function CrearProducto() {
         }
         return value;
     };
-
+    
+    const sanitizeDecimal = (value) => {
+        return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const nuevoProducto = {
-            nombre: sanitizeInput(nombre,"text"),
-            descripcion: sanitizeInput(descripcion,"text"),
-            precio: sanitizeInput(descripcion,"number"),
-            impuesto: sanitizeInput(descripcion,"number"),
+            nombre: sanitizeInput(nombre, "text"),
+            descripcion: sanitizeInput(descripcion, "text"),
+            precio: parseFloat(precio) || 0, 
+            impuesto: parseFloat(impuesto) || 0,
             disponible,
             categoria,
         };
@@ -74,7 +77,7 @@ export default function CrearProducto() {
                     <input 
                         type="text" id="nombre" 
                         value={nombre} 
-                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setNombre(e.target.value)}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" />
                 </div>
@@ -88,7 +91,8 @@ export default function CrearProducto() {
                     <input 
                         type="text" 
                         id="descripcion" 
-                        value={descripcion} onChange={(e) => setDescripcion(sanitizeInput(e.target.value,"text"))}
+                        value={descripcion} 
+                        onChange={(e) => setDescripcion(e.target.value)}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -105,7 +109,7 @@ export default function CrearProducto() {
                             type="number" 
                             id="precio" 
                             value={precio} 
-                            onChange={(e) => setPrecio(sanitizeInput(e.target.value,"number"))}
+                            onChange={(e) => setPrecio(sanitizeDecimal(e.target.value))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -122,7 +126,7 @@ export default function CrearProducto() {
                             type="number" 
                             id="impuesto" 
                             value={impuesto} 
-                            onChange={(e) => setImpuesto(sanitizeInput(e.target.value,"number"))}
+                            onChange={(e) => setImpuesto(sanitizeDecimal(e.target.value))}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
@@ -142,8 +146,13 @@ export default function CrearProducto() {
 
                 <div>
                     <label htmlFor="categoria" className="block text-sm font-medium">Categoría</label>
-                    <select id="categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)}
-                        required className="mt-1 w-full p-2 border rounded-md">
+                    <select 
+                        id="categoria" 
+                        value={categoria} 
+                        onChange={(e) => setCategoria(e.target.value)}
+                        required 
+                        className="mt-1 w-full p-2 border rounded-md"
+                    >
                         <option value="">Selecciona una categoría</option>
                         <option value="BEBIDA">BEBIDA</option>
                         <option value="COMIDA">COMIDA</option>

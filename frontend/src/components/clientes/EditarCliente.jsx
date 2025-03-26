@@ -40,11 +40,14 @@ export default function EditarCliente() {
             p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
         );
     };
+
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (telefono.replace(/\D/g, "").length !== 9) {
+        // Validación del teléfono
+        const telefonoSanitizado = telefono.replace(/\D/g, ""); // Eliminar caracteres no numéricos
+        if (telefonoSanitizado.length !== 9) {
             alert("El teléfono debe tener exactamente 9 dígitos.");
             return;
         }
@@ -53,7 +56,7 @@ export default function EditarCliente() {
             nombre: sanitizeInput(nombre,"text"),
             apellido: sanitizeInput(nombre,"text"),
             email,
-            telefono,
+            telefono: formatearNumeroTelefono(telefonoSanitizado),
         };
         
         try {
@@ -89,7 +92,7 @@ export default function EditarCliente() {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setNombre(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -101,7 +104,7 @@ export default function EditarCliente() {
                         type="text"
                         id="apellido"
                         value={apellido}
-                        onChange={(e) => setApellido(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setApellido(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -125,7 +128,7 @@ export default function EditarCliente() {
                         type="phone"
                         id="telefono"
                         value={telefono}
-                        onChange={(e) => setTelefono(formatearNumeroTelefono(e.target.value))}
+                        onChange={(e) => setTelefono(e.target.value)}
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />

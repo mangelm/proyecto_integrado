@@ -30,16 +30,19 @@ export default function CrearCliente() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (telefono.replace(/\D/g, "").length !== 9) {
+        // Validación del teléfono
+        const telefonoSanitizado = telefono.replace(/\D/g, ""); // Eliminar caracteres no numéricos
+        if (telefonoSanitizado.length !== 9) {
             alert("El teléfono debe tener exactamente 9 dígitos.");
             return;
         }
+
 
         const nuevoCliente = {
             nombre: sanitizeInput(nombre,"text"),
             apellido: sanitizeInput(nombre,"text"),
             email,
-            telefono,
+            telefono: formatearNumeroTelefono(telefonoSanitizado),
         };
 
         try {
@@ -82,7 +85,7 @@ export default function CrearCliente() {
                         type="text" 
                         id="nombre" 
                         value={nombre} 
-                        onChange={(e) => setNombre(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setNombre(e.target.value)}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -98,7 +101,7 @@ export default function CrearCliente() {
                         type="text" 
                         id="apellido" 
                         value={apellido} 
-                        onChange={(e) => setApellido(sanitizeInput(e.target.value,"text"))}
+                        onChange={(e) => setApellido(e.target.value)}
                         required 
                         className="mt-1 w-full p-2 border rounded-md" 
                     />
@@ -135,7 +138,7 @@ export default function CrearCliente() {
                             type="phone" 
                             id="telefono" 
                             value={telefono}
-                            onChange={(e) => setTelefono(formatearNumeroTelefono(e.target.value))}
+                            onChange={(e) => setTelefono(e.target.value)}
                             required 
                             className="mt-1 w-full p-2 border rounded-md" 
                         />
