@@ -15,22 +15,24 @@ export default function EstadisticasOcupacion() {
     const [error, setError] = useState(null);
     const [graficoHorariosMasSolicitados, setGraficoHorariosMasSolicitados] = useState(null);
     const [mostrarGraficoHorarios, setMostrarGraficoHorarios] = useState(false);
+    const [graficoDiasMasSolicitados, setGraficoDiasMasSolicitados] = useState(null);
+    const [mostrarGraficoDias, setMostrarGraficoDias] = useState(false);
+
 
     const handleFechaInicioChange = (e) => setFechaInicio(e.target.value);
     const handleFechaFinalChange = (e) => setFechaFinal(e.target.value);
     const handleHorarioChange = (e) => setHorarioSeleccionado(e.target.value);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setEstadisticas([]);
         setGraficoHorariosMasSolicitados(null);
-
+    
         if (new Date(fechaInicio) > new Date(fechaFinal)) {
             setError("La fecha de inicio no puede ser posterior a la fecha final.");
             return;
         }
-
+    
         setLoading(true);
         try {
             const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
@@ -39,20 +41,24 @@ export default function EstadisticasOcupacion() {
             }
             const data = await response.json();
             setEstadisticas(data);
-
+    
             const horarios = [...new Set(data.map(item => item.horario))];
             setHorariosUnicos(horarios);
             setHorarioSeleccionado(horarios[0] || "");
-
+    
             // Calcular horarios más solicitados
             calcularHorariosMasSolicitados(data);
-
+    
+            // Calcular días más solicitados
+            calcularDiasMasSolicitados(data);
+    
         } catch (error) {
             setError(error.message);
         } finally {
             setLoading(false);
         }
     };
+    
 
     const calcularHorariosMasSolicitados = (data) => {
         const horariosSolicitados = data.reduce((acc, item) => {
@@ -81,6 +87,33 @@ export default function EstadisticasOcupacion() {
         });
     };
     
+    const calcularDiasMasSolicitados = (data) => {
+        const diasSolicitados = data.reduce((acc, item) => {
+            const fecha = item.fecha;
+            const fechaStr = new Date(fecha).toLocaleDateString('es-ES'); // 'dd/MM/yyyy'
+            acc[fechaStr] = (acc[fechaStr] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const diasOrdenados = Object.entries(diasSolicitados).sort((a, b) => b[1] - a[1]);
+        const topDias = diasOrdenados.slice(0, 5); // Los 5 días más solicitados
+        
+        const labels = topDias.map(dia => dia[0]);  // Fechas formateadas
+        const dataDias = topDias.map(dia => dia[1]);  // Conteo de eventos
+        
+        setGraficoDiasMasSolicitados({
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Días más solicitados',
+                    data: dataDias,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        });
+    };    
     
     const renderChart = () => {
         if (!estadisticas.length || !horarioSeleccionado) return null;
@@ -116,6 +149,16 @@ export default function EstadisticasOcupacion() {
         );
     };
 
+    const renderGraficoDiasMasSolicitados = () => {
+        if (!graficoDiasMasSolicitados) return null;
+        return (
+            <div className="w-full h-96 mt-6">
+                <Bar data={graficoDiasMasSolicitados} options={{ responsive: true, maintainAspectRatio: false }} />
+            </div>
+        );
+    };
+    
+
     const handleButtonClickHorarios = () => {
         // console.log("Botón 'Ver horarios más solicitados' clickeado, estado previo:", mostrarGraficoHorarios);
         setMostrarGraficoHorarios(!mostrarGraficoHorarios);
@@ -150,7 +193,15 @@ export default function EstadisticasOcupacion() {
                         {mostrarGraficoHorarios ? "Ocultar horarios más solicitados" : "Ver horarios más solicitados"}
                     </button>
                     {mostrarGraficoHorarios && renderGraficoHorariosMasSolicitados()}
-                    
+                    <button
+                        onClick={() => {
+                            setMostrarGraficoDias(!mostrarGraficoDias);
+                        }}
+                        className="mt-6 w-full p-2 bg-blue-500 text-white rounded"
+                    >
+                        {mostrarGraficoDias ? "Ocultar días más solicitados" : "Ver días más solicitados"}
+                    </button>
+                    {mostrarGraficoDias && renderGraficoDiasMasSolicitados()}
                 </div>
             )}
 
