@@ -18,7 +18,7 @@ public class EventoApiController {
     @Autowired
     private EventoService eventoService;
     
-    //LLamada a metodo para obtener todos los eventos con paginacion
+    //Metodo para obtener todos los eventos con paginacion
     @GetMapping
     public ResponseEntity<Page<Evento>> listarEventos(
         @RequestParam(defaultValue = "0") int page, 
@@ -30,7 +30,7 @@ public class EventoApiController {
         return ResponseEntity.ok(eventos);
     }
     
-    //LLamada a metodo para obtener el evento por Id
+    //Metodo para obtener el evento por Id
     @GetMapping("/{id}")
     public ResponseEntity<Evento> obtenerEvento(@PathVariable Long id) {
         try {
@@ -41,7 +41,7 @@ public class EventoApiController {
         }
     }
     
-    //LLamada a metodo crearEvento
+    //Metodo crearEvento
     @PostMapping
     public ResponseEntity<Evento> crearEvento(@RequestBody Evento evento) {
         System.out.println("Recibiendo solicitud POST para crear un evento: " + evento);
@@ -49,7 +49,7 @@ public class EventoApiController {
     }
 
     
-    //LLamada a metodo actualizarEvento
+    //Metodo actualizarEvento
     @PutMapping("/{id}")
     public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
         System.out.println("Solicitud PUT recibida para ID: " + id);
@@ -59,7 +59,7 @@ public class EventoApiController {
         return ResponseEntity.ok(eventoActualizado);
     }
 
-    //LLamada a metodo eliminarEvento
+    //Metodo eliminarEvento
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEvento(@PathVariable Long id) {
         try {
@@ -69,4 +69,5 @@ public class EventoApiController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }

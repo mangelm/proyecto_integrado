@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.repository.EventoRepository;
 import com.gestioneventos.service.EventoService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import com.gestioneventos.exception.RecursoNoEncontradoException;
 
 //Implementación de los metodos de EventoService
@@ -18,6 +22,9 @@ public class EventoServiceImp implements EventoService {
 
     @Autowired
     private EventoRepository eventoRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager; 
     
     //Metodo para crear un evento
     @Override
@@ -64,4 +71,6 @@ public class EventoServiceImp implements EventoService {
     public Page<Evento> obtenerTodosLosEventos(Pageable pageable) {
         return eventoRepository.findAll(pageable);
     }
+    
+    
 }
