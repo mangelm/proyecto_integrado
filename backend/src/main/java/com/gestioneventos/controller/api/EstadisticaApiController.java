@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gestioneventos.model.dto.EstadisticaOcupacionDTO;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
+import com.gestioneventos.model.dto.ProductoConsumoPorPersonasDTO;
 import com.gestioneventos.model.enumeration.Horario;
 import com.gestioneventos.repository.EventoRepository;
 import com.gestioneventos.service.ConsumoProductoService;
@@ -129,5 +130,34 @@ public class EstadisticaApiController {
             return ResponseEntity.internalServerError().body("Error interno en el servidor.");
         }
     }
+    
+    @GetMapping("/productos-personas")
+    public ResponseEntity<?> obtenerProductosMasConsumidosPorPersonas(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+        try {
+            // Convertimos las fechas recibidas en LocalDate
+            LocalDate inicio = LocalDate.parse(fechaInicio);
+            LocalDate fin = LocalDate.parse(fechaFinal);
+
+            // Validamos que la fecha de inicio no sea posterior a la fecha final
+            if (inicio.isAfter(fin)) {
+                return ResponseEntity.badRequest().body("La fecha de inicio no puede ser posterior a la fecha final.");
+            }
+
+            logger.info("Consultando productos más consumidos por personas entre {} y {}", inicio, fin);
+
+            // Llamada al servicio para obtener los productos más consumidos por personas
+            List<ProductoConsumoPorPersonasDTO> productos = consumoProductoService.obtenerProductosMasConsumidosPorPersonas(inicio, fin);
+
+            // Devolvemos la lista de productos consumidos por personas
+            return ResponseEntity.ok(productos);
+        } catch (DateTimeParseException e) {
+            logger.error("Formato de fecha inválido: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Formato de fecha inválido. Usa YYYY-MM-DD.");
+        } catch (Exception e) {
+            logger.error("Error al obtener productos más consumidos por personas: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Error interno en el servidor.");
+        }
+    }
+
     
 }

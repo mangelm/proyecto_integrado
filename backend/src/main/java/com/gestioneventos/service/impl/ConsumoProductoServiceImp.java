@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
+import com.gestioneventos.model.dto.ProductoConsumoPorPersonasDTO;
 import com.gestioneventos.model.enumeration.Horario;
 import com.gestioneventos.repository.ConsumoProductoRepository;
 import com.gestioneventos.service.ConsumoProductoService;
@@ -67,5 +68,22 @@ public class ConsumoProductoServiceImp implements ConsumoProductoService {
             throw new RuntimeException("Error interno en la consulta de consumo por horario", e);
         }
     }
+
+    @Override
+    public List<ProductoConsumoPorPersonasDTO> obtenerProductosMasConsumidosPorPersonas(LocalDate fechaInicio, LocalDate fechaFinal) {
+        // Llamamos al repositorio para obtener los resultados de la consulta
+        List<Object[]> resultados = consumoProductoRepository.obtenerProductosMasConsumidosPorPersonas(fechaInicio, fechaFinal);
+        
+        // Mapeamos los resultados a DTOs
+        return resultados.stream()
+            .map(obj -> new ProductoConsumoPorPersonasDTO(
+                (String) obj[0],              // Nombre del producto
+                ((Number) obj[1]).intValue(), // Cantidad de personas
+                ((Number) obj[2]).intValue()  // Total consumido
+            ))
+            .collect(Collectors.toList());
+    }
+
+
 
 }

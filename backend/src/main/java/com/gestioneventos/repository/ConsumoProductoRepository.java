@@ -32,4 +32,15 @@ public interface ConsumoProductoRepository extends JpaRepository<ConsumoProducto
     @Query("SELECT p.nombre, e.horario, SUM(cp.cantidad) FROM ConsumoProducto cp JOIN cp.producto p JOIN cp.evento e WHERE e.fecha BETWEEN :fechaInicio AND :fechaFinal GROUP BY p.id, p.nombre, e.horario ORDER BY e.horario, SUM(cp.cantidad) DESC")
     List<Object[]> obtenerConsumoPorProductoYHorario(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFinal") LocalDate fechaFinal);
 
+    // Método para obtener productos más consumidos por cantidad de personas
+    @Query("SELECT p.nombre, e.cantidadPersonas, SUM(cp.cantidad) " +
+           "FROM ConsumoProducto cp " +
+           "JOIN cp.producto p " +
+           "JOIN cp.evento e " +
+           "WHERE e.fecha BETWEEN :fechaInicio AND :fechaFinal " +
+           "GROUP BY p.id, p.nombre, e.cantidadPersonas " +
+           "ORDER BY e.cantidadPersonas DESC, SUM(cp.cantidad) DESC")
+    List<Object[]> obtenerProductosMasConsumidosPorPersonas(@Param("fechaInicio") LocalDate fechaInicio, 
+                                                             @Param("fechaFinal") LocalDate fechaFinal);
+    
 }
