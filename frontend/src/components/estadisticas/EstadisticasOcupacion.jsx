@@ -3,6 +3,7 @@ import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Link } from "react-router-dom";
 
+// Componentes y librerias necesarios para los gráficos
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function EstadisticasOcupacion() {
@@ -18,10 +19,11 @@ export default function EstadisticasOcupacion() {
     const [graficoDiasMasSolicitados, setGraficoDiasMasSolicitados] = useState(null);
     const [mostrarGraficoDias, setMostrarGraficoDias] = useState(false);
 
-
     const handleFechaInicioChange = (e) => setFechaInicio(e.target.value);
     const handleFechaFinalChange = (e) => setFechaFinal(e.target.value);
     const handleHorarioChange = (e) => setHorarioSeleccionado(e.target.value);
+
+    //Haciendo peticion para enviar los datos
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -35,13 +37,14 @@ export default function EstadisticasOcupacion() {
     
         setLoading(true);
         try {
+            //Enviamos los filtros de las fechas al servidor para que nos devuelva los datos que queremos
             const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
             if (!response.ok) {
                 throw new Error(`Error ${response.status}: ${await response.text()}`);
             }
             const data = await response.json();
             setEstadisticas(data);
-    
+
             const horarios = [...new Set(data.map(item => item.horario))];
             setHorariosUnicos(horarios);
             setHorarioSeleccionado(horarios[0] || "");
@@ -59,7 +62,7 @@ export default function EstadisticasOcupacion() {
         }
     };
     
-
+    //Funcion que calcula los horarios con mas eventos y guardo los datos para luego ser tratados y utilizados para generar el gráfico
     const calcularHorariosMasSolicitados = (data) => {
         const horariosSolicitados = data.reduce((acc, item) => {
             const horario = item.horario;
@@ -72,7 +75,8 @@ export default function EstadisticasOcupacion() {
 
         const labels = topHorarios.map(horario => horario[0]); // Horarios
         const dataHorarios = topHorarios.map(horario => horario[1]); // Conteo de solicitudes
-
+        
+        //Datos tratados para generar el gráfico
         setGraficoHorariosMasSolicitados({
             labels: labels,
             datasets: [
@@ -87,6 +91,7 @@ export default function EstadisticasOcupacion() {
         });
     };
     
+    //Funcion que calcula los dias mas solicitados y guardo los datos para luego ser tratados y utilizados para generar el gráfico
     const calcularDiasMasSolicitados = (data) => {
         const diasSolicitados = data.reduce((acc, item) => {
             const fecha = item.fecha;
@@ -115,6 +120,7 @@ export default function EstadisticasOcupacion() {
         });
     };    
     
+    //Renderizando para motrar el gráfico de cuantos eventos hay en ciertos espacios dentro del rango de fechas introducido
     const renderChart = () => {
         if (!estadisticas.length || !horarioSeleccionado) return null;
 
@@ -140,6 +146,7 @@ export default function EstadisticasOcupacion() {
         );
     };
 
+    //Renderizando para motrar el gráfico de cuantos horarios estan mas solicitados
     const renderGraficoHorariosMasSolicitados = () => {
         if (!graficoHorariosMasSolicitados) return null;
         return (
@@ -149,6 +156,7 @@ export default function EstadisticasOcupacion() {
         );
     };
 
+    //Renderizando para motrar el gráfico de que dias estan mas solicitados
     const renderGraficoDiasMasSolicitados = () => {
         if (!graficoDiasMasSolicitados) return null;
         return (
@@ -160,32 +168,34 @@ export default function EstadisticasOcupacion() {
     
 
     const handleButtonClickHorarios = () => {
-        // console.log("Botón 'Ver horarios más solicitados' clickeado, estado previo:", mostrarGraficoHorarios);
-        setMostrarGraficoHorarios(!mostrarGraficoHorarios);
-        // console.log("Nuevo estado de mostrarGraficoHorarios:", mostrarGraficoHorarios);
+        setMostrarGraficoHorarios(prev => !prev);
     };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
                 <h2 className="text-xl font-semibold text-center mb-4">Generar Estadísticas</h2>
+                {/* Donde introducidemos las fechas por las que filtraremos  */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input type="date" value={fechaInicio} onChange={handleFechaInicioChange} required className="w-full p-2 border rounded" />
                     <input type="date" value={fechaFinal} onChange={handleFechaFinalChange} required className="w-full p-2 border rounded" />
                     <button type="submit" disabled={!fechaInicio || !fechaFinal || loading} className="w-full p-2 bg-blue-500 text-white rounded">{loading ? "Generando..." : "Generar Estadísticas"}</button>
                 </form>
             </div>
+            {/* Mientras cargan los datos para añadirle dinamismo  */}
             {loading && <p className="mt-4 text-gray-600">Cargando datos...</p>}
+            {/* Para controlar y mostrar los errores  */}
             {error && <p className="mt-4 text-red-600">{error}</p>}
             {estadisticas.length > 0 && !loading && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
-                    <h2 className="text-xl font-semibold text-center mb-4">Estadísticas de Ocupación</h2>
+                    <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
                     <select value={horarioSeleccionado} onChange={handleHorarioChange} className="w-full p-2 border rounded">
                         {horariosUnicos.map(horario => (
                             <option key={horario} value={horario}>{horario}</option>
                         ))}
                     </select>
                     <div className="w-full h-96">{renderChart()}</div>
+                    {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
                     <button
                         onClick={handleButtonClickHorarios}
                         className="mt-6 w-full p-2 bg-green-500 text-white rounded"

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+// Hay que asegurarse de tener react-router-dom instalado
+import { Link } from "react-router-dom"; 
 
 export default function PanelAdministracion() {
 

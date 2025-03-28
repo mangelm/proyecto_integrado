@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gestioneventos.model.dto.EstadisticaOcupacionDTO;
+import com.gestioneventos.model.dto.ProductoConsumoDTO;
+import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
 import com.gestioneventos.model.enumeration.Horario;
 import com.gestioneventos.repository.EventoRepository;
+import com.gestioneventos.service.ConsumoProductoService;
 
 @RestController
 @RequestMapping("/api/estadisticas")
@@ -27,6 +30,9 @@ public class EstadisticaApiController {
 
     @Autowired
     private EventoRepository eventoRepository;
+    
+    @Autowired
+    private ConsumoProductoService consumoProductoService;
 
     @GetMapping("/ocupacion")
     public ResponseEntity<?> obtenerEstadisticas(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
@@ -70,4 +76,49 @@ public class EstadisticaApiController {
             return ResponseEntity.internalServerError().body("Error interno en el servidor.");
         }
     }
+    
+    @GetMapping("/productos")
+    public ResponseEntity<?> obtenerConsumoPorProducto(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+        try {
+            LocalDate inicio = LocalDate.parse(fechaInicio);
+            LocalDate fin = LocalDate.parse(fechaFinal);
+
+            if (inicio.isAfter(fin)) {
+                return ResponseEntity.badRequest().body("La fecha de inicio no puede ser posterior a la fecha final.");
+            }
+
+            logger.info("Consultando consumo de productos entre {} y {}", inicio, fin);
+            List<ProductoConsumoDTO> productos = consumoProductoService.obtenerConsumoPorProducto(inicio, fin);
+
+            return ResponseEntity.ok(productos);
+        } catch (DateTimeParseException e) {
+            logger.error("Formato de fecha inválido: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Formato de fecha inválido. Usa YYYY-MM-DD.");
+        } catch (Exception e) {
+            logger.error("Error al obtener estadísticas de productos: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Error interno en el servidor.");
+        }
+    }
+    
+    @GetMapping("/productos-horario")
+    public ResponseEntity<?> obtenerConsumoPorProductoYHorario(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+        try {
+            LocalDate inicio = LocalDate.parse(fechaInicio);
+            LocalDate fin = LocalDate.parse(fechaFinal);
+
+            if (inicio.isAfter(fin)) {
+                return ResponseEntity.badRequest().body("La fecha de inicio no puede ser posterior a la fecha final.");
+            }
+
+            List<ProductoConsumoPorHorarioDTO> productos = consumoProductoService.obtenerConsumoPorProductoYHorario(inicio, fin);
+            return ResponseEntity.ok(productos);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Formato de fecha inválido. Usa YYYY-MM-DD.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error interno en el servidor.");
+        }
+    }
+
+
+    
 }

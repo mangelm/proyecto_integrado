@@ -14,6 +14,7 @@ import EditarCliente from './components/clientes/EditarCliente';
 import DetallesEvento from './components/eventos/DetallesEvento';
 import Estadisticas from './components/estadisticas/Estadisticas';
 import EstadisticasOcupacion from './components/estadisticas/EstadisticasOcupacion';
+import AnalisisConsumo from './components/estadisticas/AnalisisConsumo';
 
 function App() {
   return (
@@ -32,7 +33,8 @@ function App() {
           <Route path="/clientes/editar/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
           <Route path="/clientes/crear/" element={<CrearCliente/>} /> {/* Ruta para crear */}
           <Route path="/estadisticas" element={<Estadisticas />} />
-          <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primer gráfico */}
+          <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primeros gráficos */}
+          <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}
         </Routes>
       </div>
     </Router>
