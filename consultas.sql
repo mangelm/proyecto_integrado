@@ -1,5 +1,6 @@
 # Creando Base de datos y usuario de prueba
 create database eventos;
+use eventos;
 create user 'administrador'@'localhost' identified by '1234';
 grant all privileges on eventos.* to administrador;
 
@@ -28,3 +29,12 @@ JOIN evento e ON cp.evento_id = e.id
 WHERE e.fecha BETWEEN '2025-03-01' AND '2025-03-31'
 GROUP BY p.id,p.nombre,e.horario
 ORDER BY e.horario, total_consumido DESC;
+
+-- Productos más consumidos por cantidad de personas
+SELECT p.nombre, e.cantidad_personas, SUM(cp.cantidad) as total_consumido
+FROM consumo_producto cp
+JOIN producto p ON cp.producto_id = p.id
+JOIN evento e ON cp.evento_id = e.id
+WHERE e.fecha BETWEEN '2025-03-01' AND '2025-03-31'
+GROUP BY p.id,p.nombre,e.cantidad_personas
+ORDER BY e.cantidad_personas, total_consumido DESC;

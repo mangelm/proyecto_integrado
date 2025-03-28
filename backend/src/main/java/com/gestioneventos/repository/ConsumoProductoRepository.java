@@ -29,10 +29,7 @@ public interface ConsumoProductoRepository extends JpaRepository<ConsumoProducto
     List<Object[]> obtenerConsumoPorProducto(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFinal") LocalDate fechaFinal);
     
     // Consulta productos por horario
-    @Query("SELECT p.nombre, e.horario.name(), SUM(cp.cantidad) FROM ConsumoProducto cp " +
-    	       "JOIN cp.producto p " +
-    	       "JOIN cp.evento e WHERE e.fecha BETWEEN :fechaInicio AND :fechaFinal " +
-    	       "GROUP BY p.id, p.nombre, e.horario ORDER BY e.horario, SUM(cp.cantidad) DESC")
-   List<Object[]> obtenerConsumoPorProductoYHorario(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFinal") LocalDate fechaFinal);
+    @Query("SELECT p.nombre, e.horario, SUM(cp.cantidad) FROM ConsumoProducto cp JOIN cp.producto p JOIN cp.evento e WHERE e.fecha BETWEEN :fechaInicio AND :fechaFinal GROUP BY p.id, p.nombre, e.horario ORDER BY e.horario, SUM(cp.cantidad) DESC")
+    List<Object[]> obtenerConsumoPorProductoYHorario(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFinal") LocalDate fechaFinal);
 
 }

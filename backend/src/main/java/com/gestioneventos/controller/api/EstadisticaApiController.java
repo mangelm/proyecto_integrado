@@ -103,22 +103,31 @@ public class EstadisticaApiController {
     @GetMapping("/productos-horario")
     public ResponseEntity<?> obtenerConsumoPorProductoYHorario(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
+            // Validación de fechas
             LocalDate inicio = LocalDate.parse(fechaInicio);
             LocalDate fin = LocalDate.parse(fechaFinal);
+
+            // Comprobación extra de las fechas
+            logger.info("Fechas recibidas: inicio = {}, fin = {}", inicio, fin);
 
             if (inicio.isAfter(fin)) {
                 return ResponseEntity.badRequest().body("La fecha de inicio no puede ser posterior a la fecha final.");
             }
 
+            // Llamada al servicio
             List<ProductoConsumoPorHorarioDTO> productos = consumoProductoService.obtenerConsumoPorProductoYHorario(inicio, fin);
+
+            // Comprobación de los resultados antes de enviarlos al frontend
+            logger.info("Cantidad de productos por horario obtenidos: {}", productos.size());
+
             return ResponseEntity.ok(productos);
         } catch (DateTimeParseException e) {
+            logger.error("Formato de fecha inválido: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Formato de fecha inválido. Usa YYYY-MM-DD.");
         } catch (Exception e) {
+            logger.error("Error al obtener consumos por producto y horario: {}", e.getMessage());
             return ResponseEntity.internalServerError().body("Error interno en el servidor.");
         }
     }
-
-
     
 }
