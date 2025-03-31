@@ -68,6 +68,29 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version> <!-- Versión más reciente de MySQL Connector/J -->
         </dependency>
+        <!-- Dependencia de Spring Security -->
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-security</artifactId>
+	    </dependency>
+	    <!-- Dependencia para JWT -->
+	    <dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-api</artifactId>
+		    <version>0.12.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-impl</artifactId>
+		    <version>0.12.0</version>
+		    <scope>runtime</scope>
+		</dependency>
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-jackson</artifactId>
+		    <version>0.12.0</version>
+		    <scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

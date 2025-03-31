@@ -38,3 +38,14 @@ JOIN evento e ON cp.evento_id = e.id
 WHERE e.fecha BETWEEN '2025-03-01' AND '2025-03-31'
 GROUP BY p.id,p.nombre,e.cantidad_personas
 ORDER BY e.cantidad_personas, total_consumido DESC;
+
+-- Consumo promedio por persona
+SELECT p.nombre,
+    COUNT(DISTINCT cp.evento_id) AS cantidadPersonasQueConsumieron,
+    SUM(cp.cantidad) / COUNT(DISTINCT cp.evento_id) AS consumoPromedio
+FROM consumo_producto cp
+JOIN producto p ON cp.producto_id = p.id
+JOIN evento e ON cp.evento_id = e.id
+WHERE e.fecha BETWEEN '2025-03-01' AND '2025-03-31'
+GROUP BY p.id, p.nombre
+ORDER BY consumoPromedio DESC;
