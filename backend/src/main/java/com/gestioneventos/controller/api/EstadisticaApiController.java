@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestioneventos.model.dto.ConsumoPromedioDTO;
 import com.gestioneventos.model.dto.EstadisticaOcupacionDTO;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
@@ -159,5 +160,28 @@ public class EstadisticaApiController {
         }
     }
 
-    
+    @GetMapping("/productos-promedio-personas")
+    public ResponseEntity<?> obtenerConsumoPromedioPorPersona(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+        try {
+            LocalDate inicio = LocalDate.parse(fechaInicio);
+            LocalDate fin = LocalDate.parse(fechaFinal);
+
+            if (inicio.isAfter(fin)) {
+                return ResponseEntity.badRequest().body("La fecha de inicio no puede ser posterior a la fecha final.");
+            }
+
+            logger.info("Consultando consumo promedio por persona entre {} y {}", inicio, fin);
+
+            List<ConsumoPromedioDTO> productos = consumoProductoService.obtenerConsumoPromedioPorPersona(inicio, fin);
+
+            return ResponseEntity.ok(productos);
+        } catch (DateTimeParseException e) {
+            logger.error("Formato de fecha inválido: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Formato de fecha inválido. Usa YYYY-MM-DD.");
+        } catch (Exception e) {
+            logger.error("Error al obtener consumo promedio por persona: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Error interno en el servidor.");
+        }
+    }
+
 }

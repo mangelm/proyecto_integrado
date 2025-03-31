@@ -11,6 +11,9 @@ export default function AnalisisConsumo() {
     const [datos, setDatos] = useState(null);
     const [datosPorHorario, setDatosPorHorario] = useState(null);
     const [datosPorPersonas, setDatosPorPersonas] = useState(null); // Datos para el gráfico de cantidad de personas
+
+    //Controlar visibilidad de los gráficos
+    const [mostrarGraficoTotal, setMostrarGraficoTotal] = useState(false);
     const [mostrarGraficoHorario, setMostrarGraficoHorario] = useState(false);
     const [mostrarGraficoPorPersonas, setMostrarGraficoPorPersonas] = useState(false); // Estado para mostrar/ocultar el gráfico por personas
 
@@ -117,6 +120,17 @@ export default function AnalisisConsumo() {
                     <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">Generar</button>
                 </form>
 
+                {/* Botón para mostrar/ocultar el gráfico de consumo total */}
+                {chartData && (
+                    <button 
+                        onClick={() => setMostrarGraficoTotal(!mostrarGraficoTotal)}
+                        className="w-full p-2 bg-purple-500 text-white rounded mt-4"
+                    >
+                        {mostrarGraficoTotal ? "Ocultar Consumo de Productos Totales" : "Ver Consumo de Productos Totales"}
+                    </button>
+                )}
+
+
                 {/* Botón para mostrar/ocultar el gráfico de cantidad de personas */}
                 <button 
                     onClick={(e) => {
@@ -125,7 +139,7 @@ export default function AnalisisConsumo() {
                     }} 
                     className="w-full p-2 bg-yellow-500 text-white rounded mt-4"
                 >
-                    {mostrarGraficoPorPersonas ? "Ocultar Gráfico por Personas" : "Ver Gráfico por Personas"}
+                    {mostrarGraficoPorPersonas ? "Ocultar Consumo de Productos por Cantidad Personas" : "Ver Consumo de Productos por Cantidad Personas"}
                 </button>
 
 
@@ -137,14 +151,14 @@ export default function AnalisisConsumo() {
                     }} 
                     className="w-full p-2 bg-green-500 text-white rounded mt-4"
                 >
-                    {mostrarGraficoHorario ? "Ocultar Gráfico por Horario" : "Ver Gráfico por Horario"}
+                    {mostrarGraficoHorario ? "Ocultar Consumo de Productos por Horario" : "Ver Consumo de Productos por Horario"}
                 </button>
             </div>
 
             {/* Gráfico de productos más consumidos (Total) */}
-            {chartData && (
+            {mostrarGraficoTotal && chartData && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
-                    <h2 className="text-xl font-semibold text-center mb-4">Productos Más Consumidos &#40;General&#41;</h2>
+                    <h2 className="text-xl font-semibold text-center mb-4">Productos Más Consumidos (General)</h2>
                     <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
                 </div>
             )}
