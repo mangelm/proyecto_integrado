@@ -195,21 +195,25 @@ export default function EstadisticasOcupacion() {
             {error && <p className="mt-4 text-red-600">{error}</p>}
             {estadisticas.length > 0 && !loading && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
-                    <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
-                    <select value={horarioSeleccionado} onChange={handleHorarioChange} className="w-full p-2 border rounded">
-                        {horariosUnicos.map(horario => (
-                            <option key={horario} value={horario}>{horario}</option>
-                        ))}
-                    </select>
+            
                     <button
                         onClick={handleButtonClickPrincipal}
                         className="mt-6 w-full p-2 bg-red-500 text-white rounded"
                     >
-                        {mostrarGraficoPrincipal ? "Ocultar gráfico principal" : "Mostrar gráfico principal"}
+                        {mostrarGraficoPrincipal ? "Ocultar Tasa de Ocupación por Espacio y Horario" : "Mostrar Tasa de Ocupación por Espacio y Horario"}
                     </button>
 
                     {mostrarGraficoPrincipal && (
-                        <div className="w-full h-96">{renderChart()}</div>
+                        <div className="w-full h-96">
+                            <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
+                            <select value={horarioSeleccionado} onChange={handleHorarioChange} className="w-full p-2 border rounded">
+                                {horariosUnicos.map(horario => (
+                                    <option key={horario} value={horario}>{horario}</option>
+                                ))}
+                            </select>
+                            {renderChart()}
+                        </div>
+                        
                     )}
 
                     {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
@@ -217,7 +221,7 @@ export default function EstadisticasOcupacion() {
                         onClick={handleButtonClickHorarios}
                         className="mt-6 w-full p-2 bg-green-500 text-white rounded"
                     >
-                        {mostrarGraficoHorarios ? "Ocultar horarios más solicitados" : "Ver horarios más solicitados"}
+                        {mostrarGraficoHorarios ? "Ocultar Horarios Más Solicitados" : "Ver Horarios Más Solicitados"}
                     </button>
                     {mostrarGraficoHorarios && renderGraficoHorariosMasSolicitados()}
                     <button
@@ -226,7 +230,7 @@ export default function EstadisticasOcupacion() {
                         }}
                         className="mt-6 w-full p-2 bg-blue-500 text-white rounded"
                     >
-                        {mostrarGraficoDias ? "Ocultar días más solicitados" : "Ver días más solicitados"}
+                        {mostrarGraficoDias ? "Ocultar Días Más Solicitados" : "Ver Días Más Solicitados"}
                     </button>
                     {mostrarGraficoDias && renderGraficoDiasMasSolicitados()}
                 </div>
