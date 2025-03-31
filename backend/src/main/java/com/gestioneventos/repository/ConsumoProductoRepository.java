@@ -44,15 +44,19 @@ public interface ConsumoProductoRepository extends JpaRepository<ConsumoProducto
                                                              @Param("fechaFinal") LocalDate fechaFinal);
     
     // Método para obtener promedio de productos consumidos por persona
-    @Query("SELECT p.nombre, e.cantidadPersonas, SUM(cp.cantidad) / e.cantidadPersonas AS consumoPromedio " +
+    @Query("SELECT p.nombre, " +
+    	       "COUNT(DISTINCT cp.evento.cantidadPersonas) AS cantidadPersonasQueConsumieron, " + 
+    	       "SUM(cp.cantidad) / COUNT(DISTINCT cp.evento.cantidadPersonas) AS consumoPromedio " +
     	       "FROM ConsumoProducto cp " +
     	       "JOIN cp.producto p " +
     	       "JOIN cp.evento e " +
     	       "WHERE e.fecha BETWEEN :fechaInicio AND :fechaFinal " +
-    	       "GROUP BY p.id, p.nombre, e.cantidadPersonas " +
+    	       "GROUP BY p.id, p.nombre " +
     	       "ORDER BY consumoPromedio DESC")
-	List<Object[]> obtenerConsumoPromedioPorPersona(@Param("fechaInicio") LocalDate fechaInicio, 
-	                                                @Param("fechaFinal") LocalDate fechaFinal);
+    	List<Object[]> obtenerConsumoPromedioPorPersona(@Param("fechaInicio") LocalDate fechaInicio, 
+    	                                                @Param("fechaFinal") LocalDate fechaFinal);
+
+
 
     
 }
