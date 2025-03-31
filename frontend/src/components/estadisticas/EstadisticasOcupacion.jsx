@@ -19,6 +19,8 @@ export default function EstadisticasOcupacion() {
     const [graficoDiasMasSolicitados, setGraficoDiasMasSolicitados] = useState(null);
     const [mostrarGraficoDias, setMostrarGraficoDias] = useState(false);
 
+    const [mostrarGraficoPrincipal, setMostrarGraficoPrincipal] = useState(true);
+
     const handleFechaInicioChange = (e) => setFechaInicio(e.target.value);
     const handleFechaFinalChange = (e) => setFechaFinal(e.target.value);
     const handleHorarioChange = (e) => setHorarioSeleccionado(e.target.value);
@@ -62,6 +64,11 @@ export default function EstadisticasOcupacion() {
         }
     };
     
+    //Para ocultar el primer gráfico
+    const handleButtonClickPrincipal = () => {
+        setMostrarGraficoPrincipal(prev => !prev);
+    };
+
     //Funcion que calcula los horarios con mas eventos y guardo los datos para luego ser tratados y utilizados para generar el gráfico
     const calcularHorariosMasSolicitados = (data) => {
         const horariosSolicitados = data.reduce((acc, item) => {
@@ -194,7 +201,17 @@ export default function EstadisticasOcupacion() {
                             <option key={horario} value={horario}>{horario}</option>
                         ))}
                     </select>
-                    <div className="w-full h-96">{renderChart()}</div>
+                    <button
+                        onClick={handleButtonClickPrincipal}
+                        className="mt-6 w-full p-2 bg-red-500 text-white rounded"
+                    >
+                        {mostrarGraficoPrincipal ? "Ocultar gráfico principal" : "Mostrar gráfico principal"}
+                    </button>
+
+                    {mostrarGraficoPrincipal && (
+                        <div className="w-full h-96">{renderChart()}</div>
+                    )}
+
                     {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
                     <button
                         onClick={handleButtonClickHorarios}
