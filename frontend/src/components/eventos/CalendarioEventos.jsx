@@ -11,6 +11,7 @@ const localizer = momentLocalizer(moment);
 
 export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
+    const [view, setView] = useState('month'); // Estado para la vista actual
 
     // Cargar eventos desde la API
     useEffect(() => {
@@ -37,6 +38,11 @@ export default function CalendarioEventos() {
         fetchEventos();
     }, []);
 
+    // Función para manejar el cambio de vista
+    const handleViewChange = (view) => {
+        setView(view); // Actualizar el estado con la nueva vista
+    };
+
     return (
         <>
             <div className="p-6 bg-white rounded-lg shadow-md">
@@ -49,6 +55,8 @@ export default function CalendarioEventos() {
                     style={{ height: 500 }}
                     views={["month", "week", "day"]} // Aseguramos que las vistas de mes, semana y día estén habilitadas
                     defaultView="month" // Definir la vista predeterminada como "month"
+                    view={view} // Usamos el estado 'view' para controlar la vista activa
+                    onView={handleViewChange} // Detectar el cambio de vista
                     messages={{
                         month: "Mes",
                         week: "Semana",
@@ -57,7 +65,13 @@ export default function CalendarioEventos() {
                         previous: "Anterior",
                         next: "Siguiente",
                         showMore: (total) => `+ Ver ${total} más`,
+                        weekday: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], // Nombres de días en español
+                        monthNames: [
+                            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                        ], // Nombres de los meses en español
                     }} // Mensajes personalizados en español
+                    culture="es" // Asegurándonos de que la cultura se establece como español
                 />
             </div>
 

@@ -55,8 +55,5 @@ public interface ConsumoProductoRepository extends JpaRepository<ConsumoProducto
     	       "ORDER BY consumoPromedio DESC")
     	List<Object[]> obtenerConsumoPromedioPorPersona(@Param("fechaInicio") LocalDate fechaInicio, 
     	                                                @Param("fechaFinal") LocalDate fechaFinal);
-
-
-
     
 }
