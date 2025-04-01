@@ -11,7 +11,8 @@ const localizer = momentLocalizer(moment);
 
 export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
-    const [view, setView] = useState('month'); // Estado para la vista actual
+    const [view, setView] = useState("month"); // Estado para la vista actual
+    const [currentDate, setCurrentDate] = useState(new Date()); // Estado para la fecha actual
 
     // Cargar eventos desde la API
     useEffect(() => {
@@ -21,11 +22,11 @@ export default function CalendarioEventos() {
                 const data = await response.json();
 
                 // Acceder a la propiedad 'content' que contiene los eventos
-                const eventosFormateados = data.content.map(evento => ({
+                const eventosFormateados = data.content.map((evento) => ({
                     id: evento.id,
                     title: evento.nombre,
                     start: new Date(evento.fecha),
-                    end: new Date(evento.fecha),  // Si solo tienes una fecha de evento, puedes usarla también para 'end'
+                    end: new Date(evento.fecha), // Si solo tienes una fecha de evento, puedes usarla también para 'end'
                     allDay: false, // Para que no se muestre como evento de todo el día
                 }));
 
@@ -43,6 +44,11 @@ export default function CalendarioEventos() {
         setView(view); // Actualizar el estado con la nueva vista
     };
 
+    // Función para manejar la navegación del calendario (mes, semana, día)
+    const handleNavigate = (date) => {
+        setCurrentDate(date); // Actualizar la fecha actual
+    };
+
     return (
         <>
             <div className="p-6 bg-white rounded-lg shadow-md">
@@ -57,6 +63,7 @@ export default function CalendarioEventos() {
                     defaultView="month" // Definir la vista predeterminada como "month"
                     view={view} // Usamos el estado 'view' para controlar la vista activa
                     onView={handleViewChange} // Detectar el cambio de vista
+                    onNavigate={handleNavigate} // Manejar la navegación de mes/semana/día
                     messages={{
                         month: "Mes",
                         week: "Semana",
@@ -65,13 +72,14 @@ export default function CalendarioEventos() {
                         previous: "Anterior",
                         next: "Siguiente",
                         showMore: (total) => `+ Ver ${total} más`,
-                        weekday: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], // Nombres de días en español
+                        weekday: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"], // Nombres de días en español
                         monthNames: [
                             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
                         ], // Nombres de los meses en español
                     }} // Mensajes personalizados en español
                     culture="es" // Asegurándonos de que la cultura se establece como español
+                    date={currentDate} // Asegurándonos de que la fecha de visualización se mantenga sincronizada
                 />
             </div>
 
