@@ -22,44 +22,37 @@ export default function CrearEvento() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!horario) {
-            alert("Por favor, selecciona un horario.");
-            return;
-        }
-
+    
         const nuevoEvento = {
-            nombre: sanitizeInput(nombre,"text"),
+            nombre: sanitizeInput(nombre, "text"),
             fecha,
             cantidadPersonas: parseInt(cantidadPersonas) || 0,
-            espacio: sanitizeInput(espacio,"text"),
+            espacio: sanitizeInput(espacio, "text"),
             horario,
             estado,
         };
-
+    
         try {
             const response = await fetch("http://localhost:8100/api/eventos", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(nuevoEvento),
-                credentials: 'same-origin',
             });
-
-            console.log("Respuesta:", response);
+    
             if (response.ok) {
                 navigate("/eventos");
             } else {
                 const errorData = await response.text();
-                console.log("Error en la respuesta:", errorData);
-                throw new Error(errorData || 'Error al crear el evento');
+                alert(errorData); // Muestra el mensaje "Horario ocupado, escoge otro horario."
             }
-        } catch (error) {
-            console.error("Error al crear el evento:", error);
-            alert("Error al crear el evento. Verifica la consola para más detalles.");
+        }catch (error) {
+            const errorMessage = error.response ? await error.response.text() : "Error desconocido";
+            alert("Error al crear el evento: " + errorMessage);
         }
+        
+        
     };
+    
     
 
     return (

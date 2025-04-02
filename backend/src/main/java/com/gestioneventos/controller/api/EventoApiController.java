@@ -41,11 +41,17 @@ public class EventoApiController {
         }
     }
     
-    //Metodo crearEvento
+    // Metodo para crear evento
     @PostMapping
-    public ResponseEntity<Evento> crearEvento(@RequestBody Evento evento) {
-        System.out.println("Recibiendo solicitud POST para crear un evento: " + evento);
-        return ResponseEntity.ok(eventoService.crearEvento(evento));
+    public ResponseEntity<String> crearEvento(@RequestBody Evento evento) { 
+        try {
+            // Intentamos crear el evento
+            eventoService.crearEvento(evento);
+            return ResponseEntity.ok("Evento creado exitosamente");
+        } catch (IllegalArgumentException e) {
+            // Devolvemos el mensaje del error lanzado en el servicio
+            return ResponseEntity.status(422).body(e.getMessage()); // Devuelve el error directamente sin 400
+        }
     }
 
     

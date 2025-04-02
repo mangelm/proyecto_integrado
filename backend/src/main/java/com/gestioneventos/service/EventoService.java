@@ -18,5 +18,4 @@ public interface EventoService {
 	Evento actualizarEvento(Long id, Evento evento);
 	void eliminarEvento(Long id);
 	Page<Evento> obtenerTodosLosEventos(Pageable pageable);
-	//Metodos para graficos
 }

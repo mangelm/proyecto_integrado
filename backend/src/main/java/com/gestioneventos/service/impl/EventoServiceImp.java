@@ -29,6 +29,13 @@ public class EventoServiceImp implements EventoService {
     //Metodo para crear un evento
     @Override
     public Evento crearEvento(Evento evento) {
+    	 // Verificar si existe un evento con la misma fecha, horario y espacio
+        long eventosExistentes = eventoRepository.countEventosExistentes(evento.getFecha().toLocalDate(), evento.getHorario(), evento.getEspacio());
+    	
+        if (eventosExistentes > 0) {
+            throw new IllegalArgumentException("Horario ocupado, escoge otro horario.");
+        }
+        
         return eventoRepository.save(evento);
     }
     
