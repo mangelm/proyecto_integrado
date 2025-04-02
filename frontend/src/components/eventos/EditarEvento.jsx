@@ -9,11 +9,12 @@ export default function EditarEvento() {
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("");
     const [estado, setEstado] = useState("");
+    const [error, setError] = useState(null); // Para mostrar errores al usuario
     const navigate = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:8100/api/eventos/${id}`, {
-            credentials: 'include'
+            credentials: 'include',
         })
             .then((response) => response.json())
             .then((data) => {
@@ -39,16 +40,23 @@ export default function EditarEvento() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
+        // Validar campos requeridos
+        if (!nombre || !fecha || !cantidadPersonas || !espacio || !horario || !estado) {
+            setError("Todos los campos son obligatorios");
+            return;
+        }
+
+        // Formato del objeto evento actualizado
         const eventoActualizado = {
-            nombre: sanitizeInput(nombre,"text"),
+            nombre: sanitizeInput(nombre, "text"),
             fecha,
             cantidadPersonas: parseInt(cantidadPersonas) || 0,
-            espacio: sanitizeInput(espacio,"text"),
+            espacio: sanitizeInput(espacio, "text"),
             horario,
             estado,
         };
-        
+
         try {
             const response = await fetch(`http://localhost:8100/api/eventos/${id}`, {
                 method: "PUT",
@@ -58,26 +66,33 @@ export default function EditarEvento() {
                 body: JSON.stringify(eventoActualizado),
                 credentials: 'same-origin',
             });
-    
+
             if (response.ok) {
                 // Redirigir a la lista de eventos después de la actualización exitosa
                 navigate("/eventos");
             } else {
                 // Si no es una respuesta OK, intenta obtener el cuerpo de la respuesta.
-                const errorData = await response.text(); // Cambiado a .text() para manejar respuestas vacías
-                throw new Error(errorData || 'Error al actualizar el evento');
+                const errorData = await response.text();
+                if (response.status === 422) {
+                    setError(errorData); // Mostrar el error del backend (horario ocupado, etc.)
+                } else {
+                    throw new Error(errorData || 'Error al actualizar el evento');
+                }
             }
         } catch (error) {
             console.error("Error al editar el evento:", error);
+            setError("Hubo un error al intentar actualizar el evento. Inténtalo más tarde.");
         }
     };
-    
-    
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
             <h1 className="text-2xl font-bold mb-4">Editar Evento</h1>
-            <form onSubmit={handleSubmit}>            
+
+            {/* Mostrar mensaje de error si existe */}
+            {error && <div className="text-red-500 mb-4">{error}</div>}
+
+            <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
                     <input
@@ -125,7 +140,7 @@ export default function EditarEvento() {
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
                 </div>
-                
+
                 <div className="mb-4">
                     <label htmlFor="horario" className="block text-sm font-medium text-gray-700">Horario</label>
                     <select

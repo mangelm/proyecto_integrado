@@ -57,13 +57,20 @@ public class EventoApiController {
     
     //Metodo actualizarEvento
     @PutMapping("/{id}")
-    public ResponseEntity<Evento> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
-        System.out.println("Solicitud PUT recibida para ID: " + id);
-        System.out.println("Datos recibidos: " + evento);
-        
-        Evento eventoActualizado = eventoService.actualizarEvento(id, evento);
-        return ResponseEntity.ok(eventoActualizado);
+    public ResponseEntity<String> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
+        try {
+            // Intentamos actualizar el evento
+            eventoService.actualizarEvento(id, evento);
+            return ResponseEntity.ok("Evento actualizado exitosamente");
+        } catch (IllegalArgumentException e) {
+            // Devolvemos el mensaje de error lanzado en el servicio
+            return ResponseEntity.status(422).body(e.getMessage()); // Devuelve el error con el estado 422 (Unprocessable Entity)
+        } catch (RecursoNoEncontradoException e) {
+            // Si el evento no se encuentra
+            return ResponseEntity.notFound().build();
+        }
     }
+
 
     //Metodo eliminarEvento
     @DeleteMapping("/{id}")

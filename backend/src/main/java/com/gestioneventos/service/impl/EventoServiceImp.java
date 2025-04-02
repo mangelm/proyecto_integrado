@@ -55,7 +55,15 @@ public class EventoServiceImp implements EventoService {
     //Metodo para actualizar un evento concreto
     @Override
     public Evento actualizarEvento(Long id, Evento eventoDetalles) {
-        Evento eventoExistente = obtenerEventoPorId(id);
+        
+    	Evento eventoExistente = obtenerEventoPorId(id);
+        
+    	// Verificar si existe otro evento con la misma fecha, horario y espacio
+        long eventosExistentes = eventoRepository.countEventosExistentes(eventoDetalles.getFecha().toLocalDate(), eventoDetalles.getHorario(), eventoDetalles.getEspacio());
+        if (eventosExistentes > 0) {
+            throw new IllegalArgumentException("Horario ocupado, escoge otro horario.");
+        }
+        
         eventoExistente.setNombre(eventoDetalles.getNombre());
         eventoExistente.setFecha(eventoDetalles.getFecha());
         eventoExistente.setCantidadPersonas(eventoDetalles.getCantidadPersonas());
