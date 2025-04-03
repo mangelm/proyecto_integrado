@@ -13,9 +13,9 @@ import com.gestioneventos.model.Evento;
 public interface EventoService {
 	//Metodos para implementar
 	Evento crearEvento(Evento evento);
-	List<Evento> obtenerTodosLosEventos();
+	List<Evento> obtenerTodosLosEventos(); // Metodo sin paginacion
 	Evento obtenerEventoPorId(Long id);
 	Evento actualizarEvento(Long id, Evento evento);
 	void eliminarEvento(Long id);
-	Page<Evento> obtenerTodosLosEventos(Pageable pageable);
+	Page<Evento> obtenerTodosLosEventos(Pageable pageable); // Metodo con paginacion
 }

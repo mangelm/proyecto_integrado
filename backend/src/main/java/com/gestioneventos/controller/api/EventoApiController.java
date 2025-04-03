@@ -1,5 +1,7 @@
 package com.gestioneventos.controller.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,14 @@ public class EventoApiController {
         
         return ResponseEntity.ok(eventos);
     }
+    
+    // Método para obtener todos los eventos sin paginación
+    @GetMapping("/todos")
+    public ResponseEntity<List<Evento>> obtenerTodosLosEventos() {
+        List<Evento> eventos = eventoService.obtenerTodosLosEventos(); // Sin paginación
+        return ResponseEntity.ok(eventos);
+    }
+
     
     //Metodo para obtener el evento por Id
     @GetMapping("/{id}")
