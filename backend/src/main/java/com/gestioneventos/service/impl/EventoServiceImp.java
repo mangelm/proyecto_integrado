@@ -87,5 +87,4 @@ public class EventoServiceImp implements EventoService {
         return eventoRepository.findAll(pageable);
     }
     
-    
 }
