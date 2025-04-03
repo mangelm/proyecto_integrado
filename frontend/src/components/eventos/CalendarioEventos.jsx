@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Configurar el idioma a español
 moment.locale("es"); // Establecer el idioma de moment a español
@@ -13,6 +13,7 @@ export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
     const [view, setView] = useState("month"); // Estado para la vista actual
     const [currentDate, setCurrentDate] = useState(new Date()); // Estado para la fecha actual
+    const navigate = useNavigate();
 
     // Cargar eventos desde la API
     useEffect(() => {
@@ -49,6 +50,13 @@ export default function CalendarioEventos() {
         setCurrentDate(date); // Actualizar la fecha actual
     };
 
+    // Función para manejar el clic en un día del calendario
+    const handleSelectSlot = ({ start }) => {
+        const fechaSeleccionada = moment(start).format("YYYY-MM-DD"); // Formatear la fecha
+        navigate(`/calendario/crear-evento/${fechaSeleccionada}`); // Redirigir con la fecha en la URL
+    };
+
+
     return (
         <>
             <div className="p-6 bg-white rounded-lg shadow-md">
@@ -64,6 +72,8 @@ export default function CalendarioEventos() {
                     view={view} // Usamos el estado 'view' para controlar la vista activa
                     onView={handleViewChange} // Detectar el cambio de vista
                     onNavigate={handleNavigate} // Manejar la navegación de mes/semana/día
+                    selectable // Permite seleccionar un día
+                    onSelectSlot={handleSelectSlot} // Maneja el clic en un día
                     messages={{
                         month: "Mes",
                         week: "Semana",

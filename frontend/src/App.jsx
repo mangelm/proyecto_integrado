@@ -16,6 +16,7 @@ import Estadisticas from './components/estadisticas/Estadisticas';
 import EstadisticasOcupacion from './components/estadisticas/EstadisticasOcupacion';
 import AnalisisConsumo from './components/estadisticas/AnalisisConsumo';
 import CalendarioEventos from './components/eventos/CalendarioEventos';
+import CrearEventoCalendario from './components/eventos/CrearEventoCalendario';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primeros gráficos */}
           <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}
           <Route path="/calendario" element={<CalendarioEventos />} /> {/* Ruta segundos gráficos */}
+          <Route path="/calendario/crear-evento/:fecha" element={<CrearEventoCalendario />} />
         </Routes>
       </div>
     </Router>

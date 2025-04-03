@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function CrearEvento() {
+export default function CrearEvento({ onSuccess }) {
     const [nombre, setNombre] = useState("");
     const [fecha, setFecha] = useState("");
     const [cantidadPersonas, setCantidadPersonas] = useState("");
@@ -40,7 +40,11 @@ export default function CrearEvento() {
             });
     
             if (response.ok) {
-                navigate("/eventos");
+                if (onSuccess) {
+                    onSuccess(); // Usa la función personalizada si existe
+                } else {
+                    navigate("/eventos"); // Redirección por defecto
+                }
             } else {
                 const errorData = await response.text();
                 alert(errorData); // Muestra el mensaje "Horario ocupado, escoge otro horario."
