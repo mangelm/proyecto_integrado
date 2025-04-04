@@ -58,6 +58,7 @@ export default function CrearEvento({ onSuccess }) {
     };
     
     
+    
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto">

@@ -82,7 +82,7 @@ export default function CalendarioEventos() {
     };
 
     if (loading) {
-        return <div>Loading...</div>; // Muestra un mensaje de carga mientras se obtienen los eventos
+        return <div>Cargando...</div>; // Muestra un mensaje de carga mientras se obtienen los eventos
     }
 
     return (

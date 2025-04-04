@@ -7,8 +7,9 @@ export default function GestionEventos() {
   const [displayedEventos, setDisplayedEventos] = useState([]);
   const [page, setPage] = useState(0);
   const [size] = useState(10);
-  const [paginationValue] = useState(2);
+  const [paginationValue] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   // Estados para los filtros
   const [espacioFiltro, setEspacioFiltro] = useState("");
@@ -16,21 +17,27 @@ export default function GestionEventos() {
   const [estadoFiltro, setEstadoFiltro] = useState("");
   const [filtersApplied, setFiltersApplied] = useState(false);
 
-  // Cargar eventos iniciales
+  // Cargar los eventos
   useEffect(() => {
-    fetchEventos();
-  }, [page, size]);
+    setLoading(true);
 
-  const fetchEventos = () => {
     fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) throw new Error("Error al obtener los eventos");
+        return response.json();
+      })
       .then((data) => {
         setEventos(data.content);
         setDisplayedEventos(data.content);
         setTotalPages(data.totalPages);
       })
-      .catch((error) => console.error("Error fetching eventos:", error));
-  };
+      .catch((error) => {
+        console.error("Error fetching eventos:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [page, size]);
 
   // Aplicar filtros
   const applyFilters = () => {
@@ -115,6 +122,10 @@ export default function GestionEventos() {
     }
   };
 
+  if (loading) {
+    return <div className="text-center">Cargando eventos ...</div>; // Muestra un mensaje de carga mientras se obtienen los eventos
+  }
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4">Gestión de Eventos</h1>
@@ -126,6 +137,7 @@ export default function GestionEventos() {
           </button>
         </Link>
       </div>
+
 
       {/* Sección de Filtros */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
