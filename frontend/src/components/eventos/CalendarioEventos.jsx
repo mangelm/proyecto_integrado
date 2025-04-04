@@ -76,18 +76,6 @@ export default function CalendarioEventos() {
         navigate(`/calendario/crear-evento/${fechaSeleccionada}`);
     };
 
-    // Cambiar la vista al mes siguiente
-    const handleNextMonth = () => {
-        const nextMonth = moment(currentDate).add(1, "month").toDate();
-        setCurrentDate(nextMonth);
-    };
-
-    // Cambiar la vista al mes anterior
-    const handlePrevMonth = () => {
-        const prevMonth = moment(currentDate).subtract(1, "month").toDate();
-        setCurrentDate(prevMonth);
-    };
-
     // Función para refrescar los eventos
     const handleRefresh = () => {
         fetchEventos();
@@ -102,20 +90,7 @@ export default function CalendarioEventos() {
             <div className="p-6 bg-white rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold mb-4 text-center">Calendario de Eventos</h2>
 
-                {/* Botones para cambiar de mes */}
                 <div className="flex justify-between mb-4">
-                    <button
-                        onClick={handlePrevMonth}
-                        className="bg-gray-600 text-white p-2 rounded-lg hover:bg-gray-700"
-                    >
-                        Mes Anterior
-                    </button>
-                    <button
-                        onClick={handleNextMonth}
-                        className="bg-gray-600 text-white p-2 rounded-lg hover:bg-gray-700"
-                    >
-                        Mes Siguiente
-                    </button>
                     {/* Botón de refrescar */}
                     <button
                         onClick={handleRefresh}
