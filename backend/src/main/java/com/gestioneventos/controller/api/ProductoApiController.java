@@ -1,6 +1,8 @@
 package com.gestioneventos.controller.api;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,14 @@ public class ProductoApiController {
 	
 	@Autowired
     private ProductoService productoService;
-
+	
+	//listar productos sin paginación
+    @GetMapping("/todos")
+    public ResponseEntity<List<Producto>> listarProductos() {
+        List<Producto> productos = productoService.obtenerTodosLosProductos();
+        return ResponseEntity.ok(productos);
+    }
+	
 	//LLamada a metodo para obtener todos los productos con paginacion
     @GetMapping
     public ResponseEntity<Page<Producto>> listarProductos(

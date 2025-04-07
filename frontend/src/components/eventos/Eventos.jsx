@@ -250,6 +250,12 @@ export default function GestionEventos() {
                         Detalles
                       </button>
                     </Link>
+                    {/* Botón para asignar producto */}
+                    <Link to={`/eventos/${evento.id}/productos`}>
+                      <button className="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition duration-300">
+                        Asignar Producto
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               ))

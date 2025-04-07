@@ -7,8 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.Evento;
+import com.gestioneventos.model.Producto;
+import com.gestioneventos.model.dto.AgregarProductosDTO;
+import com.gestioneventos.repository.ConsumoProductoRepository;
 import com.gestioneventos.repository.EventoRepository;
+import com.gestioneventos.repository.ProductoRepository;
 import com.gestioneventos.service.EventoService;
 
 import jakarta.persistence.EntityManager;
@@ -22,6 +27,12 @@ public class EventoServiceImp implements EventoService {
 
     @Autowired
     private EventoRepository eventoRepository;
+    
+    @Autowired
+    private ProductoRepository productoRepository;
+    
+    @Autowired
+    private ConsumoProductoRepository consumoProductoRepository;
     
     @PersistenceContext
     private EntityManager entityManager; 
@@ -86,5 +97,30 @@ public class EventoServiceImp implements EventoService {
     public Page<Evento> obtenerTodosLosEventos(Pageable pageable) {
         return eventoRepository.findAll(pageable);
     }
+    
+    
+    //Metodo para agregar productos a un evento
+	@Override
+	public Evento agregarProducto(Long eventoId, AgregarProductosDTO productoId) {
+		Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+        Producto producto = productoRepository.findById(productoId.getProductoId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        ConsumoProducto consumo = new ConsumoProducto();
+        consumo.setEvento(evento);
+        consumo.setProducto(producto);
+        consumo.setCantidad(productoId.getCantidad());
+        consumo.setPrecioUnitario(productoId.getPrecioUnitario());
+        consumo.setImpuesto(productoId.getImpuesto());
+
+        consumoProductoRepository.save(consumo);
+
+        evento.getConsumos().add(consumo); // Esto actualiza la relación en memoria
+        return eventoRepository.save(evento); // Guarda el evento actualizado
+		
+	}
+    
     
 }

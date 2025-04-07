@@ -17,6 +17,7 @@ import EstadisticasOcupacion from './components/estadisticas/EstadisticasOcupaci
 import AnalisisConsumo from './components/estadisticas/AnalisisConsumo';
 import CalendarioEventos from './components/eventos/CalendarioEventos';
 import CrearEventoCalendario from './components/eventos/CrearEventoCalendario';
+import AsignarProducto from './components/productos/AsignarProducto';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/eventos/:id" element={<DetallesEvento />} />
           <Route path="/eventos/editar/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
           <Route path="/eventos/crear/" element={<CrearEvento />} /> {/* Ruta para crear */}
+          <Route path="/eventos/:id/productos" element={<AsignarProducto />} /> {/* Ruta para crear */}
           <Route path="/productos" element={<GestionProductos />} />
           <Route path="/productos/editar/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
           <Route path="/productos/crear/" element={<CrearProducto />} /> {/* Ruta para crear */}

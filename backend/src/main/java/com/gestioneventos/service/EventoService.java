@@ -6,8 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.gestioneventos.model.Evento;
-
-
+import com.gestioneventos.model.dto.AgregarProductosDTO;
 
 //Interfaz creada para que siempre se cumpla la misma estructura en cuanto a funciones y parametros
 public interface EventoService {
@@ -18,4 +17,5 @@ public interface EventoService {
 	Evento actualizarEvento(Long id, Evento evento);
 	void eliminarEvento(Long id);
 	Page<Evento> obtenerTodosLosEventos(Pageable pageable); // Metodo con paginacion
+	Evento agregarProducto(Long eventoId, AgregarProductosDTO productoId);
 }
