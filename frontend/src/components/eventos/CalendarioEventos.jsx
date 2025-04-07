@@ -20,6 +20,7 @@ export default function CalendarioEventos() {
 
     const navigate = useNavigate();
 
+    //Solicitar la información al servidor
     const fetchEventos = useCallback(async () => {
         setLoading(true);
         try {
@@ -31,22 +32,43 @@ export default function CalendarioEventos() {
                 console.error("La respuesta no tiene la estructura esperada.");
                 return;
             }
+
             const eventosFormateados = data.map((evento) => {
                 const start = new Date(evento.fecha);
-                const end = start;
+            
+                // Asignar las horas según el horario
+                if (evento.horario === "MAÑANA") {
+                    start.setHours(8, 0);  // 8:00 AM
+                } else if (evento.horario === "TARDE") {
+                    start.setHours(14, 0); // 2:00 PM
+                } else if (evento.horario === "NOCHE") {
+                    start.setHours(19, 0); // 7:00 PM
+                }
+            
+                const end = new Date(start);
+                // Duración del evento por defecto de 5 horas, puedes ajustarlo según necesites
+                if (evento.horario === "MAÑANA") {
+                    end.setHours(13, 59); // Finaliza a las 13:00 (1:00 PM)
+                } else if (evento.horario === "TARDE") {
+                    end.setHours(18, 59); // Finaliza a las 18:00 (6:00 PM)
+                } else if (evento.horario === "NOCHE") {
+                    end.setHours(23, 0); // Finaliza a las 23:00 (11:00 PM)
+                }
             
                 return {
                     id: evento.id,
                     title: evento.nombre,
                     start,
                     end,
-                    allDay: true,
+                    allDay: false, // No es un evento de todo el día
                     estado: evento.estado || "",
                     espacio: evento.espacio || "",
                     horario: evento.horario || "",
                     fecha: evento.fecha,
                 };
             });
+            
+            
             
             setEventos(eventosFormateados);
         } catch (error) {
@@ -60,9 +82,11 @@ export default function CalendarioEventos() {
         fetchEventos();
     }, [fetchEventos]);
 
+    //Para controlar la vista (dia, semana, mes) y la fecha
     const handleViewChange = (view) => setView(view);
     const handleNavigate = (date) => setCurrentDate(date);
 
+    //Controlar enlace y fecha a la hora de seleccionar un dia
     const handleSelectSlot = ({ start }) => {
         const fechaSeleccionada = moment(start).format("YYYY-MM-DD");
         navigate(`/calendario/crear-evento/${fechaSeleccionada}`);
@@ -72,6 +96,7 @@ export default function CalendarioEventos() {
         fetchEventos();
     };
 
+    //Para gestionar los filtros del calendario
     const eventosFiltrados = useMemo(() => {
         return eventos.filter((evento) => {
             const coincideEstado = filtroEstado ? evento.estado === filtroEstado : true;
@@ -85,6 +110,7 @@ export default function CalendarioEventos() {
     }, [eventos, filtroEstado, filtroEspacio, filtroHorario]);
     
 
+    //Personalizacion de estilo de los horarios
     const getEstiloEvento = (evento) => {
         let backgroundColor = "#6b7280"; // gris por defecto
     
@@ -114,6 +140,7 @@ export default function CalendarioEventos() {
         };
     };
     
+    //Para mostrar de forma personalizada lo que quiero que se muestre en el calendario
     const EventoPersonalizado = ({ event }) => (
         <div>
             <strong>{event.title}</strong>
