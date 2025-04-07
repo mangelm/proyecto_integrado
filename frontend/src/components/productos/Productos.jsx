@@ -97,7 +97,6 @@ export default function GestionProductos() {
             <table className="min-w-full table-fixed">
                 <thead>
                     <tr>
-                        <th className="px-2 py-3 text-left text-sm font-medium text-gray-700 border-b w-1/12">Id</th>
                         <th className="px-2 py-3 text-left text-sm font-medium text-gray-700 border-b w-1/6">Nombre</th>
                         <th className="px-2 py-3 text-left text-sm font-medium text-gray-700 border-b w-1/4">Descripción</th>
                         <th className="px-2 py-3 text-left text-sm font-medium text-gray-700 border-b w-1/8">Precio</th>
@@ -111,7 +110,6 @@ export default function GestionProductos() {
                     {productos.length > 0 ? (
                         productos.map((producto) => (
                         <tr key={producto.id} className="hover:bg-gray-100">
-                            <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.id}</td>
                             <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.nombre}</td>
                             <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.descripcion}</td>
                             <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.precio}</td>

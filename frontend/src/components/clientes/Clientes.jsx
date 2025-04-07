@@ -97,7 +97,6 @@ export default function GestionClientes() {
         <table className="min-w-full table-auto table-layout-fixed">
             <thead>
             <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Id</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nombre</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Email</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Telefono</th>
@@ -108,7 +107,6 @@ export default function GestionClientes() {
             {clientes.length > 0 ? (
                 clientes.map((cliente) => (
                 <tr key={cliente.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.id}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.nombre}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.email}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.telefono}</td>

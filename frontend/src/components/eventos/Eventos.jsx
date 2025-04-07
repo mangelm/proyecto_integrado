@@ -214,7 +214,6 @@ export default function GestionEventos() {
         <table className="min-w-full table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Id</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nombre</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Fecha</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nº Asistentes</th>
@@ -228,7 +227,6 @@ export default function GestionEventos() {
             {displayedEventos.length > 0 ? (
               displayedEventos.map((evento) => (
                 <tr key={evento.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.id}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.nombre}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.fecha}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.cantidadPersonas}</td>
