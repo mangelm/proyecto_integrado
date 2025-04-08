@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
+import com.gestioneventos.model.dto.ProductoCantidadDTO;
 import com.gestioneventos.service.EventoService;
 
 @RestController
@@ -103,5 +104,17 @@ public class EventoApiController {
         Evento eventoActualizado = eventoService.agregarProducto(evento, producto);
         return ResponseEntity.ok(eventoActualizado);
     }
+    
+    // Método para obtener los productos y cantidades de un evento, devolviendo DTO
+    @GetMapping("/{id}/productos-consumidos")
+    public ResponseEntity<List<ProductoCantidadDTO>> obtenerProductosConsumidos(@PathVariable("id") Long eventoId) {
+        try {
+            List<ProductoCantidadDTO> productosConCantidad = eventoService.obtenerProductosConCantidadPorEvento(eventoId);
+            return ResponseEntity.ok(productosConCantidad);
+        } catch (RecursoNoEncontradoException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 }

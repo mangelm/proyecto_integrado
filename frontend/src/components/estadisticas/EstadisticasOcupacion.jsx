@@ -190,7 +190,7 @@ export default function EstadisticasOcupacion() {
                 </form>
             </div>
             {/* Mientras cargan los datos para añadirle dinamismo  */}
-            {loading && <p className="mt-4 text-gray-600">Cargando datos...</p>}
+            {loading && <p className="mt-4 text-gray-600">Cargando datos ...</p>}
             {/* Para controlar y mostrar los errores  */}
             {error && <p className="mt-4 text-red-600">{error}</p>}
             {estadisticas.length > 0 && !loading && (
@@ -219,7 +219,7 @@ export default function EstadisticasOcupacion() {
                     {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
                     <button
                         onClick={handleButtonClickHorarios}
-                        className="mt-6 w-full p-2 bg-green-500 text-white rounded"
+                        className="mt-24 w-full p-2 bg-green-500 text-white rounded"
                     >
                         {mostrarGraficoHorarios ? "Ocultar Horarios Más Solicitados" : "Ver Horarios Más Solicitados"}
                     </button>

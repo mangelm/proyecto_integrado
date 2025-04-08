@@ -10,6 +10,7 @@ export default function GestionEventos() {
   const [paginationValue] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [productosEventos, setProductosEventos] = useState({});
 
   // Estados para los filtros
   const [espacioFiltro, setEspacioFiltro] = useState("");
@@ -26,10 +27,29 @@ export default function GestionEventos() {
         if (!response.ok) throw new Error("Error al obtener los eventos");
         return response.json();
       })
-      .then((data) => {
+      .then(async (data) => {
         setEventos(data.content);
         setDisplayedEventos(data.content);
         setTotalPages(data.totalPages);
+
+        // Obtener productos para cada evento utilizando el nuevo endpoint
+        const productosPorEvento = {};
+        for (const evento of data.content) {
+          try {
+            const response = await fetch(`http://localhost:8100/api/eventos/${evento.id}/productos-consumidos`);
+            if (response.ok) {
+              const productosConsumidos = await response.json();
+              productosPorEvento[evento.id] = productosConsumidos;
+            } else {
+              console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, response.status);
+              productosPorEvento[evento.id] = [];
+            }
+          } catch (error) {
+            console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, error);
+            productosPorEvento[evento.id] = [];
+          }
+        }
+        setProductosEventos(productosPorEvento);
       })
       .catch((error) => {
         console.error("Error fetching eventos:", error);
@@ -107,7 +127,6 @@ export default function GestionEventos() {
       })
         .then((response) => {
           if (response.ok) {
-            // Actualizar ambos estados
             setEventos(eventos.filter((evento) => evento.id !== id));
             setDisplayedEventos(displayedEventos.filter((evento) => evento.id !== id));
             alert("Evento eliminado con éxito");
@@ -122,8 +141,15 @@ export default function GestionEventos() {
     }
   };
 
+  // Función para formatear la lista de productos consumidos
+  const formatProductosConsumidos = (productos) => {
+    if (!productos || productos.length === 0) return "Ninguno";
+
+    return productos.map(producto => `${producto.nombreProducto} (${producto.cantidad})`).join(", ");
+  };
+
   if (loading) {
-    return <div className="text-center">Cargando eventos ...</div>; // Muestra un mensaje de carga mientras se obtienen los eventos
+    return <div className="text-center">Cargando eventos ...</div>;
   }
 
   return (
@@ -137,7 +163,6 @@ export default function GestionEventos() {
           </button>
         </Link>
       </div>
-
 
       {/* Sección de Filtros */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -165,7 +190,7 @@ export default function GestionEventos() {
             value={horarioFiltro}
             onChange={(e) => setHorarioFiltro(e.target.value)}
           >
-            <option value="">Todos los horarios</option>
+            <option value="">Todos</option>
             <option value="MAÑANA">MAÑANA</option>
             <option value="TARDE">TARDE</option>
             <option value="NOCHE">NOCHE</option>
@@ -182,7 +207,7 @@ export default function GestionEventos() {
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
           >
-            <option value="">Todos los estados</option>
+            <option value="">Todos</option>
             <option value="PENDIENTE">PENDIENTE</option>
             <option value="CONFIRMADO">CONFIRMADO</option>
             <option value="CANCELADO">CANCELADO</option>
@@ -220,6 +245,7 @@ export default function GestionEventos() {
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Espacio</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Horario</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Estado</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Productos</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Acciones</th>
             </tr>
           </thead>
@@ -233,6 +259,11 @@ export default function GestionEventos() {
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.espacio}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.horario}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.estado}</td>
+                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">
+                    {productosEventos[evento.id] ?
+                      formatProductosConsumidos(productosEventos[evento.id]) :
+                      "Cargando..."}
+                  </td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b space-x-2">
                     <Link to={`/eventos/editar/${evento.id}`}>
                       <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300">
@@ -250,7 +281,6 @@ export default function GestionEventos() {
                         Detalles
                       </button>
                     </Link>
-                    {/* Botón para asignar producto */}
                     <Link to={`/eventos/${evento.id}/productos`}>
                       <button className="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition duration-300">
                         Asignar Producto
@@ -262,8 +292,8 @@ export default function GestionEventos() {
             ) : (
               <tr>
                 <td colSpan="8" className="px-6 py-4 text-center text-sm font-medium text-gray-500">
-                  {filtersApplied 
-                    ? "No hay eventos que coincidan con los filtros aplicados" 
+                  {filtersApplied
+                    ? "No hay eventos que coincidan con los filtros aplicados"
                     : "No hay eventos disponibles."}
                 </td>
               </tr>
@@ -284,7 +314,7 @@ export default function GestionEventos() {
           </button>
           <button
             onClick={handlePrevValue}
-            disabled={page <= 4}
+            disabled={page <= 0}
             className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
           >
             -{paginationValue}
@@ -314,7 +344,7 @@ export default function GestionEventos() {
         <div className="flex gap-2">
           <button
             onClick={handleNextValue}
-            disabled={page >= totalPages - paginationValue}
+            disabled={page >= totalPages - 1}
             className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
           >
             +{paginationValue}

@@ -16,5 +16,4 @@ public interface ProductoService {
 	Producto actualizarProducto(Long id, Producto producto);
 	void eliminarProducto(Long id);
 	Page<Producto> obtenerTodosLosProductos(Pageable pageable);
-	
 }

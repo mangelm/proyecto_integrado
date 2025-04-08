@@ -1,13 +1,12 @@
 package com.gestioneventos.repository;
 
 import com.gestioneventos.model.Evento;
+import com.gestioneventos.model.dto.ProductoCantidadDTO;
 import com.gestioneventos.model.enumeration.Horario;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +21,13 @@ public interface EventoRepository extends JpaRepository <Evento, Long>{
 	// Consulta para verificar si hay eventos existentes en un horario y fecha concretos
 	@Query("SELECT COUNT(e) FROM Evento e WHERE e.fecha = :fecha AND e.horario = :horario AND e.espacio = :espacio")
 	long countEventosExistentes(@Param("fecha") LocalDate fecha, @Param("horario") Horario horario, @Param("espacio") String espacio);
+	
+	// Consulta para obtener el nombre del producto y la cantidad consumida por evento
+	// Si no hago lo del new com.gestioneventos no acaba de pillar bien los parametros
+    @Query("SELECT NEW com.gestioneventos.model.dto.ProductoCantidadDTO(p.nombre, cp.cantidad) " +
+           "FROM ConsumoProducto cp " +
+           "JOIN cp.producto p " +
+           "WHERE cp.evento.id = :eventoId")
+    List<ProductoCantidadDTO> findProductosConCantidadPorEventoId(@Param("eventoId") Long eventoId);
 }
+

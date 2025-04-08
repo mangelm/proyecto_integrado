@@ -11,6 +11,7 @@ import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.Producto;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
+import com.gestioneventos.model.dto.ProductoCantidadDTO;
 import com.gestioneventos.repository.ConsumoProductoRepository;
 import com.gestioneventos.repository.EventoRepository;
 import com.gestioneventos.repository.ProductoRepository;
@@ -121,6 +122,13 @@ public class EventoServiceImp implements EventoService {
         return eventoRepository.save(evento); // Guarda el evento actualizado
 		
 	}
-    
+
+	@Override
+	 public List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId) {
+        if (!eventoRepository.existsById(eventoId)) {
+            throw new RecursoNoEncontradoException("Evento no encontrado con ID: " + eventoId);
+        }
+        return eventoRepository.findProductosConCantidadPorEventoId(eventoId);
+    }
     
 }
