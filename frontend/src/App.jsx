@@ -32,11 +32,11 @@ function App() {
           <Route path="/eventos/crear-evento/" element={<CrearEvento />} /> {/* Ruta para crear */}
           <Route path="/eventos/:id/productos" element={<AsignarProducto />} /> {/* Ruta para crear */}
           <Route path="/productos" element={<GestionProductos />} />
-          <Route path="/productos/editar/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
-          <Route path="/productos/crear/" element={<CrearProducto />} /> {/* Ruta para crear */}
+          <Route path="/productos/editar-producto/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
+          <Route path="/productos/crear-producto/" element={<CrearProducto />} /> {/* Ruta para crear */}
           <Route path="/clientes" element={<GestionClientes />} />
-          <Route path="/clientes/editar/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
-          <Route path="/clientes/crear/" element={<CrearCliente/>} /> {/* Ruta para crear */}
+          <Route path="/clientes/editar-cliente/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
+          <Route path="/clientes/crear-cliente/" element={<CrearCliente/>} /> {/* Ruta para crear */}
           <Route path="/estadisticas" element={<Estadisticas />} />
           <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primeros gráficos */}
           <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}

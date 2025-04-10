@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 export default function GestionEventos() {
   // Estados para la gestión de eventos y paginación
   const [eventos, setEventos] = useState([]);
-  const [displayedEventos, setDisplayedEventos] = useState([]);
   const [page, setPage] = useState(0);
   const [size] = useState(10);
   const [paginationValue] = useState(3);
@@ -13,10 +12,9 @@ export default function GestionEventos() {
   const [productosEventos, setProductosEventos] = useState({});
 
   // Estados para los filtros
-  const [espacioFiltro, setEspacioFiltro] = useState("");
-  const [horarioFiltro, setHorarioFiltro] = useState("");
-  const [estadoFiltro, setEstadoFiltro] = useState("");
-  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [filtroEspacio, setFiltroEspacio] = useState("");
+  const [filtroHorario, setFiltroHorario] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
 
   // Cargar los eventos
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function GestionEventos() {
       })
       .then(async (data) => {
         setEventos(data.content);
-        setDisplayedEventos(data.content);
         setTotalPages(data.totalPages);
 
         // Obtener productos para cada evento utilizando el nuevo endpoint
@@ -59,36 +56,14 @@ export default function GestionEventos() {
       });
   }, [page, size]);
 
-  // Aplicar filtros
-  const applyFilters = () => {
-    let filtered = [...eventos];
-
-    if (espacioFiltro) {
-      filtered = filtered.filter(evento =>
-        evento.espacio.toLowerCase().includes(espacioFiltro.toLowerCase())
-      );
-    }
-
-    if (horarioFiltro) {
-      filtered = filtered.filter(evento => evento.horario === horarioFiltro);
-    }
-
-    if (estadoFiltro) {
-      filtered = filtered.filter(evento => evento.estado === estadoFiltro);
-    }
-
-    setDisplayedEventos(filtered);
-    setFiltersApplied(true);
-  };
-
-  // Limpiar filtros
-  const resetFilters = () => {
-    setEspacioFiltro("");
-    setHorarioFiltro("");
-    setEstadoFiltro("");
-    setDisplayedEventos(eventos);
-    setFiltersApplied(false);
-  };
+  // Filtrar eventos
+  const eventosFiltrados = eventos.filter((evento) => {
+    const coincideEspacio = evento.espacio.toLowerCase().includes(filtroEspacio.toLowerCase());
+    const coincideHorario = filtroHorario === "" || evento.horario === filtroHorario;
+    const coincideEstado = filtroEstado === "" || evento.estado === filtroEstado;
+    
+    return coincideEspacio && coincideHorario && coincideEstado;
+  });
 
   // Funciones de paginación
   const handlePrevPage = () => {
@@ -128,7 +103,6 @@ export default function GestionEventos() {
         .then((response) => {
           if (response.ok) {
             setEventos(eventos.filter((evento) => evento.id !== id));
-            setDisplayedEventos(displayedEventos.filter((evento) => evento.id !== id));
             alert("Evento eliminado con éxito");
           } else {
             alert("Error al eliminar el evento.");
@@ -153,138 +127,100 @@ export default function GestionEventos() {
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Eventos</h1>
+    <div className="p-8 bg-white rounded-lg shadow-lg">
+      <h1 className="text-3xl font-semibold text-gray-900 mb-6">Gestión de Eventos</h1>
 
-      <div className="mb-4">
+      <div className="mb-6">
         <Link to="/eventos/crear-evento">
-          <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
             Crear Evento
           </button>
         </Link>
       </div>
 
       {/* Sección de Filtros */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div>
-          <label htmlFor="espacioFiltro" className="block text-sm font-medium">
-            Espacio
-          </label>
-          <input
-            type="text"
-            id="espacioFiltro"
-            className="mt-1 w-full p-2 border rounded-md"
-            value={espacioFiltro}
-            onChange={(e) => setEspacioFiltro(e.target.value)}
-            placeholder="Filtrar por espacio"
-          />
-        </div>
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <input
+          type="text"
+          placeholder="Buscar por espacio"
+          value={filtroEspacio}
+          onChange={(e) => setFiltroEspacio(e.target.value)}
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-        <div>
-          <label htmlFor="horarioFiltro" className="block text-sm font-medium">
-            Horario
-          </label>
-          <select
-            id="horarioFiltro"
-            className="mt-1 w-full p-2 border rounded-md"
-            value={horarioFiltro}
-            onChange={(e) => setHorarioFiltro(e.target.value)}
-          >
-            <option value="">Todos</option>
-            <option value="MAÑANA">MAÑANA</option>
-            <option value="TARDE">TARDE</option>
-            <option value="NOCHE">NOCHE</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="estadoFiltro" className="block text-sm font-medium">
-            Estado
-          </label>
-          <select
-            id="estadoFiltro"
-            className="mt-1 w-full p-2 border rounded-md"
-            value={estadoFiltro}
-            onChange={(e) => setEstadoFiltro(e.target.value)}
-          >
-            <option value="">Todos</option>
-            <option value="PENDIENTE">PENDIENTE</option>
-            <option value="CONFIRMADO">CONFIRMADO</option>
-            <option value="CANCELADO">CANCELADO</option>
-            <option value="FINALIZADO">FINALIZADO</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={applyFilters}
-          className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition duration-300"
+        <select
+          value={filtroHorario}
+          onChange={(e) => setFiltroHorario(e.target.value)}
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Aplicar Filtros
-        </button>
+          <option value="">Todos los horarios</option>
+          <option value="MAÑANA">MAÑANA</option>
+          <option value="TARDE">TARDE</option>
+          <option value="NOCHE">NOCHE</option>
+        </select>
 
-        {filtersApplied && (
-          <button
-            onClick={resetFilters}
-            className="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 transition duration-300"
-          >
-            Limpiar Filtros
-          </button>
-        )}
+        <select
+          value={filtroEstado}
+          onChange={(e) => setFiltroEstado(e.target.value)}
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Todos los estados</option>
+          <option value="PENDIENTE">PENDIENTE</option>
+          <option value="CONFIRMADO">CONFIRMADO</option>
+          <option value="CANCELADO">CANCELADO</option>
+          <option value="FINALIZADO">FINALIZADO</option>
+        </select>
       </div>
 
       {/* Tabla de Eventos */}
       <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-50">
+        <table className="min-w-full bg-white table-auto rounded-lg shadow-md">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nombre</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Fecha</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nº Asistentes</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Espacio</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Horario</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Hora</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Estado</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Productos</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Acciones</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Nombre</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Fecha</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Nº Asistentes</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Espacio</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Horario</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Hora</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Estado</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Productos</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {displayedEventos.length > 0 ? (
-              displayedEventos.map((evento) => (
+            {eventosFiltrados.length > 0 ? (
+              eventosFiltrados.map((evento) => (
                 <tr key={evento.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.nombre}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.fecha}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.cantidadPersonas}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.espacio}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.horario}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.hora}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.estado}</td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">
-                    {productosEventos[evento.id] ?
-                      formatProductosConsumidos(productosEventos[evento.id]) :
-                      "Cargando..."}
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.nombre}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.fecha}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.cantidadPersonas}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.espacio}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.horario}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.hora}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{evento.estado}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {productosEventos[evento.id] ? formatProductosConsumidos(productosEventos[evento.id]) : "Cargando..."}
                   </td>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b space-x-2">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 space-x-2">
                     <Link to={`/eventos/editar-evento/${evento.id}`}>
-                      <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300">
+                      <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition duration-300">
                         Editar
                       </button>
                     </Link>
                     <button
                       onClick={() => handleDelete(evento.id)}
-                      className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition duration-300"
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition duration-300"
                     >
                       Eliminar
                     </button>
                     <Link to={`/eventos/${evento.id}`}>
-                      <button className="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-900 transition duration-300">
+                      <button className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">
                         Detalles
                       </button>
                     </Link>
                     <Link to={`/eventos/${evento.id}/productos`}>
-                      <button className="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition duration-300">
+                      <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
                         Asignar Producto
                       </button>
                     </Link>
@@ -293,10 +229,8 @@ export default function GestionEventos() {
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="px-6 py-4 text-center text-sm font-medium text-gray-500">
-                  {filtersApplied
-                    ? "No hay eventos que coincidan con los filtros aplicados"
-                    : "No hay eventos disponibles."}
+                <td colSpan="9" className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                  No hay eventos disponibles.
                 </td>
               </tr>
             )}
@@ -305,19 +239,19 @@ export default function GestionEventos() {
       </div>
 
       {/* Paginación */}
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="flex gap-2">
+      <div className="mt-6 flex justify-between items-center">
+        <div className="flex gap-4">
           <button
             onClick={handleFirstPage}
             disabled={page === 0}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             Primero
           </button>
           <button
             onClick={handlePrevValue}
             disabled={page <= 0}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             -{paginationValue}
           </button>
@@ -327,7 +261,7 @@ export default function GestionEventos() {
           <button
             onClick={handlePrevPage}
             disabled={page === 0}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             Anterior
           </button>
@@ -337,36 +271,37 @@ export default function GestionEventos() {
           <button
             onClick={handleNextPage}
             disabled={page === totalPages - 1}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             Siguiente
           </button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <button
             onClick={handleNextValue}
             disabled={page >= totalPages - 1}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             +{paginationValue}
           </button>
           <button
             onClick={handleLastPage}
             disabled={page === totalPages - 1}
-            className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+            className="bg-gray-300 text-black px-4 py-2 rounded-lg shadow-md disabled:opacity-50 hover:bg-gray-400 transition duration-300"
           >
             Último
           </button>
         </div>
       </div>
 
-      <br />
-      <Link to={`/`}>
-        <button className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition duration-300">
-          Volver a la página principal
-        </button>
-      </Link>
+      <div className="mt-6">
+        <Link to={`/`}>
+          <button className="bg-green-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300">
+            Volver a la página principal
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
