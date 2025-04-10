@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+import { Link } from "react-router-dom";
 
 export default function GestionProductos() {
     const [productos, setProductos] = useState([]);
@@ -8,6 +8,13 @@ export default function GestionProductos() {
     const [paginationValue] = useState(2);
     const [totalPages, setTotalPages] = useState(0); // Total de páginas
     const [loading, setLoading] = useState(false); // Indicador de carga
+
+    // Filtros
+    const [filtroCategoria, setFiltroCategoria] = useState(""); // Filtro por categoría
+    const [filtroNombre, setFiltroNombre] = useState(""); // Filtro por nombre
+
+    // Categorías posibles (puedes cambiar esto dependiendo de cómo se maneje en el backend)
+    const categorias = ["BEBIDA", "COMIDA", "SERVICIO"];
 
     useEffect(() => {
         setLoading(true); // Inicia el indicador de carga
@@ -20,6 +27,14 @@ export default function GestionProductos() {
         .catch((error) => console.error("Error fetching productos:", error))
         .finally(() => setLoading(false)); // Detiene el indicador de carga
     }, [page, size]);
+
+    // Filtrar productos según los filtros aplicados
+    const productosFiltrados = productos.filter((producto) => {
+        return (
+            (filtroCategoria ? producto.categoria === filtroCategoria : true) &&
+            (filtroNombre ? producto.nombre.toLowerCase().includes(filtroNombre.toLowerCase()) : true)
+        );
+    });
 
     // Renderizar mientras carga
     if (loading) {
@@ -81,9 +96,45 @@ export default function GestionProductos() {
         }
     };
 
+    // Función para limpiar los filtros
+    const limpiarFiltros = () => {
+        setFiltroCategoria("");
+        setFiltroNombre("");
+    };
+
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
             <h1 className="text-2xl font-bold mb-4">Gestión de Productos</h1>
+            
+            {/* Filtros */}
+            <div className="mb-4 flex gap-4">
+                <input
+                    type="text"
+                    className="p-2 border rounded"
+                    placeholder="Buscar por nombre"
+                    value={filtroNombre}
+                    onChange={(e) => setFiltroNombre(e.target.value)}
+                />
+                <select
+                    className="p-2 border rounded"
+                    value={filtroCategoria}
+                    onChange={(e) => setFiltroCategoria(e.target.value)}
+                >
+                    <option value="">Filtrar por categoría</option>
+                    {categorias.map((categoria, index) => (
+                        <option key={index} value={categoria}>
+                            {categoria}
+                        </option>
+                    ))}
+                </select>
+                <button 
+                    onClick={limpiarFiltros} 
+                    className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 transition duration-300"
+                >
+                    Limpiar Filtros
+                </button>
+            </div>
+
             <div className="mb-4">
                 {/* Botón para crear producto, que redirige a la página de creación */}
                 <Link to="/productos/crear">
@@ -107,8 +158,8 @@ export default function GestionProductos() {
                     </tr>
                 </thead>
                 <tbody>
-                    {productos.length > 0 ? (
-                        productos.map((producto) => (
+                    {productosFiltrados.length > 0 ? (
+                        productosFiltrados.map((producto) => (
                         <tr key={producto.id} className="hover:bg-gray-100">
                             <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.nombre}</td>
                             <td className="px-2 py-2 text-sm font-medium text-gray-900 border-b truncate">{producto.descripcion}</td>
