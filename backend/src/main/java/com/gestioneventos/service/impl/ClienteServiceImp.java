@@ -41,12 +41,20 @@ public class ClienteServiceImp implements ClienteService {
 	//Metodo para actualizar un cliente concreto
 	@Override
 	public Cliente actualizarCliente(Long id, Cliente cliente) {
-		Cliente existente = obtenerClientePorId(id);
-		existente.setNombre(cliente.getNombre());
-		existente.setApellido(cliente.getApellido());
-		existente.setEmail(cliente.getEmail());
-		existente.setTelefono(cliente.getTelefono());
-		return clienteRepository.save(existente);
+	    Cliente existente = obtenerClientePorId(id);
+
+	    // Asegúrate de que el Rol se esté asignando correctamente
+	    if (cliente.getRol() != null) {
+	        existente.setRol(cliente.getRol());
+	    }
+	    
+	    // Actualización de otros campos
+	    existente.setNombre(cliente.getNombre());
+	    existente.setApellido(cliente.getApellido());
+	    existente.setEmail(cliente.getEmail());
+	    existente.setTelefono(cliente.getTelefono());
+
+	    return clienteRepository.save(existente);
 	}
 	
 	//Metodo para eliminar un producto por su id

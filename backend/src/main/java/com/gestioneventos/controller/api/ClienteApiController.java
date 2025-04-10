@@ -54,12 +54,19 @@ public class ClienteApiController {
 	            return ResponseEntity.notFound().build();
 	        }
 	    }
-
+	    
+	    //Metodo para actualizar un cliente
 	    @PutMapping("/{id}")
 	    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @RequestBody Cliente cliente) {
-	        return ResponseEntity.ok(clienteService.actualizarCliente(id, cliente));
-	    }
+	        // Si el rol es enviado como string, asegúrate de que se deserialice correctamente
+	        if (cliente.getRol() == null) {
+	            return ResponseEntity.badRequest().body(null);  // Si el rol es null, enviar error
+	        }
 
+	        Cliente clienteActualizado = clienteService.actualizarCliente(id, cliente);
+	        return ResponseEntity.ok(clienteActualizado);
+	    }
+	    
 	    //LLamada a metodo eliminarCliente
 	    @DeleteMapping("/{id}")
 	    public ResponseEntity<Void> eliminarCliente(@PathVariable Long id) {

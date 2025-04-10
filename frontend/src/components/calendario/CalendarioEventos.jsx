@@ -161,27 +161,30 @@ export default function CalendarioEventos() {
     );
 
     // Para la vista semana
-    const EventoPersonalizadoSemana = ({ event }) => (
-        <div style={{
-            padding: '16px', // Aumentamos el padding para hacer el evento más grande
-            fontSize: '1.2em', // Aumentamos el tamaño de la fuente
-            backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
-                             event.horario === "TARDE" ? "#60a5fa" :
-                             event.horario === "NOCHE" ? "#f87171" :
-                             "#d1d5db", // Fondo de color basado en el horario
-            borderRadius: '8px',
-            color: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            height: 'auto',
-            minHeight: '70px',
-            marginBottom: '10px',
-        }}>
-            <strong>{event.title}</strong>
-            <div style={{ fontSize: "1em", marginTop: '8px' }}>Espacio: {event.espacio}</div>
-        </div>
-    );
+    const EventoPersonalizadoSemana = ({ event }) => {
+        return (
+            <div style={{
+                padding: '16px', // Aumentamos el padding para hacer el evento más grande
+                fontSize: '1.2em', // Aumentamos el tamaño de la fuente
+                backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
+                                 event.horario === "TARDE" ? "#60a5fa" :
+                                 event.horario === "NOCHE" ? "#f87171" :
+                                 "#d1d5db", // Fondo de color basado en el horario
+                borderRadius: '8px',
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                height: 'auto',
+                minHeight: '70px',
+                marginBottom: '10px',
+            }}>
+                <div style={{ fontSize: '0.2em' }}>
+                    <strong>{event.title}</strong>
+                </div>
+            </div>
+        );
+    };
 
     if (loading) {
         return <div>Cargando calendario ...</div>;
