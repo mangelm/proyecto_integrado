@@ -42,13 +42,13 @@ export default function EditarEvento() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         // Validar campos requeridos
         if (!nombre || !fecha || !cantidadPersonas || !espacio || !horario || !estado || !hora) {
             setError("Todos los campos son obligatorios");
             return;
         }
-
+    
         // Formato del objeto evento actualizado
         const eventoActualizado = {
             nombre: sanitizeInput(nombre, "text"),
@@ -59,7 +59,7 @@ export default function EditarEvento() {
             hora,
             estado,
         };
-
+    
         try {
             const response = await fetch(`http://localhost:8100/api/eventos/${id}`, {
                 method: "PUT",
@@ -69,7 +69,7 @@ export default function EditarEvento() {
                 body: JSON.stringify(eventoActualizado),
                 credentials: 'same-origin',
             });
-
+    
             if (response.ok) {
                 // Redirigir a la lista de eventos después de la actualización exitosa
                 navigate("/eventos");
@@ -87,6 +87,7 @@ export default function EditarEvento() {
             setError("Hubo un error al intentar actualizar el evento. Inténtalo más tarde.");
         }
     };
+    
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
