@@ -69,11 +69,12 @@ public class EventoServiceImp implements EventoService {
     @Override
     public Evento actualizarEvento(Long id, Evento evento) {
         // Primero, obtenemos el evento a actualizar
-        Evento eventoExistente = eventoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado"));
+        Evento eventoExistente = eventoRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado"));
 
         // Verificamos si el espacio está ocupado en la misma fecha y horario, excepto si es el mismo evento
         if (evento.getId() != id) {
-            long count = eventoRepository.countEventosExistentes(evento.getFecha(), evento.getHorario(), evento.getEspacio());
+            long count = eventoRepository.countEventosExistentesMismoId(evento.getFecha().toLocalDate(), evento.getHorario(), evento.getEspacio(), id);
             if (count > 0) {
                 throw new IllegalArgumentException("El espacio está ocupado en la misma fecha y horario.");
             }
@@ -90,6 +91,7 @@ public class EventoServiceImp implements EventoService {
 
         return eventoRepository.save(eventoExistente);
     }
+
     
     //Metodo para eliminar un producto por su id
     @Override

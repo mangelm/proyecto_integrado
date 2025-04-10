@@ -134,6 +134,12 @@ export default function CalendarioEventos() {
         return <div>Cargando calendario ...</div>;
     }
 
+    const handleSelectEvent = (event) => {
+        // Redirigir a la página de edición del evento
+        navigate(`/calendario/editar-evento/${event.id}`);
+    };
+    
+
     return (
         <>
             <div className="p-6 bg-white rounded-lg shadow-md">
@@ -212,6 +218,8 @@ export default function CalendarioEventos() {
                     //Para controlar el dia seleccionado para crear eventos
                     selectable
                     onSelectSlot={handleSelectSlot}
+                    //Al seleccionar un evento
+                    onSelectEvent={handleSelectEvent}
                     //Colores para los horarios
                     eventPropGetter={getEstiloEvento}
                     //Para mostrar en el calendario los datos que quiero

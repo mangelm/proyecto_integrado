@@ -15,9 +15,10 @@ import DetallesEvento from './components/eventos/DetallesEvento';
 import Estadisticas from './components/estadisticas/Estadisticas';
 import EstadisticasOcupacion from './components/estadisticas/EstadisticasOcupacion';
 import AnalisisConsumo from './components/estadisticas/AnalisisConsumo';
-import CalendarioEventos from './components/eventos/CalendarioEventos';
-import CrearEventoCalendario from './components/eventos/CrearEventoCalendario';
 import AsignarProducto from './components/productos/AsignarProducto';
+import CalendarioEventos from './components/calendario/CalendarioEventos';
+import CrearEventoCalendario from './components/calendario/CrearEventoCalendario';
+import EditarEventoCalendario from './components/calendario/EditarEventoCalendario';
 
 function App() {
   return (
@@ -27,8 +28,8 @@ function App() {
           <Route path="/" element={<PanelAdministracion />} />
           <Route path="/eventos" element={<GestionEventos />} />
           <Route path="/eventos/:id" element={<DetallesEvento />} />
-          <Route path="/eventos/editar/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
-          <Route path="/eventos/crear/" element={<CrearEvento />} /> {/* Ruta para crear */}
+          <Route path="/eventos/editar-evento/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
+          <Route path="/eventos/crear-evento/" element={<CrearEvento />} /> {/* Ruta para crear */}
           <Route path="/eventos/:id/productos" element={<AsignarProducto />} /> {/* Ruta para crear */}
           <Route path="/productos" element={<GestionProductos />} />
           <Route path="/productos/editar/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
@@ -41,6 +42,7 @@ function App() {
           <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}
           <Route path="/calendario" element={<CalendarioEventos />} /> {/* Ruta segundos gráficos */}
           <Route path="/calendario/crear-evento/:fecha" element={<CrearEventoCalendario />} />
+          <Route path="/calendario/editar-evento/:id" element={<EditarEventoCalendario />} />
         </Routes>
       </div>
     </Router>

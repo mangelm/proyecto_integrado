@@ -157,7 +157,7 @@ export default function GestionEventos() {
       <h1 className="text-2xl font-bold mb-4">Gestión de Eventos</h1>
 
       <div className="mb-4">
-        <Link to="/eventos/crear">
+        <Link to="/eventos/crear-evento">
           <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
             Crear Evento
           </button>
@@ -267,7 +267,7 @@ export default function GestionEventos() {
                       "Cargando..."}
                   </td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b space-x-2">
-                    <Link to={`/eventos/editar/${evento.id}`}>
+                    <Link to={`/eventos/editar-evento/${evento.id}`}>
                       <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300">
                         Editar
                       </button>
