@@ -98,8 +98,10 @@ export default function GestionClientes() {
             <thead>
             <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nombre</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Apellido</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Email</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Telefono</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Rol</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Acciones</th>
             </tr>
             </thead>
@@ -108,8 +110,10 @@ export default function GestionClientes() {
                 clientes.map((cliente) => (
                 <tr key={cliente.id} className="hover:bg-gray-100">
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.nombre}</td>
+                    <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.apellido}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.email}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.telefono}</td>
+                    <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.rol}</td>
                     <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">
                     {/* Botones para editar y eliminar */}
                     <Link to={`/clientes/editar/${cliente.id}`}>

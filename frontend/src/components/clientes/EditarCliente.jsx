@@ -7,6 +7,7 @@ export default function EditarCliente() {
     const [apellido, setApellido] = useState("");
     const [email, setEmail] = useState("");
     const [telefono, setTelefono] = useState("");
+    const [rol,setRol] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,6 +20,7 @@ export default function EditarCliente() {
                 setApellido(data.apellido);
                 setEmail(data.email);
                 setTelefono(data.telefono);
+                setRol(data.rol);
             })
             .catch((error) => console.error("Error al cargar el cliente:", error));
     }, [id]);
@@ -57,6 +59,7 @@ export default function EditarCliente() {
             apellido: sanitizeInput(nombre,"text"),
             email,
             telefono: formatearNumeroTelefono(telefonoSanitizado),
+            rol
         };
         
         try {
@@ -132,6 +135,21 @@ export default function EditarCliente() {
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="rol" className="block text-sm font-medium text-gray-700">Rol</label>
+                    <select
+                        id="rol"
+                        value={rol}
+                        onChange={(e) => setRol(e.target.value)}
+                        required
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="CLIENTE">CLIENTE</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="STAFF">STAFF</option>
+                    </select>
                 </div>
 
                 <div className="flex justify-between items-center">
