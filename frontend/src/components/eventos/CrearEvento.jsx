@@ -7,7 +7,7 @@ export default function CrearEvento({ onSuccess }) {
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("MAÑANA");
-    const [hora, setHora] = useState(""); // Nuevo estado para la hora
+    const [hora, setHora] = useState(""); 
     const navigate = useNavigate();
 
     const sanitizeInput = (value, type) => {

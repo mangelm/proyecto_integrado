@@ -7,7 +7,7 @@ export default function CrearEventoCalendario() {
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("MAÑANA");
-    const [estado, setEstado] = useState("PENDIENTE");
+    const [hora, setHora] = useState(""); 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,7 +18,7 @@ export default function CrearEventoCalendario() {
             cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio,
             horario,
-            estado,
+            hora,
         };
 
         try {
@@ -117,26 +117,18 @@ export default function CrearEventoCalendario() {
                     </select>
                 </div>
 
-                <div>
-                    <label 
-                        htmlFor="estado" 
-                        className="block text-sm font-medium"
-                        >
-                            Estado
-                        </label>
-                    <select 
-                        id="estado" 
-                        value={estado} 
-                        onChange={(e) => setEstado(e.target.value)}
-                        required 
-                        className="mt-1 w-full p-2 border rounded-md"
-                    >
-                        <option value="PENDIENTE">PENDIENTE</option>
-                        <option value="CONFIRMADO">CONFIRMADO</option>
-                        <option value="CANCELADO">CANCELADO</option>
-                        <option value="FINALIZADO">FINALIZADO</option>
-                    </select>
+                <div className="mb-4">
+                    <label htmlFor="hora" className="block text-sm font-medium text-gray-700">Hora</label>
+                    <input
+                        type="time"
+                        id="hora"
+                        value={hora}
+                        onChange={(e) => setHora(e.target.value)}
+                        required
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
                 </div>
+
 
                 <div className="flex justify-between">
                     <button

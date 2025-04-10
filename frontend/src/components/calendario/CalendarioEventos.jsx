@@ -20,13 +20,12 @@ export default function CalendarioEventos() {
 
     const navigate = useNavigate();
 
-    //Solicitar la información al servidor
+    // Solicitar la información al servidor
     const fetchEventos = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch("http://localhost:8100/api/eventos/todos");
             const data = await response.json();
-
 
             if (!data || !Array.isArray(data)) {
                 console.error("La respuesta no tiene la estructura esperada.");
@@ -34,14 +33,19 @@ export default function CalendarioEventos() {
             }
 
             const eventosFormateados = data.map((evento) => {
-                const start = new Date(evento.fecha);
-                const end = start;
-            
+                // Formateamos la fecha y la hora
+                const fecha = new Date(evento.fecha); // La fecha
+                const hora = evento.hora ? evento.hora.split(":") : [0, 0]; // Obtenemos la hora y los minutos
+                fecha.setHours(hora[0]);  // Establecemos las horas
+                fecha.setMinutes(hora[1]);  // Establecemos los minutos
+
+                const end = new Date(fecha);  // El evento termina en el mismo horario
+
                 return {
                     id: evento.id,
                     title: evento.nombre,
-                    start,
-                    end,
+                    start: fecha,
+                    end: end,
                     allDay: false, // No es un evento de todo el día
                     estado: evento.estado || "",
                     espacio: evento.espacio || "",
@@ -49,9 +53,7 @@ export default function CalendarioEventos() {
                     fecha: evento.fecha,
                 };
             });
-            
-            
-            
+
             setEventos(eventosFormateados);
         } catch (error) {
             console.error("Error al cargar eventos:", error);
@@ -64,11 +66,11 @@ export default function CalendarioEventos() {
         fetchEventos();
     }, [fetchEventos]);
 
-    //Para controlar la vista (dia, semana, mes) y la fecha
+    // Para controlar la vista (día, semana, mes) y la fecha
     const handleViewChange = (view) => setView(view);
     const handleNavigate = (date) => setCurrentDate(date);
 
-    //Controlar enlace y fecha a la hora de seleccionar un dia
+    // Controlar enlace y fecha al seleccionar un día
     const handleSelectSlot = ({ start }) => {
         const fechaSeleccionada = moment(start).format("YYYY-MM-DD");
         navigate(`/calendario/crear-evento/${fechaSeleccionada}`);
@@ -78,7 +80,7 @@ export default function CalendarioEventos() {
         fetchEventos();
     };
 
-    //Para gestionar los filtros del calendario
+    // Para gestionar los filtros del calendario
     const eventosFiltrados = useMemo(() => {
         return eventos.filter((evento) => {
             const coincideEstado = filtroEstado ? evento.estado === filtroEstado : true;
@@ -86,16 +88,15 @@ export default function CalendarioEventos() {
                 ? evento.espacio.toLowerCase().includes(filtroEspacio.toLowerCase())
                 : true;
             const coincideHorario = filtroHorario ? evento.horario === filtroHorario : true;
-    
+
             return coincideEstado && coincideEspacio && coincideHorario;
         });
     }, [eventos, filtroEstado, filtroEspacio, filtroHorario]);
-    
 
-    //Personalizacion de estilo de los horarios
+    // Personalización de estilo de los horarios
     const getEstiloEvento = (evento) => {
         let backgroundColor = "#6b7280"; // gris por defecto
-    
+
         switch (evento.horario) {
             case "MAÑANA":
                 backgroundColor = "#34d399"; // verde
@@ -109,7 +110,7 @@ export default function CalendarioEventos() {
             default:
                 backgroundColor = "#d1d5db"; // gris claro si no hay horario
         }
-    
+
         return {
             style: {
                 backgroundColor,
@@ -117,16 +118,68 @@ export default function CalendarioEventos() {
                 opacity: 0.9,
                 color: "white",
                 border: "none",
-                padding: "4px",
+                padding: "8px", // Aumentamos el padding para hacerlo más grande
+                fontSize: "1.2em", // Aumentamos el tamaño de la fuente
+                height: 'auto', // Permite que el evento crezca en altura según el contenido
+                minHeight: '50px', // Establece una altura mínima para los eventos
+                display: 'flex',
+                justifyContent: 'center', // Centra el texto
+                alignItems: 'center',
             },
         };
     };
-    
-    //Para mostrar de forma personalizada lo que quiero que se muestre en el calendario
-    const EventoPersonalizado = ({ event }) => (
+
+    // Nuevo componente para la vista de día
+    const EventoPersonalizadoDia = ({ event }) => (
+        <div style={{ 
+            padding: '16px', // Aumentamos el padding para hacer el evento más grande
+            fontSize: '1.2em', // Aumentamos el tamaño de la fuente
+            backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
+                             event.horario === "TARDE" ? "#60a5fa" :
+                             event.horario === "NOCHE" ? "#f87171" :
+                             "#d1d5db", // Fondo de color basado en el horario
+            borderRadius: '8px',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: 'auto',
+            minHeight: '70px', // Asegura una altura mínima para los eventos
+            marginBottom: '10px', // Espacio entre los eventos
+        }}>
+            <strong>{event.title}</strong>
+            <div style={{ fontSize: "1em", marginTop: '8px' }}>Espacio: {event.espacio}</div>
+        </div>
+    );
+
+    // Para mostrar de forma personalizada lo que quiero que se muestre en el calendario
+    const EventoPersonalizadoMes = ({ event }) => (
         <div>
             <strong>{event.title}</strong>
             <div style={{ fontSize: "0.8em" }}>{event.espacio}</div>
+        </div>
+    );
+
+    // Para la vista semana
+    const EventoPersonalizadoSemana = ({ event }) => (
+        <div style={{
+            padding: '16px', // Aumentamos el padding para hacer el evento más grande
+            fontSize: '1.2em', // Aumentamos el tamaño de la fuente
+            backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
+                             event.horario === "TARDE" ? "#60a5fa" :
+                             event.horario === "NOCHE" ? "#f87171" :
+                             "#d1d5db", // Fondo de color basado en el horario
+            borderRadius: '8px',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: 'auto',
+            minHeight: '70px',
+            marginBottom: '10px',
+        }}>
+            <strong>{event.title}</strong>
+            <div style={{ fontSize: "1em", marginTop: '8px' }}>Espacio: {event.espacio}</div>
         </div>
     );
 
@@ -138,7 +191,6 @@ export default function CalendarioEventos() {
         // Redirigir a la página de edición del evento
         navigate(`/calendario/editar-evento/${event.id}`);
     };
-    
 
     return (
         <>
@@ -156,7 +208,7 @@ export default function CalendarioEventos() {
                         <option value="PENDIENTE">Pendiente</option>
                         <option value="CONFIRMADO">Confirmado</option>
                         <option value="CANCELADO">Cancelado</option>
-                        <option value="CANCELADO">Finalizado</option>
+                        <option value="FINALIZADO">Finalizado</option>
                     </select>
 
                     <input
@@ -179,17 +231,6 @@ export default function CalendarioEventos() {
                     </select>
 
                     <button
-                        onClick={() => {
-                            setFiltroEstado("");
-                            setFiltroEspacio("");
-                            setFiltroHorario("");
-                        }}
-                        className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                    >
-                        Limpiar filtros
-                    </button>
-
-                    <button
                         onClick={handleRefresh}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
@@ -199,34 +240,29 @@ export default function CalendarioEventos() {
 
                 <Calendar
                     localizer={localizer}
-                    // Eventos con los filtros
                     events={eventosFiltrados}
-                    //Fechas de inicio y fin que en nuestro caso solo hay una fecha de inicio asi que seria la misma
                     startAccessor="start"
                     endAccessor="end"
-                    //Tamaño personalizado del campo
                     style={{ height: 1000 }}
-                    //Que se vean los meses, semanas y dias
                     views={["month", "week", "day"]}
-                    //Por defecto que se vea el mes
                     defaultView="month"
-                    //Para controlar el cambio de vista
                     view={view}
                     onView={handleViewChange}
-                    //Para controlar el movimiento de anterior y siguiente
                     onNavigate={handleNavigate}
-                    //Para controlar el dia seleccionado para crear eventos
                     selectable
                     onSelectSlot={handleSelectSlot}
-                    //Al seleccionar un evento
                     onSelectEvent={handleSelectEvent}
-                    //Colores para los horarios
                     eventPropGetter={getEstiloEvento}
-                    //Para mostrar en el calendario los datos que quiero
                     components={{
-                        event: EventoPersonalizado,
+                        event: (props) => {
+                            if (props.view === 'day') {
+                                return <EventoPersonalizadoDia event={props.event} />;
+                            } else if (props.view === 'week') {
+                                return <EventoPersonalizadoSemana event={props.event} />;
+                            }
+                            return <EventoPersonalizadoMes event={props.event} />;
+                        }
                     }}
-                    //Personalización en español de lo que se ve
                     messages={{
                         month: "Mes",
                         week: "Semana",
@@ -236,7 +272,6 @@ export default function CalendarioEventos() {
                         next: "Siguiente",
                         showMore: (total) => `+ Ver ${total} más`,
                     }}
-
                     culture="es"
                     date={currentDate}
                 />

@@ -27,7 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<PanelAdministracion />} />
           <Route path="/eventos" element={<GestionEventos />} />
-          <Route path="/eventos/:id" element={<DetallesEvento />} />
+          <Route path="/eventos/detalle-evento/:id" element={<DetallesEvento />} />
           <Route path="/eventos/editar-evento/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
           <Route path="/eventos/crear-evento/" element={<CrearEvento />} /> {/* Ruta para crear */}
           <Route path="/eventos/:id/productos" element={<AsignarProducto />} /> {/* Ruta para crear */}
