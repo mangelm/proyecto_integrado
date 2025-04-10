@@ -1,9 +1,11 @@
 package com.gestioneventos.model;
 
 import java.sql.Date;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
@@ -19,12 +21,13 @@ public class Evento {
     private Date fecha;
     private Integer cantidadPersonas;
     private String espacio;
+    private LocalTime hora;
     
-    @Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.STRING)
     private Horario horario;
     
     @Enumerated(EnumType.STRING)
-    private Estado estado;
+    private Estado estado = Estado.PENDIENTE;
     
     //Para gestionar la relacion y que no serialize los clientes
     @JsonBackReference("cliente-eventos")
@@ -91,6 +94,16 @@ public class Evento {
 
 	public void setEstado(Estado estado) {
 		this.estado = estado;
+	}
+	
+	//definir cómo se debe serializar el atributo hora
+	@JsonFormat(pattern = "HH:mm") 
+    public LocalTime getHora() {
+        return hora;
+    }
+
+	public void setHora(LocalTime hora) {
+		this.hora = hora;
 	}
 
 	public Cliente getCliente() {

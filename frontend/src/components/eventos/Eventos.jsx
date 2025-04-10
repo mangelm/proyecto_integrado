@@ -244,6 +244,7 @@ export default function GestionEventos() {
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nº Asistentes</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Espacio</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Horario</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Hora</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Estado</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Productos</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Acciones</th>
@@ -258,6 +259,7 @@ export default function GestionEventos() {
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.cantidadPersonas}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.espacio}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.horario}</td>
+                  <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.hora}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">{evento.estado}</td>
                   <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">
                     {productosEventos[evento.id] ?

@@ -35,25 +35,7 @@ export default function CalendarioEventos() {
 
             const eventosFormateados = data.map((evento) => {
                 const start = new Date(evento.fecha);
-            
-                // Asignar las horas según el horario
-                if (evento.horario === "MAÑANA") {
-                    start.setHours(8, 0);  // 8:00 AM
-                } else if (evento.horario === "TARDE") {
-                    start.setHours(14, 0); // 2:00 PM
-                } else if (evento.horario === "NOCHE") {
-                    start.setHours(19, 0); // 7:00 PM
-                }
-            
-                const end = new Date(start);
-                // Duración del evento por defecto de 5 horas, puedes ajustarlo según necesites
-                if (evento.horario === "MAÑANA") {
-                    end.setHours(13, 59); // Finaliza a las 13:00 (1:00 PM)
-                } else if (evento.horario === "TARDE") {
-                    end.setHours(18, 59); // Finaliza a las 18:00 (6:00 PM)
-                } else if (evento.horario === "NOCHE") {
-                    end.setHours(23, 0); // Finaliza a las 23:00 (11:00 PM)
-                }
+                const end = start;
             
                 return {
                     id: evento.id,

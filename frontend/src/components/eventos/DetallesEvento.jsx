@@ -8,6 +8,7 @@ export default function DetallesEvento() {
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("");
+    const [hora, setHora] = useState("");
     const [estado, setEstado] = useState("");
 
     useEffect(() => {
@@ -21,6 +22,7 @@ export default function DetallesEvento() {
                 setCantidadPersonas(data.cantidadPersonas);
                 setEspacio(data.espacio);
                 setHorario(data.horario);
+                setHora(data.hora);
                 setEstado(data.estado);
             })
             .catch((error) => console.error("Error al cargar el evento:", error));
@@ -54,6 +56,11 @@ export default function DetallesEvento() {
                 <div className="flex flex-col">
                     <label className="text-sm font-medium text-gray-700 mb-2">Horario</label>
                     <p className="p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-800">{horario}</p>
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="text-sm font-medium text-gray-700 mb-2">Hora</label>
+                    <p className="p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-800">{hora}</p>
                 </div>
 
                 <div className="flex flex-col">

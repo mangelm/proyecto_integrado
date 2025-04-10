@@ -6,6 +6,7 @@ import com.gestioneventos.model.enumeration.Horario;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,5 +30,17 @@ public interface EventoRepository extends JpaRepository <Evento, Long>{
            "JOIN cp.producto p " +
            "WHERE cp.evento.id = :eventoId")
     List<ProductoCantidadDTO> findProductosConCantidadPorEventoId(@Param("eventoId") Long eventoId);
+
+    // Método para encontrar un evento por fecha, horario y excluyendo un ID específico
+    Optional<Evento> findByFechaAndHorarioAndIdNot(LocalDate fecha, Horario horario, Long idExcluido);
+    
+    // Método para encontrar un evento por fecha, horario y espacio
+    Optional<Evento> findByFechaAndHorarioAndEspacio(LocalDate fecha, Horario horario, String espacio);
+    
+    long countEventosExistentes(LocalDate fecha, Horario horario, String espacio);
+
+    @Query("SELECT e FROM Evento e WHERE e.fecha = :fecha AND e.horario = :horario AND e.espacio = :espacio")
+    Evento findConflictingEvent(@Param("fecha") LocalDate fecha, @Param("horario") Horario horario, @Param("espacio") String espacio);
+
 }
 

@@ -72,12 +72,11 @@ public class EventoApiController {
     @PutMapping("/{id}")
     public ResponseEntity<String> actualizarEvento(@PathVariable Long id, @RequestBody Evento evento) {
         try {
-            // Intentamos actualizar el evento
             eventoService.actualizarEvento(id, evento);
             return ResponseEntity.ok("Evento actualizado exitosamente");
         } catch (IllegalArgumentException e) {
-            // Devolvemos el mensaje de error lanzado en el servicio
-            return ResponseEntity.status(422).body(e.getMessage()); // Devuelve el error con el estado 422 (Unprocessable Entity)
+            // Devolvemos el mensaje de error en caso de conflicto con el espacio
+            return ResponseEntity.status(422).body(e.getMessage());
         } catch (RecursoNoEncontradoException e) {
             // Si el evento no se encuentra
             return ResponseEntity.notFound().build();
@@ -104,7 +103,7 @@ public class EventoApiController {
         Evento eventoActualizado = eventoService.agregarProducto(evento, producto);
         return ResponseEntity.ok(eventoActualizado);
     }
-    
+      
     // Método para obtener los productos y cantidades de un evento, devolviendo DTO
     @GetMapping("/{id}/productos-consumidos")
     public ResponseEntity<List<ProductoCantidadDTO>> obtenerProductosConsumidos(@PathVariable("id") Long eventoId) {

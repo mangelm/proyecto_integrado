@@ -122,10 +122,10 @@ export default function AsignarProducto() {
                 </button>
                 <button
                         type="button"
-                        onClick={() => navigate("/eventos")}
+                        onClick={() => navigate("/eventos")} 
                         className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded"
                     >
-                        Cancelar
+                        Volver
                     </button>
             </div>
 

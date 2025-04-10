@@ -8,6 +8,7 @@ export default function EditarEvento() {
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("");
+    const [hora, setHora] = useState("");
     const [estado, setEstado] = useState("");
     const [error, setError] = useState(null); // Para mostrar errores al usuario
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function EditarEvento() {
                 setCantidadPersonas(data.cantidadPersonas);
                 setEspacio(data.espacio);
                 setHorario(data.horario);
+                setHora(data.hora);
                 setEstado(data.estado);
             })
             .catch((error) => console.error("Error al cargar el evento:", error));
@@ -42,7 +44,7 @@ export default function EditarEvento() {
         e.preventDefault();
 
         // Validar campos requeridos
-        if (!nombre || !fecha || !cantidadPersonas || !espacio || !horario || !estado) {
+        if (!nombre || !fecha || !cantidadPersonas || !espacio || !horario || !estado || !hora) {
             setError("Todos los campos son obligatorios");
             return;
         }
@@ -54,6 +56,7 @@ export default function EditarEvento() {
             cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio: sanitizeInput(espacio, "text"),
             horario,
+            hora,
             estado,
         };
 
@@ -154,6 +157,18 @@ export default function EditarEvento() {
                         <option value="TARDE">TARDE</option>
                         <option value="NOCHE">NOCHE</option>
                     </select>
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="hora" className="block text-sm font-medium text-gray-700">Hora</label>
+                    <input
+                        type="time"
+                        id="hora"
+                        value={hora}
+                        onChange={(e) => setHora(e.target.value)}
+                        required
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
                 </div>
 
                 <div className="mb-4">

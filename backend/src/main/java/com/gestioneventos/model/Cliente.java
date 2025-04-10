@@ -3,6 +3,7 @@ package com.gestioneventos.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gestioneventos.model.enumeration.Rol;
 
 import jakarta.persistence.*;
 
@@ -16,11 +17,14 @@ public class Cliente {
     private String email;
     private String telefono;
     
+    @Enumerated(EnumType.STRING)
+    private Rol rol = Rol.CLIENTE;
+    
     //Para gestionar la relacion y que no serialize los eventos
     @JsonManagedReference("cliente-eventos")
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Evento> eventos;
-
+    
 	public Long getId() {
 		return id;
 	}
@@ -68,4 +72,13 @@ public class Cliente {
 	public void setEventos(List<Evento> eventos) {
 		this.eventos = eventos;
 	}
+
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
+	}
+	
 }

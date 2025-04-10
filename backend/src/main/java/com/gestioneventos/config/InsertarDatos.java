@@ -3,6 +3,7 @@ package com.gestioneventos.config;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,6 @@ import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
 import com.github.javafaker.Faker;
 
-//Componente que genera datos de prueba
 @Component
 public class InsertarDatos implements CommandLineRunner {
 
@@ -37,13 +37,13 @@ public class InsertarDatos implements CommandLineRunner {
 
     @Autowired
     private ClienteRepository clienteRepository;
-    
+
     @Autowired
     private EventoRepository eventoRepository;
-    
+
     @Autowired
     private ProductoRepository productoRepository;
-    
+
     @Autowired
     private ConsumoProductoRepository consumoProductoRepository;
 
@@ -95,6 +95,7 @@ public class InsertarDatos implements CommandLineRunner {
                     evento.setFecha(Date.valueOf(LocalDate.now().plusDays(random.nextInt(30))));
                     evento.setCantidadPersonas(faker.number().numberBetween(10, 200));
                     evento.setEspacio(faker.address().city());
+                    evento.setHora(LocalTime.of(faker.number().numberBetween(8, 22), 0)); // Hora aleatoria entre 08:00 y 21:00
                     evento.setHorario(Horario.values()[random.nextInt(Horario.values().length)]);
                     evento.setEstado(Estado.values()[random.nextInt(Estado.values().length)]);
                     evento.setCliente(cliente);

@@ -7,7 +7,7 @@ export default function CrearEvento({ onSuccess }) {
     const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("MAÑANA");
-    const [estado, setEstado] = useState("PENDIENTE");
+    const [hora, setHora] = useState(""); // Nuevo estado para la hora
     const navigate = useNavigate();
 
     const sanitizeInput = (value, type) => {
@@ -29,7 +29,7 @@ export default function CrearEvento({ onSuccess }) {
             cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio: sanitizeInput(espacio, "text"),
             horario,
-            estado,
+            hora, // Incluir la hora
         };
     
         try {
@@ -47,28 +47,20 @@ export default function CrearEvento({ onSuccess }) {
                 }
             } else {
                 const errorData = await response.text();
-                alert(errorData); // Muestra el mensaje "Horario ocupado, escoge otro horario."
+                alert(errorData); // Muestra el mensaje de error
             }
-        }catch (error) {
+        } catch (error) {
             const errorMessage = error.response ? await error.response.text() : "Error desconocido";
             alert("Error al crear el evento: " + errorMessage);
         }
-        
-        
     };
-    
-    
-    
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto">
             <h1 className="text-2xl font-bold mb-4 text-center">Crear Evento</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label 
-                        htmlFor="nombre" 
-                        className="block text-sm font-medium"
-                    >
+                    <label htmlFor="nombre" className="block text-sm font-medium">
                         Nombre
                     </label>
                     <input 
@@ -82,10 +74,8 @@ export default function CrearEvento({ onSuccess }) {
                 </div>
 
                 <div>
-                    <label 
-                        htmlFor="fecha" 
-                        className="block text-sm font-medium">
-                            Fecha
+                    <label htmlFor="fecha" className="block text-sm font-medium">
+                        Fecha
                     </label>
                     <input 
                         type="date" 
@@ -99,10 +89,7 @@ export default function CrearEvento({ onSuccess }) {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label 
-                            htmlFor="cantidad_personas" 
-                            className="block text-sm font-medium"
-                        >
+                        <label htmlFor="cantidad_personas" className="block text-sm font-medium">
                             Nº Asistentes
                         </label>
                         <input 
@@ -116,11 +103,8 @@ export default function CrearEvento({ onSuccess }) {
                     </div>
 
                     <div>
-                        <label 
-                            htmlFor="espacio" 
-                            className="block text-sm font-medium"
-                        >
-                                Espacio
+                        <label htmlFor="espacio" className="block text-sm font-medium">
+                            Espacio
                         </label>
                         <input 
                             type="text" 
@@ -134,11 +118,8 @@ export default function CrearEvento({ onSuccess }) {
                 </div>
 
                 <div>
-                    <label 
-                        htmlFor="horario" 
-                        className="block text-sm font-medium"
-                        >
-                            Horario
+                    <label htmlFor="horario" className="block text-sm font-medium">
+                        Horario
                     </label>
                     <select 
                         id="horario" 
@@ -154,24 +135,17 @@ export default function CrearEvento({ onSuccess }) {
                 </div>
 
                 <div>
-                    <label 
-                        htmlFor="estado" 
-                        className="block text-sm font-medium"
-                        >
-                            Estado
-                        </label>
-                    <select 
-                        id="estado" 
-                        value={estado} 
-                        onChange={(e) => setEstado(e.target.value)}
+                    <label htmlFor="hora" className="block text-sm font-medium">
+                        Hora
+                    </label>
+                    <input 
+                        type="time" 
+                        id="hora" 
+                        value={hora} 
+                        onChange={(e) => setHora(e.target.value)}
                         required 
-                        className="mt-1 w-full p-2 border rounded-md"
-                    >
-                        <option value="PENDIENTE">PENDIENTE</option>
-                        <option value="CONFIRMADO">CONFIRMADO</option>
-                        <option value="CANCELADO">CANCELADO</option>
-                        <option value="FINALIZADO">FINALIZADO</option>
-                    </select>
+                        className="mt-1 w-full p-2 border rounded-md" 
+                    />
                 </div>
 
                 <div className="flex justify-between">
@@ -179,7 +153,7 @@ export default function CrearEvento({ onSuccess }) {
                         type="submit" 
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                     >
-                            Crear Evento
+                        Crear Evento
                     </button>
                     <button 
                         type="button" 

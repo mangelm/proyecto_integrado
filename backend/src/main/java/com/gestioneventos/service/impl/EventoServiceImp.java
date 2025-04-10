@@ -2,6 +2,7 @@ package com.gestioneventos.service.impl;
 
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,22 +67,26 @@ public class EventoServiceImp implements EventoService {
     
     //Metodo para actualizar un evento concreto
     @Override
-    public Evento actualizarEvento(Long id, Evento eventoDetalles) {
-        
-    	Evento eventoExistente = obtenerEventoPorId(id);
-        
-    	// Verificar si existe otro evento con la misma fecha, horario y espacio
-        long eventosExistentes = eventoRepository.countEventosExistentes(eventoDetalles.getFecha().toLocalDate(), eventoDetalles.getHorario(), eventoDetalles.getEspacio());
-        if (eventosExistentes > 0) {
-            throw new IllegalArgumentException("Horario ocupado, escoge otro horario.");
+    public Evento actualizarEvento(Long id, Evento evento) {
+        // Primero, obtenemos el evento a actualizar
+        Evento eventoExistente = eventoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado"));
+
+        // Verificamos si el espacio está ocupado en la misma fecha y horario, excepto si es el mismo evento
+        if (evento.getId() != id) {
+            long count = eventoRepository.countEventosExistentes(evento.getFecha(), evento.getHorario(), evento.getEspacio());
+            if (count > 0) {
+                throw new IllegalArgumentException("El espacio está ocupado en la misma fecha y horario.");
+            }
         }
-        
-        eventoExistente.setNombre(eventoDetalles.getNombre());
-        eventoExistente.setFecha(eventoDetalles.getFecha());
-        eventoExistente.setCantidadPersonas(eventoDetalles.getCantidadPersonas());
-        eventoExistente.setEspacio(eventoDetalles.getEspacio());
-        eventoExistente.setHorario(eventoDetalles.getHorario());
-        eventoExistente.setEstado(eventoDetalles.getEstado());
+
+        // Procedemos a actualizar el evento
+        eventoExistente.setNombre(evento.getNombre());
+        eventoExistente.setFecha(evento.getFecha());
+        eventoExistente.setCantidadPersonas(evento.getCantidadPersonas());
+        eventoExistente.setEspacio(evento.getEspacio());
+        eventoExistente.setHorario(evento.getHorario());
+        eventoExistente.setHora(evento.getHora());
+        eventoExistente.setEstado(evento.getEstado());
 
         return eventoRepository.save(eventoExistente);
     }
@@ -130,5 +135,4 @@ public class EventoServiceImp implements EventoService {
         }
         return eventoRepository.findProductosConCantidadPorEventoId(eventoId);
     }
-    
 }
