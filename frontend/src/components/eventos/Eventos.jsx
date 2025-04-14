@@ -115,13 +115,6 @@ export default function GestionEventos() {
     }
   };
 
-  // Función para formatear la lista de productos consumidos
-  const formatProductosConsumidos = (productos) => {
-    if (!productos || productos.length === 0) return "Ninguno";
-
-    return productos.map(producto => `${producto.nombreProducto} (${producto.cantidad})`).join(", ");
-  };
-
   if (loading) {
     return <div className="text-center">Cargando eventos ...</div>;
   }
@@ -176,115 +169,126 @@ export default function GestionEventos() {
     {/* Tabla de Eventos */}
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
-        <thead className="bg-gray-100 hidden md:table-header-group">
-          <tr>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
-            <th className="px-2 py-2 text-centertext-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Fecha</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Asistentes</th>
-            <th className="px-2 py-2 text-centertext-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Espacio</th>
-            <th className="hidden px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Horario</th>
-            <th className="hidden px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Hora</th>
-            <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Estado</th>
-            <th className="hidden px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b lg:table-cell lg:px-4 lg:py-3 lg:text-sm">Productos</th>
-            <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {eventosFiltrados.length > 0 ? (
-            eventosFiltrados.map((evento) => (
-              <tr key={evento.id} className="hover:bg-gray-50 md:table-row">
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Nombre</span>
-                    <span>{evento.nombre}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.nombre}</div>
-                </td>
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Fecha</span>
-                    <span>{evento.fecha}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.fecha}</div>
-                </td>
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Asistentes</span>
-                    <span>{evento.cantidadPersonas}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.cantidadPersonas}</div>
-                </td>
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Espacio</span>
-                    <span>{evento.espacio}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.espacio}</div>
-                </td>
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Horario</span>
-                    <span>{evento.horario}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.horario}</div>
-                </td>
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Hora</span>
-                    <span>{evento.hora}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.hora}</div>
-                </td>
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Estado</span>
-                    <span>{evento.estado}</span>
-                  </div>
-                  <div className="hidden md:block">{evento.estado}</div>
-                </td>
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
-                  <div className="md:hidden flex justify-between">
-                    <span className="font-semibold text-gray-700">Productos</span>
-                    <span>{productosEventos[evento.id] ? formatProductosConsumidos(productosEventos[evento.id]) : "Cargando..."}</span>
-                  </div>
-                  <div className="hidden md:block">{productosEventos[evento.id] ? formatProductosConsumidos(productosEventos[evento.id]) : "Cargando..."}</div>
-                </td>
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                <div className="md:hidden font-semibold text-center">Acciones</div>
-                <div className="flex flex-col md:flex-row md:space-x-2 space-y-1 md:space-y-0">
-                  <Link to={`/eventos/editar-evento/${evento.id}`}>
-                    <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full">
-                      Editar
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(evento.id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full"
-                  >
-                    Eliminar
-                  </button>
-                  <Link to={`/eventos/${evento.id}`}>
-                    <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full">
-                      Detalles
-                    </button>
-                  </Link>
-                  <Link to={`/eventos/${evento.id}/productos`}>
-                    <button className="bg-indigo-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-indigo-700 transition duration-300 md:px-4 md:py-2 w-full">
-                      Asignar
-                    </button>
-                  </Link>
-                </div>
-              </td>
-              </tr>
-            ))
-          ) : (
+      <thead className="bg-gray-100 hidden md:table-header-group">
             <tr>
-              <td colSpan="9" className="px-4 py-4 text-center text-sm font-medium text-gray-500">
-                No hay eventos disponibles.
-              </td>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Fecha</th>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Asistentes</th>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Espacio</th>
+              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Horario</th>
+              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Hora</th>
+              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Estado</th>
+              <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm lg:hidden">Productos</th>
+              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b lg:table-cell lg:px-4 lg:py-3 lg:text-sm">Productos</th>
+              <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
             </tr>
-          )}
-        </tbody>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {eventosFiltrados.length > 0 ? (
+              eventosFiltrados.map((evento) => (
+                <tr key={evento.id} className="hover:bg-gray-50 md:table-row">
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Nombre</span>
+                      <span>{evento.nombre}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.nombre}</div>
+                  </td>
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Fecha</span>
+                      <span>{evento.fecha}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.fecha}</div>
+                  </td>
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Asistentes</span>
+                      <span>{evento.cantidadPersonas}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.cantidadPersonas}</div>
+                  </td>
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Espacio</span>
+                      <span>{evento.espacio}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.espacio}</div>
+                  </td>
+                  <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Horario</span>
+                      <span>{evento.horario}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.horario}</div>
+                  </td>
+                  <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Hora</span>
+                      <span>{evento.hora}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.hora}</div>
+                  </td>
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                    <div className="md:hidden flex justify-between">
+                      <span className="font-semibold text-gray-700">Estado</span>
+                      <span>{evento.estado}</span>
+                    </div>
+                    <div className="hidden md:block">{evento.estado}</div>
+                  </td>
+                  <td className="px-2 py-2 text-center text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block lg:hidden">
+                    <div className="font-semibold text-gray-700 mb-1">Productos:</div>
+                    <ul className="list-none">
+                      {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
+                        <li key={producto.nombreProducto}>{`${producto.nombreProducto} (${producto.cantidad})`}</li>
+                      ))}
+                      {!productosEventos[evento.id] && <li>Cargando...</li>}
+                    </ul>
+                  </td>
+                  <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
+                    <ul className="list-none">
+                      {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
+                        <li key={producto.nombreProducto} className="whitespace-nowrap">{`${producto.nombreProducto} (${producto.cantidad})`}</li>
+                      ))}
+                      {!productosEventos[evento.id] && <li>Cargando...</li>}
+                    </ul>
+                  </td>
+                  <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                    <div className="md:hidden font-semibold text-center">Acciones</div>
+                    <div className="flex flex-col md:flex-row md:space-x-2 space-y-1 md:space-y-0">
+                      <Link to={`/eventos/editar-evento/${evento.id}`}>
+                        <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                          Editar
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(evento.id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap"
+                      >
+                        Eliminar
+                      </button>
+                      <Link to={`/eventos/${evento.id}`}>
+                        <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                          Detalles
+                        </button>
+                      </Link>
+                      <Link to={`/eventos/${evento.id}/productos`}>
+                        <button className="bg-indigo-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-indigo-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                          Asignar Producto
+                        </button>
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="10" className="px-4 py-4 text-center text-sm font-medium text-gray-500">
+                  No hay eventos disponibles.
+                </td>
+              </tr>
+            )}
+          </tbody>
       </table>
     </div>
 
