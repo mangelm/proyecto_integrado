@@ -255,25 +255,25 @@ export default function GestionEventos() {
                   </td>
                   <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                     <div className="md:hidden font-semibold text-center">Acciones</div>
-                    <div className="flex flex-col md:flex-row md:space-x-2 space-y-1 md:space-y-0">
+                    <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
                       <Link to={`/eventos/editar-evento/${evento.id}`}>
-                        <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                        <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                           Editar
                         </button>
                       </Link>
                       <button
                         onClick={() => handleDelete(evento.id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap"
+                        className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
                       >
                         Eliminar
                       </button>
                       <Link to={`/eventos/${evento.id}`}>
-                        <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                        <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                           Detalles
                         </button>
                       </Link>
                       <Link to={`/eventos/${evento.id}/productos`}>
-                        <button className="bg-indigo-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-indigo-700 transition duration-300 md:px-4 md:py-2 w-full whitespace-nowrap">
+                        <button className="bg-indigo-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-indigo-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                           Asignar Producto
                         </button>
                       </Link>
