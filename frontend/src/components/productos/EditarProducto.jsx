@@ -79,96 +79,96 @@ export default function EditarProducto() {
     
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Editar Producto</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 gap-6 mb-6">
-                    <div>
-                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input
-                            type="text"
-                            id="nombre"
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        />
-                    </div>
+        <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl mx-auto border border-gray-200">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Editar Producto</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label htmlFor="nombre" className="block text-sm sm:text-md font-medium text-gray-700">Nombre</label>
+                    <input
+                        type="text"
+                        id="nombre"
+                        value={nombre}
+                        onChange={(e) => setNombre(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-sm sm:text-md"
+                    />
+                </div>
 
-                    <div>
-                        <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
-                        <input
-                            type="text"
-                            id="descripcion"
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        />
-                    </div>
+                <div>
+                    <label htmlFor="descripcion" className="block text-sm sm:text-md font-medium text-gray-700">Descripción</label>
+                    <input
+                        type="text"
+                        id="descripcion"
+                        value={descripcion}
+                        onChange={(e) => setDescripcion(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-sm sm:text-md"
+                    />
+                </div>
 
+                <div className="sm:grid sm:grid-cols-2 sm:gap-4">
                     <div>
-                        <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
+                        <label htmlFor="precio" className="block text-sm sm:text-md font-medium text-gray-700">Precio</label>
                         <input
                             type="number"
                             id="precio"
                             value={precio}
                             onChange={(e) => setPrecio(sanitizeDecimal(e.target.value))}
                             required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-sm sm:text-md"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="impuesto" className="block text-sm font-medium text-gray-700">Impuesto</label>
+                        <label htmlFor="impuesto" className="block text-sm sm:text-md font-medium text-gray-700">Impuesto</label>
                         <input
                             type="number"
                             id="impuesto"
                             value={impuesto}
                             onChange={(e) => setImpuesto(sanitizeDecimal(e.target.value))}
                             required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-sm sm:text-md"
                         />
-                    </div>
-
-                    <div>
-                        <label htmlFor="disponible" className="block text-sm font-medium text-gray-700">Disponible</label>
-                        <input
-                            type="checkbox"
-                            id="disponible"
-                            checked={disponible}
-                            onChange={(e) => setDisponible(e.target.checked)}
-                            className="mt-1 block w-6 h-6 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">Categoría</label>
-                        <select
-                            id="categoria"
-                            value={categoria}
-                            onChange={(e) => setCategoria(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        >
-                            <option value="BEBIDA">BEBIDA</option>
-                            <option value="COMIDA">COMIDA</option>
-                            <option value="SERVICIO">SERVICIO</option>
-                        </select>
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-6">
+                <div>
+                    <label htmlFor="disponible" className="block text-sm sm:text-md font-medium text-gray-700">Disponible</label>
+                    <input
+                        type="checkbox"
+                        id="disponible"
+                        checked={disponible}
+                        onChange={(e) => setDisponible(e.target.checked)}
+                        className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="categoria" className="block text-sm sm:text-md font-medium text-gray-700">Categoría</label>
+                    <select
+                        id="categoria"
+                        value={categoria}
+                        onChange={(e) => setCategoria(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 text-sm sm:text-md"
+                    >
+                        <option value="BEBIDA">BEBIDA</option>
+                        <option value="COMIDA">COMIDA</option>
+                        <option value="SERVICIO">SERVICIO</option>
+                    </select>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition duration-200"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700 transition duration-200 text-sm sm:text-md w-full sm:w-auto"
                     >
                         Guardar Cambios
                     </button>
                     <button
                         type="button"
                         onClick={() => navigate("/productos")}
-                        className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md shadow-md hover:bg-gray-400 transition duration-200"
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md shadow-md hover:bg-gray-400 transition duration-200 text-sm sm:text-md w-full sm:w-auto"
                     >
                         Cancelar
                     </button>
