@@ -108,8 +108,8 @@ export default function GestionProductos() {
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Descripcion</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Precio</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Impuesto</th>
-                            <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Disponible</th>
-                            <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Categoría</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Disponible</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Categoría</th>
                             <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -146,17 +146,17 @@ export default function GestionProductos() {
                                         </div>
                                         <div className="hidden md:block">{producto.impuesto}</div>
                                     </td>
-                                    <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                                         <div className="md:hidden flex justify-between">
                                             <span className="font-semibold text-gray-700">Disponible</span>
-                                            <span>{producto.disponible}</span>
+                                            <span>{producto.disponible ? 'Sí' : 'No'}</span>
                                         </div>
-                                        <div className="hidden md:block">{producto.disponible}</div>
+                                        <div className="hidden md:block">{producto.disponible ? 'Sí' : 'No'}</div>
                                     </td>
-                                    <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                                         <div className="md:hidden flex justify-between">
-                                        <span className="font-semibold text-gray-700">Categoría</span>
-                                        <span>{producto.categoria}</span>
+                                            <span className="font-semibold text-gray-700">Categoria</span>
+                                            <span>{producto.categoria}</span>
                                         </div>
                                         <div className="hidden md:block">{producto.categoria}</div>
                                     </td>

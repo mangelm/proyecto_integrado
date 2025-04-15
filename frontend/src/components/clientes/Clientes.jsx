@@ -75,26 +75,26 @@ export default function GestionClientes() {
     });
 
     if (loading) {
-        return <div className="text-center">Cargando clientes...</div>;
+        return <div className="text-center p-6">Cargando clientes...</div>;
     }
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Gestión de Clientes</h1>
+        <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md">
+            <h1 className="text-xl sm:text-2xl font-bold mb-4">Gestión de Clientes</h1>
 
-            <div className="mb-4 flex flex-wrap gap-4">
+            <div className="mb-4 flex flex-wrap gap-2 sm:gap-4">
                 <input
                     type="text"
                     placeholder="Buscar por nombre"
                     value={filtroNombre}
                     onChange={(e) => setFiltroNombre(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-lg"
+                    className="border border-gray-300 p-2 rounded-lg flex-grow min-w-0"
                 />
 
                 <select
                     value={filtroRol}
                     onChange={(e) => setFiltroRol(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-lg"
+                    className="border border-gray-300 p-2 rounded-lg w-full sm:w-auto"
                 >
                     <option value="">Todos los roles</option>
                     <option value="ADMIN">ADMIN</option>
@@ -103,119 +103,166 @@ export default function GestionClientes() {
                 </select>
             </div>
 
-            <div className="mb-4">
+            <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
                 <Link to="/clientes/crear-cliente">
-                    <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                    <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
                         Crear Cliente
                     </button>
                 </Link>
             </div>
 
-            <table className="min-w-full table-auto table-layout-fixed">
-                <thead>
-                    <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Nombre</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Apellido</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Email</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Teléfono</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Rol</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {clientesFiltrados.length > 0 ? (
-                        clientesFiltrados.map((cliente) => (
-                            <tr key={cliente.id} className="hover:bg-gray-100">
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.nombre}</td>
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.apellido}</td>
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.email}</td>
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.telefono}</td>
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b truncate">{cliente.rol}</td>
-                                <td className="px-4 py-2 text-sm font-medium text-gray-900 border-b">
-                                    <Link to={`/clientes/editar-cliente/${cliente.id}`}>
-                                        <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300 mr-2">
-                                            Editar
-                                        </button>
-                                    </Link>
-                                    <button
-                                        onClick={() => handleDelete(cliente.id)}
-                                        className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition duration-300"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+            {/* Tabla de Clientes */}
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
+                
+                    <thead className="bg-gray-100 hidden md:table-header-group">
+                        <tr>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Apellido</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Email</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Teléfono</th>
+                            <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Rol</th>
+                            <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody className="divide-y divide-gray-200">
+                        {clientesFiltrados.length > 0 ? (
+                            clientesFiltrados.map((cliente) => (
+                                <tr key={cliente.id} className="hover:bg-gray-50 md:table-row">
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Nombre</span>
+                                            <span>{cliente.nombre}</span>
+                                        </div>
+                                        <div className="hidden md:block">{cliente.nombre}</div>
+                                    </td>
+                                    
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Apellido</span>
+                                            <span>{cliente.apellido}</span>
+                                        </div>
+                                        <div className="hidden md:block">{cliente.apellido}</div>
+                                    </td>
+                            
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Email</span>
+                                            <span>{cliente.email}</span>
+                                        </div>
+                                        <div className="hidden md:block">{cliente.email}</div>
+                                    </td>
+
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Teléfono</span>
+                                            <span>{cliente.telefono}</span>
+                                        </div>
+                                        <div className="hidden md:block">{cliente.telefono}</div>
+                                    </td>
+
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Rol</span>
+                                            <span>{cliente.rol}</span>
+                                        </div>
+                                        <div className="hidden md:block">{cliente.rol}</div>
+                                    </td>
+                            
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden font-semibold text-center">Acciones</div>
+                                        <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
+                                            <Link to={`/clientes/editar-cliente/${cliente.id}`}>
+                                                <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
+                                                    Editar
+                                                </button>
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(cliente.id)}
+                                                className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
                     ) : (
                         <tr>
-                            <td colSpan="8" className="px-6 py-4 text-center text-sm font-medium text-gray-500 border-b">
+                            <td colSpan="10" className="px-4 py-4 text-center text-sm font-medium text-gray-500">
                                 No hay clientes disponibles.
                             </td>
                         </tr>
                     )}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
-            <div className="mt-4 flex justify-between items-center">
-                <div>
+            {/* Paginación */}
+            <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
+                <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
                     <button
                         onClick={handleFirstPage}
                         disabled={page === 0}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
                         Primero
                     </button>
                     <button
                         onClick={() => handlePrevValue(paginationValue)}
-                        disabled={page <= 4}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+                        disabled={page <= 0}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
                         -{paginationValue}
                     </button>
                 </div>
 
-                <div>
+                <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
                     <button
                         onClick={handlePrevPage}
                         disabled={page === 0}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto"
                     >
                         Anterior
                     </button>
-                    <span className="text-sm font-medium text-gray-700">{`Página ${page + 1} de ${totalPages}`}</span>
+                    <span className="text-xs font-medium text-gray-700 md:text-sm">
+                        Página {page + 1} de {totalPages}
+                    </span>
                     <button
                         onClick={handleNextPage}
                         disabled={page === totalPages - 1}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300"
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto"
                     >
                         Siguiente
                     </button>
                 </div>
 
-                <div>
+                <div className="flex gap-2 w-full md:w-auto">
                     <button
                         onClick={() => handleNextValue(paginationValue)}
-                        disabled={page >= totalPages - paginationValue}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+                        disabled={page >= totalPages - 1}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
                         +{paginationValue}
                     </button>
                     <button
                         onClick={handleLastPage}
                         disabled={page === totalPages - 1}
-                        className="bg-gray-300 text-black p-2 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-300 ml-2"
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
                         Último
                     </button>
                 </div>
             </div>
 
-            <br />
-            <Link to={`/`}>
-                <button className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition duration-300 mr-2">
-                    Volver a la página principal
-                </button>
-            </Link>
+            <div className="mt-6 text-center w-full md:w-auto">
+                <Link to={`/`}>
+                    <button className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full md:w-auto">
+                        Volver a la página principal
+                    </button>
+                </Link>
+            </div>
         </div>
     );
 }
