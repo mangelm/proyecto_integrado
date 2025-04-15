@@ -56,8 +56,8 @@ export default function CrearEvento({ onSuccess }) {
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto">
-            <h1 className="text-2xl font-bold mb-4 text-center">Crear Evento</h1>
+        <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-md mx-auto">
+            <h1 className="text-xl font-bold mb-4 text-center sm:text-2xl">Crear Evento</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="nombre" className="block text-sm font-medium">
@@ -69,7 +69,7 @@ export default function CrearEvento({ onSuccess }) {
                         value={nombre} 
                         onChange={(e) => setNombre(e.target.value)}
                         required 
-                        className="mt-1 w-full p-2 border rounded-md" 
+                        className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
 
@@ -83,11 +83,11 @@ export default function CrearEvento({ onSuccess }) {
                         value={fecha} 
                         onChange={(e) => setFecha(e.target.value)}
                         required 
-                        className="mt-1 w-full p-2 border rounded-md" 
+                        className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label htmlFor="cantidad_personas" className="block text-sm font-medium">
                             Nº Asistentes
@@ -98,7 +98,7 @@ export default function CrearEvento({ onSuccess }) {
                             value={cantidadPersonas}
                             onChange={(e) => setCantidadPersonas(e.target.value)}
                             required 
-                            className="mt-1 w-full p-2 border rounded-md" 
+                            className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                     </div>
 
@@ -112,7 +112,7 @@ export default function CrearEvento({ onSuccess }) {
                             value={espacio} 
                             onChange={(e) => setEspacio(e.target.value)}
                             required 
-                            className="mt-1 w-full p-2 border rounded-md" 
+                            className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
                     </div>
                 </div>
@@ -126,7 +126,7 @@ export default function CrearEvento({ onSuccess }) {
                         value={horario} 
                         onChange={(e) => setHorario(e.target.value)}
                         required 
-                        className="mt-1 w-full p-2 border rounded-md"
+                        className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     >
                         <option value="MAÑANA">MAÑANA</option>
                         <option value="TARDE">TARDE</option>
@@ -144,21 +144,21 @@ export default function CrearEvento({ onSuccess }) {
                         value={hora} 
                         onChange={(e) => setHora(e.target.value)}
                         required 
-                        className="mt-1 w-full p-2 border rounded-md" 
+                        className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                     <button 
                         type="submit" 
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                     >
                         Crear Evento
                     </button>
                     <button 
                         type="button" 
                         onClick={() => navigate("/eventos")} 
-                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
                     >
                         Cancelar
                     </button>
