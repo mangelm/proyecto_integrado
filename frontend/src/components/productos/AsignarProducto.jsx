@@ -63,27 +63,27 @@ export default function AsignarProducto() {
     };
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4">Asignar Producto al Evento</h2>
+        <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Asignar Producto al Evento</h2>
 
             {/* Información del evento */}
             {evento && (
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold">Evento: {evento.nombre}</h3>
-                    <p>Fecha: {evento.fecha}</p>
-                    <p>Cantidad de personas: {evento.cantidadPersonas}</p>
-                    <p>Espacio: {evento.espacio}</p>
-                    <p>Horario: {evento.horario}</p>
-                    <p>Estado: {evento.estado}</p>
+                <div className="mb-4 text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2">Evento: {evento.nombre}</h3>
+                    <p className="text-sm sm:text-md">Fecha: {evento.fecha}</p>
+                    <p className="text-sm sm:text-md">Cantidad de personas: {evento.cantidadPersonas}</p>
+                    <p className="text-sm sm:text-md">Espacio: {evento.espacio}</p>
+                    <p className="text-sm sm:text-md">Horario: {evento.horario}</p>
+                    <p className="text-sm sm:text-md">Estado: {evento.estado}</p>
                 </div>
             )}
 
             {/* Selección de producto */}
-            <div>
-                <label htmlFor="producto" className="block text-sm font-medium">Selecciona un Producto</label>
+            <div className="mb-4">
+                <label htmlFor="producto" className="block text-sm sm:text-md font-medium mb-1">Selecciona un Producto</label>
                 <select
                     id="producto"
-                    className="mt-1 w-full p-2 border rounded-md"
+                    className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
                     value={selectedProducto}
                     onChange={(e) => setSelectedProducto(e.target.value)}
                 >
@@ -101,34 +101,34 @@ export default function AsignarProducto() {
             </div>
 
             {/* Cantidad */}
-            <div className="mt-4">
-                <label htmlFor="cantidad" className="block text-sm font-medium">Cantidad</label>
+            <div className="mb-4">
+                <label htmlFor="cantidad" className="block text-sm sm:text-md font-medium mb-1">Cantidad</label>
                 <input
                     id="cantidad"
                     type="number"
-                    className="mt-1 w-full p-2 border rounded-md"
+                    className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
                     value={cantidad}
                     onChange={(e) => setCantidad(e.target.value)}
                     min="1"
                 />
             </div>
 
-            <div className="mt-4">
+            {/* Botones */}
+            <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <button
                     onClick={handleAsignarProducto}
-                    className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300"
+                    className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300 text-sm sm:text-md w-full sm:w-auto"
                 >
                     Asignar Producto
                 </button>
                 <button
-                        type="button"
-                        onClick={() => navigate("/eventos")} 
-                        className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded"
-                    >
-                        Volver
-                    </button>
+                    type="button"
+                    onClick={() => navigate("/eventos")}
+                    className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded-lg transition duration-300 text-sm sm:text-md w-full sm:w-auto"
+                >
+                    Volver
+                </button>
             </div>
-
         </div>
     );
 }
