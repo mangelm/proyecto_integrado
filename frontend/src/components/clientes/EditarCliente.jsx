@@ -86,65 +86,94 @@ export default function EditarCliente() {
     };
     
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Editar Cliente</h1>
-            <form onSubmit={handleSubmit}>            
-                <div className="mb-4">
-                    <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
+        <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-md mx-auto">
+            <h1 className="text-xl font-bold mb-4 text-center sm:text-2xl md:text-3xl">Editar Cliente</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label
+                        htmlFor="nombre"
+                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                    >
+                        Nombre
+                    </label>
                     <input
                         type="text"
                         id="nombre"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
                         required
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
 
-                <div className="mb-4">
-                    <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">Apellido</label>
+                <div>
+                    <label
+                        htmlFor="apellido"
+                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                    >
+                        Apellido
+                    </label>
                     <input
                         type="text"
                         id="apellido"
                         value={apellido}
                         onChange={(e) => setApellido(e.target.value)}
                         required
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
 
-                <div className="mb-4">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                    <input
-                        type="text"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
+                <div className="sm:grid sm:grid-cols-2 sm:gap-4">
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-gray-700 sm:text-base"
+                        >
+                            Email
+                        </label>
+                        <input
+                            type="text"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                    </div>
                 </div>
 
-                <div className="mb-4">
-                    <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono</label>
-                    <input
-                        type="phone"
-                        id="telefono"
-                        value={telefono}
-                        onChange={(e) => setTelefono(e.target.value)}
-                        required
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
+                <div className="sm:grid sm:grid-cols-2 sm:gap-4">
+                    <div>
+                        <label
+                            htmlFor="telefono"
+                            className="block text-sm font-medium text-gray-700 sm:text-base"
+                        >
+                            Teléfono
+                        </label>
+                        <input
+                            type="phone"
+                            id="telefono"
+                            value={telefono}
+                            onChange={(e) => setTelefono(e.target.value)}
+                            required
+                            className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                    </div>
                 </div>
 
-                <div className="mb-4">
-                    <label htmlFor="rol" className="block text-sm font-medium text-gray-700">Rol</label>
+                <div>
+                    <label
+                        htmlFor="rol"
+                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                    >
+                        Rol
+                    </label>
                     <select
                         id="rol"
                         value={rol}
                         onChange={(e) => setRol(e.target.value)}
                         required
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     >
                         <option value="CLIENTE">CLIENTE</option>
                         <option value="ADMIN">ADMIN</option>
@@ -152,17 +181,17 @@ export default function EditarCliente() {
                     </select>
                 </div>
 
-                <div className="flex justify-between items-center">
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white p-2 rounded"
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                    <button 
+                        type="submit" 
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                     >
                         Guardar Cambios
                     </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate("/clientes")}
-                        className="bg-gray-300 text-black p-2 rounded"
+                    <button 
+                        type="button" 
+                        onClick={() => navigate("/clientes")} 
+                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
                     >
                         Cancelar
                     </button>
