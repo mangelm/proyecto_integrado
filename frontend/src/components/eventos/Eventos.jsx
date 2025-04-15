@@ -267,7 +267,7 @@ export default function GestionEventos() {
                       >
                         Eliminar
                       </button>
-                      <Link to={`/eventos/${evento.id}`}>
+                      <Link to={`/eventos/detalle-evento/${evento.id}`}>
                         <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                           Detalles
                         </button>
