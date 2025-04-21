@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
+import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Link, useNavigate } from "react-router-dom";
 
-moment.locale("es");
 const localizer = momentLocalizer(moment);
+moment.locale('es');
 
 export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
@@ -19,6 +20,10 @@ export default function CalendarioEventos() {
     const [filtroHorario, setFiltroHorario] = useState("");
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("Locale de Moment:", moment.locale()); // Comprobamos la locale activa
+    }, []);
 
     // Solicitar la información al servidor
     const fetchEventos = useCallback(async () => {

@@ -1,5 +1,4 @@
 import './app.css';
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PanelAdministracion from "./pages/PanelAdministracion";
 import GestionEventos from "./components/eventos/Eventos";

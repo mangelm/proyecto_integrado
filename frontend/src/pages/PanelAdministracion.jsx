@@ -1,4 +1,3 @@
-import React from 'react';
 // Hay que asegurarse de tener react-router-dom instalado
 import { Link } from "react-router-dom"; 
 
