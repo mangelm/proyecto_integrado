@@ -20,6 +20,7 @@ import CalendarioEventos from './components/calendario/CalendarioEventos';
 import CrearEventoCalendario from './components/calendario/CrearEventoCalendario';
 import EditarEventoCalendario from './components/calendario/EditarEventoCalendario';
 import DetallesEventoCalendario from './components/calendario/DetallesEventoCalendario';
+import TicketProducto from './components/productos/TicketProducto';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/productos" element={<GestionProductos />} />
           <Route path="/productos/editar-producto/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
           <Route path="/productos/crear-producto/" element={<CrearProducto />} /> {/* Ruta para crear */}
+          <Route path="/ticket/" element={<TicketProducto />} />
           <Route path="/clientes" element={<GestionClientes />} />
           <Route path="/clientes/editar-cliente/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
           <Route path="/clientes/crear-cliente/" element={<CrearCliente/>} /> {/* Ruta para crear */}
