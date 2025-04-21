@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import jsPDF from 'jspdf';
+import { Link } from "react-router-dom"; 
 
 const TicketProducto = () => {
     const [productos, setProductos] = useState([]);
@@ -87,7 +88,7 @@ const TicketProducto = () => {
 
     return (
         <div className="max-w-md mx-auto p-4 border rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Ticket Producto</h2>
+            <h2 className="text-xl font-semibold mb-4 text-center">Ticket Producto</h2>
 
             <label className="block mb-2">Selecciona un producto</label>
             <Select
@@ -113,6 +114,14 @@ const TicketProducto = () => {
             >
             Imprimir
             </button>
+
+            <div className="mt-6 text-center w-full md:w-auto">
+                <Link to={`/`}>
+                    <button className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full md:w-auto">
+                    Volver a la página principal
+                    </button>
+                </Link>
+            </div>
         </div>
     );
 };
