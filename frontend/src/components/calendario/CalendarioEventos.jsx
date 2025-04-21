@@ -38,19 +38,21 @@ export default function CalendarioEventos() {
                 const hora = evento.hora ? evento.hora.split(":") : [0, 0]; // Obtenemos la hora y los minutos
                 fecha.setHours(hora[0]);  // Establecemos las horas
                 fecha.setMinutes(hora[1]);  // Establecemos los minutos
+                fecha.setSeconds(0);      // Aseguramos segundos a 0
+                fecha.setMilliseconds(0); // Aseguramos milisegundos a 0
 
-                const end = new Date(fecha);  // El evento termina en el mismo horario
-
+                // Calcula una hora de fin 60 minutos después del inicio
+                const end = new Date(fecha.getTime() + 120 * 60000); 
                 return {
                     id: evento.id,
                     title: evento.nombre,
                     start: fecha,
-                    end: end,
+                    end: end, 
                     allDay: false, // No es un evento de todo el día
                     estado: evento.estado || "",
                     espacio: evento.espacio || "",
                     horario: evento.horario || "",
-                    fecha: evento.fecha,
+                    fecha: evento.fecha, // Mantienes la fecha original si la necesitas para otra cosa
                 };
             });
 
@@ -114,45 +116,55 @@ export default function CalendarioEventos() {
         return {
             style: {
                 backgroundColor,
-                borderRadius: "8px",
+                borderRadius: "4px",
                 opacity: 0.9,
                 color: "white",
                 border: "none",
-                padding: "8px", // Aumentamos el padding para hacerlo más grande
-                fontSize: "1.2em", // Aumentamos el tamaño de la fuente
-                height: 'auto', // Permite que el evento crezca en altura según el contenido
-                minHeight: '50px', // Establece una altura mínima para los eventos
-                display: 'flex',
-                justifyContent: 'center', // Centra el texto
-                alignItems: 'center',
             },
         };
     };
 
-    // Nuevo componente para la vista de día
-    const EventoPersonalizadoDia = ({ event }) => (
-        <div style={{ 
-            padding: '16px', // Aumentamos el padding para hacer el evento más grande
-            fontSize: '1.2em', // Aumentamos el tamaño de la fuente
-            backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
-                             event.horario === "TARDE" ? "#60a5fa" :
-                             event.horario === "NOCHE" ? "#f87171" :
-                             "#d1d5db", // Fondo de color basado en el horario
-            borderRadius: '8px',
-            color: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            height: 'auto',
-            minHeight: '70px', // Asegura una altura mínima para los eventos
-            marginBottom: '10px', // Espacio entre los eventos
-        }}>
-            <strong>{event.title}</strong>
-            <div style={{ fontSize: "1em", marginTop: '8px' }}>Espacio: {event.espacio}</div>
-        </div>
-    );
+    // Para la vista de día - Mostrando Título y Espacio
+    const EventoPersonalizadoDia = ({ event }) => {
+        return (
+            <div style={{
+                height: 'auto',
+                width: '100%',
+                overflow: 'visible', 
+                padding: '2px 4px',
+                fontSize: '0.8em', 
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column', 
+                justifyContent: 'flex-start', 
+                boxSizing: 'border-box',
+            }}>
+                {/* Línea 1: Título */}
+                <div style={{
+                    fontWeight: 'bold',  
+                    whiteSpace: 'normal',
+                    overflow: 'visible',
+                    textOverflow: 'unset',
+                }}>
+                    {event.title}
+                </div>
 
-    // Para mostrar de forma personalizada lo que quiero que se muestre en el calendario
+                {/* Línea 2: Espacio (si existe) */}
+                {event.espacio && (
+                    <div style={{
+                        fontSize: '0.9em', 
+                        whiteSpace: 'normal',
+                        overflow: 'visible',
+                        textOverflow: 'unset',
+                    }}>
+                        {event.espacio}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // Para la vista del mes
     const EventoPersonalizadoMes = ({ event }) => (
         <div>
             <strong>{event.title}</strong>
@@ -160,28 +172,28 @@ export default function CalendarioEventos() {
         </div>
     );
 
-    // Para la vista semana
+    // Para la vista de semana
     const EventoPersonalizadoSemana = ({ event }) => {
         return (
             <div style={{
-                padding: '16px', // Aumentamos el padding para hacer el evento más grande
-                fontSize: '1.2em', // Aumentamos el tamaño de la fuente
-                backgroundColor: event.horario === "MAÑANA" ? "#34d399" :
-                                 event.horario === "TARDE" ? "#60a5fa" :
-                                 event.horario === "NOCHE" ? "#f87171" :
-                                 "#d1d5db", // Fondo de color basado en el horario
+                padding: '8px',
+                fontSize: '1em',
+                backgroundColor:
+                    event.horario === "MAÑANA" ? "#34d399" :
+                    event.horario === "TARDE" ? "#60a5fa" :
+                    event.horario === "NOCHE" ? "#f87171" :
+                    "#d1d5db",
                 borderRadius: '8px',
                 color: 'white',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                height: 'auto',
-                minHeight: '70px',
-                marginBottom: '10px',
+                minHeight: '60px',  // Esto puede ser ajustado según lo que necesites
+                width: '100%',
+                overflow: 'visible', // Asegura que todo el contenido sea visible
             }}>
-                <div style={{ fontSize: '0.2em' }}>
-                    <strong>{event.title}</strong>
-                </div>
+                <strong>{event.title}</strong>
+                <div style={{ fontSize: "0.85em" }}>{event.espacio}</div>
             </div>
         );
     };
@@ -257,15 +269,15 @@ export default function CalendarioEventos() {
                     onSelectEvent={handleSelectEvent}
                     eventPropGetter={getEstiloEvento}
                     components={{
-                        event: (props) => {
-                            if (props.view === 'day') {
-                                return <EventoPersonalizadoDia event={props.event} />;
-                            } else if (props.view === 'week') {
-                                return <EventoPersonalizadoSemana event={props.event} />;
-                            }
-                            return <EventoPersonalizadoMes event={props.event} />;
+                        event: EventoPersonalizadoMes,
+                        week: {
+                            event: EventoPersonalizadoSemana
+                        },
+                        day: {
+                            event: EventoPersonalizadoDia
                         }
                     }}
+                    
                     messages={{
                         month: "Mes",
                         week: "Semana",

@@ -19,6 +19,7 @@ import AsignarProducto from './components/productos/AsignarProducto';
 import CalendarioEventos from './components/calendario/CalendarioEventos';
 import CrearEventoCalendario from './components/calendario/CrearEventoCalendario';
 import EditarEventoCalendario from './components/calendario/EditarEventoCalendario';
+import DetallesEventoCalendario from './components/calendario/DetallesEventoCalendario';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/calendario" element={<CalendarioEventos />} /> {/* Ruta segundos gráficos */}
           <Route path="/calendario/crear-evento/:fecha" element={<CrearEventoCalendario />} />
           <Route path="/calendario/editar-evento/:id" element={<EditarEventoCalendario />} />
+          <Route path="/calendario/detalle-evento/:id" element={<DetallesEventoCalendario />} />
         </Routes>
       </div>
     </Router>
