@@ -59,7 +59,7 @@ export default function DetallesEventoCalendario() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-700 mb-2">Hora</label>
+                    <label className="text-sm font-medium text-gray-700 mb-2">Hora Inicio</label>
                     <p className="p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-800">{hora}</p>
                 </div>
 

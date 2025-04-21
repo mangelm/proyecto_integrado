@@ -203,8 +203,8 @@ export default function CalendarioEventos() {
     }
 
     const handleSelectEvent = (event) => {
-        // Redirigir a la página de edición del evento
-        navigate(`/calendario/editar-evento/${event.id}`);
+        // Redirigir a la página de detalles del evento
+        navigate(`/calendario/detalle-evento/${event.id}`);
     };
 
     return (
