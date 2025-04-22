@@ -25,14 +25,14 @@ export default function GestionProductos() {
             .finally(() => setCargando(false));
     }, [page, size]);
 
-    // Filtrar productos 
+    // Filtrar productos
     const productosFiltrados = productos.filter((producto) => {
         const coincideNombre = producto.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
         const coincideCategoria = filtroCategoria === "" || producto.categoria === filtroCategoria;
         return coincideNombre && coincideCategoria;
     });
 
-    // Funciones de paginación 
+    // Funciones de paginación
     const manejoPaginaPrevia = () => page > 0 && setPage(page - 1);
     const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1);
     const manejoPrimeraPagina = () => setPage(0);
@@ -68,7 +68,7 @@ export default function GestionProductos() {
 
             {/* Filtros */}
             <div className="mb-4 flex flex-wrap gap-2 sm:gap-4 items-center justify-between">
-                
+
                 <input
                     type="text"
                     placeholder="Buscar por nombre"
@@ -98,22 +98,23 @@ export default function GestionProductos() {
                 </Link>
             </div>
 
-            {/* Tabla de Eventos */}
+            {/* Tabla de Productos */}
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
-                
+
                     <thead className="bg-gray-100 hidden md:table-header-group">
                         <tr>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
-                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Descripcion</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Descripción</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Precio</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Impuesto</th>
+                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Total</th> {/* Nueva columna */}
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Disponible</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Categoría</th>
                             <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
                         </tr>
                     </thead>
-                    
+
                     <tbody className="divide-y divide-gray-200">
                         {productosFiltrados.length > 0 ? (
                             productosFiltrados.map((producto) => (
@@ -145,6 +146,13 @@ export default function GestionProductos() {
                                             <span>{producto.impuesto}</span>
                                         </div>
                                         <div className="hidden md:block">{producto.impuesto}</div>
+                                    </td>
+                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                                        <div className="md:hidden flex justify-between">
+                                            <span className="font-semibold text-gray-700">Total</span>
+                                            <span>{(producto.precio + producto.impuesto).toFixed(2)}</span>
+                                        </div>
+                                        <div className="hidden md:block">{(producto.precio + producto.impuesto).toFixed(2)}</div> {/* Cálculo del total */}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                                         <div className="md:hidden flex justify-between">
@@ -188,63 +196,63 @@ export default function GestionProductos() {
                     </tbody>
                 </table>
             </div>
-            
+
             {/* Paginación */}
             <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
                 <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
                     <button
-                    onClick={manejoPrimeraPagina}
-                    disabled={page === 0}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+                        onClick={manejoPrimeraPagina}
+                        disabled={page === 0}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    Primero
+                        Primero
                     </button>
                     <button
-                    onClick={manejoValorPrevio}
-                    disabled={page <= 0}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+                        onClick={manejoValorPrevio}
+                        disabled={page <= 0}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    -{valorPaginacion}
+                        -{valorPaginacion}
                     </button>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
                     <button
-                    onClick={manejoPaginaPrevia}
-                    disabled={page === 0}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
+                        onClick={manejoPaginaPrevia}
+                        disabled={page === 0}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
                     >
-                    Anterior
+                        Anterior
                     </button>
                     <span className="text-xs font-medium text-gray-700 md:text-sm">
-                    Página {page + 1} de {totalPages}
+                        Página {page + 1} de {totalPages}
                     </span>
                     <button
-                    onClick={manejoSiguentePagina}
-                    disabled={page === totalPages - 1}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
+                        onClick={manejoSiguentePagina}
+                        disabled={page === totalPages - 1}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
                     >
-                    Siguiente
+                        Siguiente
                     </button>
                 </div>
 
                 <div className="flex gap-2 w-full md:w-auto">
                     <button
-                    onClick={manejoSiguienteValor}
-                    disabled={page >= totalPages - 1}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+                        onClick={manejoSiguienteValor}
+                        disabled={page >= totalPages - 1}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    +{valorPaginacion}
+                        +{valorPaginacion}
                     </button>
                     <button
-                    onClick={manejoUltimaPagina}
-                    disabled={page === totalPages - 1}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+                        onClick={manejoUltimaPagina}
+                        disabled={page === totalPages - 1}
+                        className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    Último
+                        Último
                     </button>
                 </div>
-                </div>
+            </div>
 
             <div className="mt-6 text-center w-full md:w-auto">
                 <Link to={`/`}>
