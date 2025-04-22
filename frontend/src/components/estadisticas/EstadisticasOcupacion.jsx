@@ -12,7 +12,7 @@ export default function EstadisticasOcupacion() {
     const [estadisticas, setEstadisticas] = useState([]);
     const [horariosUnicos, setHorariosUnicos] = useState([]);
     const [horarioSeleccionado, setHorarioSeleccionado] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
     const [graficoHorariosMasSolicitados, setGraficoHorariosMasSolicitados] = useState(null);
     const [mostrarGraficoHorarios, setMostrarGraficoHorarios] = useState(false);
@@ -21,12 +21,12 @@ export default function EstadisticasOcupacion() {
 
     const [mostrarGraficoPrincipal, setMostrarGraficoPrincipal] = useState(true);
 
-    const handleFechaInicioChange = (e) => setFechaInicio(e.target.value);
-    const handleFechaFinalChange = (e) => setFechaFinal(e.target.value);
-    const handleHorarioChange = (e) => setHorarioSeleccionado(e.target.value);
+    const manejoCambioFechaInicio = (e) => setFechaInicio(e.target.value);
+    const manejoCambioFechaFinal = (e) => setFechaFinal(e.target.value);
+    const manejoCambioHorario = (e) => setHorarioSeleccionado(e.target.value);
 
     //Haciendo peticion para enviar los datos
-    const handleSubmit = async (e) => {
+    const manejoEnvio = async (e) => {
         e.preventDefault();
         setError(null);
         setEstadisticas([]);
@@ -37,7 +37,7 @@ export default function EstadisticasOcupacion() {
             return;
         }
     
-        setLoading(true);
+        setCargando(true);
         try {
             //Enviamos los filtros de las fechas al servidor para que nos devuelva los datos que queremos
             const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
@@ -60,12 +60,12 @@ export default function EstadisticasOcupacion() {
         } catch (error) {
             setError(error.message);
         } finally {
-            setLoading(false);
+            setCargando(false);
         }
     };
     
     //Para ocultar el primer gráfico
-    const handleButtonClickPrincipal = () => {
+    const manejoBotonClickPrincipal = () => {
         setMostrarGraficoPrincipal(prev => !prev);
     };
 
@@ -139,7 +139,7 @@ export default function EstadisticasOcupacion() {
             return {
                 label: espacio,
                 data: [totalEventos],
-                backgroundColor: randomColor(),
+                backgroundColor: colorAleatorio(),
                 borderColor: 'rgba(0, 0, 0, 0.1)',
                 borderWidth: 1
             };
@@ -174,7 +174,7 @@ export default function EstadisticasOcupacion() {
     };
     
 
-    const handleButtonClickHorarios = () => {
+    const manejoBotonClickHorarios = () => {
         setMostrarGraficoHorarios(prev => !prev);
     };
 
@@ -183,21 +183,21 @@ export default function EstadisticasOcupacion() {
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
                 <h2 className="text-xl font-semibold text-center mb-4">Generar Estadísticas</h2>
                 {/* Donde introducidemos las fechas por las que filtraremos  */}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input type="date" value={fechaInicio} onChange={handleFechaInicioChange} required className="w-full p-2 border rounded" />
-                    <input type="date" value={fechaFinal} onChange={handleFechaFinalChange} required className="w-full p-2 border rounded" />
-                    <button type="submit" disabled={!fechaInicio || !fechaFinal || loading} className="w-full p-2 bg-blue-500 text-white rounded">{loading ? "Generando..." : "Generar Estadísticas"}</button>
+                <form onSubmit={manejoEnvio} className="space-y-4">
+                    <input type="date" value={fechaInicio} onChange={manejoCambioFechaInicio} required className="w-full p-2 border rounded" />
+                    <input type="date" value={fechaFinal} onChange={manejoCambioFechaFinal} required className="w-full p-2 border rounded" />
+                    <button type="submit" disabled={!fechaInicio || !fechaFinal || cargando} className="w-full p-2 bg-blue-500 text-white rounded">{cargando ? "Generando..." : "Generar Estadísticas"}</button>
                 </form>
             </div>
             {/* Mientras cargan los datos para añadirle dinamismo  */}
-            {loading && <p className="mt-4 text-gray-600">Cargando datos ...</p>}
+            {cargando && <p className="mt-4 text-gray-600">Cargando datos ...</p>}
             {/* Para controlar y mostrar los errores  */}
             {error && <p className="mt-4 text-red-600">{error}</p>}
-            {estadisticas.length > 0 && !loading && (
+            {estadisticas.length > 0 && !cargando && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
             
                     <button
-                        onClick={handleButtonClickPrincipal}
+                        onClick={manejoBotonClickPrincipal}
                         className="mt-6 w-full p-2 bg-red-500 text-white rounded"
                     >
                         {mostrarGraficoPrincipal ? "Ocultar Tasa de Ocupación por Espacio y Horario" : "Mostrar Tasa de Ocupación por Espacio y Horario"}
@@ -206,7 +206,7 @@ export default function EstadisticasOcupacion() {
                     {mostrarGraficoPrincipal && (
                         <div className="w-full h-96">
                             <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
-                            <select value={horarioSeleccionado} onChange={handleHorarioChange} className="w-full p-2 border rounded">
+                            <select value={horarioSeleccionado} onChange={manejoCambioHorario} className="w-full p-2 border rounded">
                                 {horariosUnicos.map(horario => (
                                     <option key={horario} value={horario}>{horario}</option>
                                 ))}
@@ -218,7 +218,7 @@ export default function EstadisticasOcupacion() {
 
                     {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
                     <button
-                        onClick={handleButtonClickHorarios}
+                        onClick={manejoBotonClickHorarios}
                         className="mt-24 w-full p-2 bg-green-500 text-white rounded"
                     >
                         {mostrarGraficoHorarios ? "Ocultar Horarios Más Solicitados" : "Ver Horarios Más Solicitados"}
@@ -242,4 +242,4 @@ export default function EstadisticasOcupacion() {
 }
 
 //Generamos colores aleatorios hexadecimales
-const randomColor = () => "#" + Math.floor(Math.random() * 16777215).toString(16);
+const colorAleatorio = () => "#" + Math.floor(Math.random() * 16777215).toString(16);

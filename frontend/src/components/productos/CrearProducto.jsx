@@ -8,7 +8,7 @@ export default function CrearProducto() {
     const [impuesto, setImpuesto] = useState("");
     const [disponible, setDisponible] = useState(false);
     const [categoria, setCategoria] = useState("BEBIDA");
-    const navigate = useNavigate();
+    const navegar = useNavigate();
 
     const sanitizeInput = (value, type) => {
         if (type === "text") {
@@ -24,7 +24,7 @@ export default function CrearProducto() {
         return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
     };
 
-    const handleSubmit = async (e) => {
+    const manejarEnvio = async (e) => {
         e.preventDefault();
 
         const nuevoProducto = {
@@ -48,7 +48,7 @@ export default function CrearProducto() {
 
             console.log("Respuesta:", response);
             if (response.ok) {
-                navigate("/productos");
+                navegar("/productos");
             } else {
                 const errorData = await response.text();
                 console.log("Error en la respuesta:", errorData);
@@ -65,7 +65,7 @@ export default function CrearProducto() {
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl mx-auto">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Crear Producto</h1>
             <form
-                onSubmit={handleSubmit}
+                onSubmit={manejarEnvio}
                 className="space-y-4"
             >
                 <div>
@@ -172,7 +172,7 @@ export default function CrearProducto() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/productos")}
+                        onClick={() => navegar("/productos")}
                         className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition duration-300 text-sm sm:text-md w-full sm:w-auto"
                     >
                         Cancelar

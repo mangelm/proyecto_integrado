@@ -5,16 +5,16 @@ export default function GestionProductos() {
     const [productos, setProductos] = useState([]);
     const [page, setPage] = useState(0);
     const [size] = useState(5);
-    const [paginationValue] = useState(2);
+    const [valorPaginacion] = useState(2);
     const [totalPages, setTotalPages] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [cargando, setCargando] = useState(false);
 
     // Filtros
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroCategoria, setFiltroCategoria] = useState("");
 
     useEffect(() => {
-        setLoading(true);
+        setCargando(true);
         fetch(`http://localhost:8100/api/productos?page=${page}&size=${size}`)
             .then((response) => response.json())
             .then((data) => {
@@ -22,7 +22,7 @@ export default function GestionProductos() {
                 setTotalPages(data.totalPages);
             })
             .catch((error) => console.error("Error fetching productos:", error))
-            .finally(() => setLoading(false));
+            .finally(() => setCargando(false));
     }, [page, size]);
 
     // Filtrar productos 
@@ -33,15 +33,15 @@ export default function GestionProductos() {
     });
 
     // Funciones de paginación 
-    const handlePrevPage = () => page > 0 && setPage(page - 1);
-    const handleNextPage = () => page < totalPages - 1 && setPage(page + 1);
-    const handleFirstPage = () => setPage(0);
-    const handleLastPage = () => setPage(totalPages - 1);
-    const handleNextValue = () => setPage(prev => Math.min(prev + paginationValue, totalPages - 1));
-    const handlePrevValue = () => setPage(prev => Math.max(prev - paginationValue, 0));
+    const manejoPaginaPrevia = () => page > 0 && setPage(page - 1);
+    const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1);
+    const manejoPrimeraPagina = () => setPage(0);
+    const manejoUltimaPagina = () => setPage(totalPages - 1);
+    const manejoSiguienteValor = () => setPage(valorPrevio => Math.min(valorPrevio + valorPaginacion, totalPages - 1));
+    const manejoValorPrevio = () => setPage(valorPrevio => Math.max(valorPrevio - valorPaginacion, 0));
 
     // Eliminar producto
-    const handleDelete = (id) => {
+    const manejoBorrar = (id) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
             fetch(`http://localhost:8100/api/productos/${id}`, {
                 method: "DELETE",
@@ -58,7 +58,7 @@ export default function GestionProductos() {
         }
     };
 
-    if (loading) {
+    if (cargando) {
         return <div className="text-center">Cargando productos...</div>;
     }
 
@@ -169,7 +169,7 @@ export default function GestionProductos() {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => handleDelete(producto.id)}
+                                                onClick={() => manejoBorrar(producto.id)}
                                                 className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
                                             >
                                                 Eliminar
@@ -193,24 +193,24 @@ export default function GestionProductos() {
             <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
                 <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
                     <button
-                    onClick={handleFirstPage}
+                    onClick={manejoPrimeraPagina}
                     disabled={page === 0}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
                     Primero
                     </button>
                     <button
-                    onClick={handlePrevValue}
+                    onClick={manejoValorPrevio}
                     disabled={page <= 0}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    -{paginationValue}
+                    -{valorPaginacion}
                     </button>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
                     <button
-                    onClick={handlePrevPage}
+                    onClick={manejoPaginaPrevia}
                     disabled={page === 0}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
                     >
@@ -220,7 +220,7 @@ export default function GestionProductos() {
                     Página {page + 1} de {totalPages}
                     </span>
                     <button
-                    onClick={handleNextPage}
+                    onClick={manejoSiguentePagina}
                     disabled={page === totalPages - 1}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
                     >
@@ -230,14 +230,14 @@ export default function GestionProductos() {
 
                 <div className="flex gap-2 w-full md:w-auto">
                     <button
-                    onClick={handleNextValue}
+                    onClick={manejoSiguienteValor}
                     disabled={page >= totalPages - 1}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >
-                    +{paginationValue}
+                    +{valorPaginacion}
                     </button>
                     <button
-                    onClick={handleLastPage}
+                    onClick={manejoUltimaPagina}
                     disabled={page === totalPages - 1}
                     className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
                     >

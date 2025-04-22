@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function CrearEvento({ onSuccess }) {
     const [nombre, setNombre] = useState("");
     const [fecha, setFecha] = useState("");
-    const [cantidadAsistentes, setCantidadAsistentes] = useState("");
+    const [cantidadPersonas, setCantidadPersonas] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("MAÑANA");
     const [hora, setHora] = useState("");
@@ -40,28 +40,28 @@ export default function CrearEvento({ onSuccess }) {
             const fechaEvento = new Date(fecha);
             const ahora = new Date();
 
-            const añoEvento = fechaEvento.getFullYear();
+            const anoEvento = fechaEvento.getFullYear();
             const mesEvento = fechaEvento.getMonth();
             const diaEvento = fechaEvento.getDate();
 
-            const añoAhora = ahora.getFullYear();
+            const anoAhora = ahora.getFullYear();
             const mesAhora = ahora.getMonth();
             const diaAhora = ahora.getDate();
 
-            if (añoEvento < añoAhora || (añoEvento === añoAhora && mesEvento < mesAhora) || (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
+            if (anoEvento < anoAhora || (anoEvento === anoAhora && mesEvento < mesAhora) || (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
                 nuevosErrores.fecha = "La fecha debe ser futura.";
                 valido = false;
-            } else if (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
+            } else if (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
                 nuevosErrores.fecha = "No se puede crear un evento para hoy.";
                 valido = false;
             }
         }
 
-        if (!cantidadAsistentes) {
-            nuevosErrores.cantidadAsistentes = "La cantidad de asistentes es requerida.";
+        if (!cantidadPersonas) {
+            nuevosErrores.cantidadPersonas = "La cantidad de asistentes es requerida.";
             valido = false;
-        } else if (parseInt(cantidadAsistentes) <= 0) {
-            nuevosErrores.cantidadAsistentes = "La cantidad de asistentes debe ser positiva.";
+        } else if (parseInt(cantidadPersonas) <= 0) {
+            nuevosErrores.cantidadPersonas = "La cantidad de asistentes debe ser positiva.";
             valido = false;
         }
 
@@ -91,7 +91,7 @@ export default function CrearEvento({ onSuccess }) {
         const nuevoEvento = {
             nombre: limpiarInput(nombre, "texto"),
             fecha,
-            cantidadPersonas: parseInt(cantidadAsistentes) || 0,
+            cantidadPersonas: parseInt(cantidadPersonas) || 0,
             espacio: limpiarInput(espacio, "texto"),
             horario,
             hora,
@@ -161,12 +161,12 @@ export default function CrearEvento({ onSuccess }) {
                         <input
                             type="number"
                             id="cantidad_personas"
-                            value={cantidadAsistentes}
-                            onChange={(e) => setCantidadAsistentes(e.target.value)}
+                            value={cantidadPersonas}
+                            onChange={(e) => setCantidadPersonas(e.target.value)}
                             required
                             className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.cantidadAsistentes && <p className="text-red-500 text-xs italic">{errores.cantidadAsistentes}</p>}
+                        {errores.cantidadPersonas && <p className="text-red-500 text-xs italic">{errores.cantidadPersonass}</p>}
                     </div>
 
                     <div>

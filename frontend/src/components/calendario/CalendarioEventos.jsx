@@ -10,8 +10,8 @@ const localizer = momentLocalizer(moment);
 
 export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
-    const [view, setView] = useState("month");
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [vista, setVista] = useState("month");
+    const [fechaActual, setFechaActual] = useState(new Date());
     const [cargando, setCargando] = useState(true);
 
     // Filtros
@@ -35,20 +35,20 @@ export default function CalendarioEventos() {
 
             const eventosFormateados = data.map((evento) => {
                 // Formateamos la fecha y la hora
-                const fecha = new Date(evento.fecha); // La fecha
+                const fechaInicial = new Date(evento.fecha); // La fecha
                 const hora = evento.hora ? evento.hora.split(":") : [0, 0]; // Obtenemos la hora y los minutos
-                fecha.setHours(hora[0]);  // Establecemos las horas
-                fecha.setMinutes(hora[1]);  // Establecemos los minutos
-                fecha.setSeconds(0);      // Aseguramos segundos a 0
-                fecha.setMilliseconds(0); // Aseguramos milisegundos a 0
+                fechaInicial.setHours(hora[0]);  // Establecemos las horas
+                fechaInicial.setMinutes(hora[1]);  // Establecemos los minutos
+                fechaInicial.setSeconds(0);      // Aseguramos segundos a 0
+                fechaInicial.setMilliseconds(0); // Aseguramos milisegundos a 0
 
                 // Calcula una hora de fin 60 minutos después del inicio
-                const end = new Date(fecha.getTime() + 120 * 60000); 
+                const fechaFinal = new Date(fechaInicial.getTime() + 120 * 60000); 
                 return {
                     id: evento.id,
                     title: evento.nombre,
-                    start: fecha,
-                    end: end, 
+                    start: fechaInicial,
+                    end: fechaFinal, 
                     allDay: false, // No es un evento de todo el día
                     estado: evento.estado || "",
                     espacio: evento.espacio || "",
@@ -70,16 +70,16 @@ export default function CalendarioEventos() {
     }, [fetchEventos]);
 
     // Para controlar la vista (día, semana, mes) y la fecha
-    const handleViewChange = (view) => setView(view);
-    const handleNavigate = (date) => setCurrentDate(date);
+    const manejoCambioVistas = (vista) => setVista(vista);
+    const manejoNavegacion = (fechaActual) => setFechaActual(fechaActual);
 
     // Controlar enlace y fecha al seleccionar un día
-    const handleSelectSlot = ({ start }) => {
+    const manejoSeleccionarDia = ({ start }) => {
         const fechaSeleccionada = moment(start).format("YYYY-MM-DD");
         navegar(`/calendario/crear-evento/${fechaSeleccionada}`);
     };
 
-    const handleRefresh = () => {
+    const manejoRefrescar = () => {
         fetchEventos();
     };
 
@@ -203,7 +203,7 @@ export default function CalendarioEventos() {
         return <div>Cargando calendario ...</div>;
     }
 
-    const handleSelectEvent = (event) => {
+    const manejoSeleccionarEvento = (event) => {
         // Redirigir a la página de detalles del evento
         navegar(`/calendario/detalle-evento/${event.id}`);
     };
@@ -272,7 +272,7 @@ export default function CalendarioEventos() {
                     </select>
 
                     <button
-                        onClick={handleRefresh}
+                        onClick={manejoRefrescar}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
                         Refrescar
@@ -288,12 +288,12 @@ export default function CalendarioEventos() {
                     style={{ height: 1000 }}
                     views={["month", "week", "day"]}
                     defaultView="month"
-                    view={view}
-                    onView={handleViewChange}
-                    onNavigate={handleNavigate}
+                    view={vista}
+                    onView={manejoCambioVistas}
+                    onNavigate={manejoNavegacion}
                     selectable
-                    onSelectSlot={handleSelectSlot}
-                    onSelectEvent={handleSelectEvent}
+                    onSelectSlot={manejoSeleccionarDia}
+                    onSelectEvent={manejoSeleccionarEvento}
                     eventPropGetter={getEstiloEvento}
                     components={{
                         event: EventoPersonalizadoMes,
@@ -305,7 +305,7 @@ export default function CalendarioEventos() {
                         }
                     }}
                     messages={messages}
-                    date={currentDate}
+                    date={fechaActual}
                 />
             </div>
 

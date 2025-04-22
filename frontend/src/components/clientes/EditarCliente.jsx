@@ -8,8 +8,8 @@ export default function EditarCliente() {
     const [email, setEmail] = useState("");
     const [telefono, setTelefono] = useState("");
     const [rol, setRol] = useState("");
-    const [errors, setErrors] = useState({}); // Estado para almacenar errores de validación
-    const navigate = useNavigate();
+    const [errores, setErrores] = useState({}); // Estado para almacenar errores de validación
+    const navegar = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:8100/api/clientes/${id}`, {
@@ -27,58 +27,58 @@ export default function EditarCliente() {
     }, [id]);
 
     const handleTelefonoChange = (e) => {
-        const rawValue = e.target.value.replace(/\D/g, ""); // Solo números
-        if (rawValue.length <= 9) {
-            const formatted = rawValue.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, p1, p2, p3) => {
+        const telefonoSinModificar = e.target.value.replace(/\D/g, ""); // Solo números
+        if (telefonoSinModificar.length <= 9) {
+            const telefonoformateado = telefonoSinModificar.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, p1, p2, p3) => {
                 if (p3) return `${p1}-${p2}-${p3}`;
                 if (p2) return `${p1}-${p2}`;
                 return p1;
             });
-            setTelefono(formatted);
+            setTelefono(telefonoformateado);
             // Limpiar error específico al escribir
-            if (errors.telefono) {
-                setErrors(prevErrors => ({ ...prevErrors, telefono: null }));
+            if (errores.telefono) {
+                setErrores(prevErrors => ({ ...prevErrors, telefono: null }));
             }
         }
     };
 
     const handleInputChange = (setter, fieldName) => (e) => {
         setter(e.target.value);
-        if (errors[fieldName]) {
-            setErrors(prevErrors => ({ ...prevErrors, [fieldName]: null }));
+        if (errores[fieldName]) {
+            setErrores(prevErrors => ({ ...prevErrors, [fieldName]: null }));
         }
-        if (errors.general) { // Limpiar error general también
-            setErrors(prevErrors => ({ ...prevErrors, general: null }));
+        if (errores.general) { // Limpiar error general también
+            setErrores(prevErrors => ({ ...prevErrors, general: null }));
         }
     };
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrors({}); // Limpiar errores previos al intentar enviar
+        setErrores({}); // Limpiar errores previos al intentar enviar
 
-        let formIsValid = true;
-        let frontendErrors = {};
+        let formularioValido = true;
+        let erroresVista = {};
         const telefonoSanitizado = telefono.replace(/\D/g, "");
 
-        if (!nombre) frontendErrors.nombre = "El nombre es obligatorio.";
-        if (!apellido) frontendErrors.apellido = "El apellido es obligatorio.";
-        if (!email) frontendErrors.email = "El email es obligatorio.";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) frontendErrors.email = "El formato del email no es válido.";
+        if (!nombre) erroresVista.nombre = "El nombre es obligatorio.";
+        if (!apellido) erroresVista.apellido = "El apellido es obligatorio.";
+        if (!email) erroresVista.email = "El email es obligatorio.";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) erroresVista.email = "El formato del email no es válido.";
 
         if (!telefono) {
-            frontendErrors.telefono = "El teléfono es obligatorio.";
+            erroresVista.telefono = "El teléfono es obligatorio.";
         } else if (telefonoSanitizado.length !== 9) {
-            frontendErrors.telefono = "El teléfono debe tener exactamente 9 dígitos.";
-            formIsValid = false;
+            erroresVista.telefono = "El teléfono debe tener exactamente 9 dígitos.";
+            formularioValido = false;
         }
 
-        if (Object.keys(frontendErrors).length > 0) {
-            setErrors(frontendErrors);
-            formIsValid = false;
+        if (Object.keys(erroresVista).length > 0) {
+            setErrores(erroresVista);
+            formularioValido = false;
         }
 
-        if (!formIsValid) {
+        if (!formularioValido) {
             alert("Por favor, corrige los errores del formulario.");
             return;
         }
@@ -103,33 +103,33 @@ export default function EditarCliente() {
             });
 
             if (response.ok) {
-                navigate("/clientes");
+                navegar("/clientes");
             } else {
                 const errorData = await response.json();
                 console.error("Error al editar el cliente:", errorData);
                 if (response.status === 400 && errorData && typeof errorData === 'object') {
-                    const backendErrors = {};
+                    const erroresServidor = {};
                     if (Array.isArray(errorData.errors)) {
                         errorData.errors.forEach(err => {
                             if (err.field && err.defaultMessage) {
-                                backendErrors[err.field] = err.defaultMessage;
+                                erroresServidor[err.field] = err.defaultMessage;
                             }
                         });
                     } else {
                         for (const key in errorData) {
                             if (!['timestamp', 'status', 'error', 'message', 'path'].includes(key)) {
-                                backendErrors[key] = errorData[key];
+                                erroresServidor[key] = errorData[key];
                             }
                         }
                     }
-                    setErrors(prev => ({ ...prev, ...backendErrors }));
+                    setErrores(prev => ({ ...prev, ...erroresServidor }));
                 } else {
-                    setErrors({ general: errorData.message || `Error ${response.status}: ${response.statusText}. Inténtalo de nuevo.` });
+                    setErrores({ general: errorData.message || `Error ${response.status}: ${response.statusText}. Inténtalo de nuevo.` });
                 }
             }
         } catch (error) {
             console.error("Error al editar el cliente:", error);
-            setErrors({ general: "No se pudo conectar con el servidor o hubo un error inesperado. Revisa la consola." });
+            setErrores({ general: "No se pudo conectar con el servidor o hubo un error inesperado. Revisa la consola." });
         }
     };
 
@@ -137,9 +137,9 @@ export default function EditarCliente() {
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-md mx-auto">
             <h1 className="text-xl font-bold mb-4 text-center sm:text-2xl md:text-3xl">Editar Cliente</h1>
 
-            {errors.general && (
+            {errores.general && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                    {errors.general}
+                    {errores.general}
                 </div>
             )}
 
@@ -157,11 +157,11 @@ export default function EditarCliente() {
                         value={nombre}
                         onChange={handleInputChange(setNombre, 'nombre')}
                         required
-                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.nombre ? 'border-red-500' : 'border-gray-300'}`}
-                        aria-invalid={errors.nombre ? "true" : "false"}
-                        aria-describedby={errors.nombre ? "nombre-error" : undefined}
+                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.nombre ? 'border-red-500' : 'border-gray-300'}`}
+                        aria-invalid={errores.nombre ? "true" : "false"}
+                        aria-describedby={errores.nombre ? "nombre-error" : undefined}
                     />
-                    {errors.nombre && <p id="nombre-error" className="mt-1 text-xs text-red-600">{errors.nombre}</p>}
+                    {errores.nombre && <p id="nombre-error" className="mt-1 text-xs text-red-600">{errores.nombre}</p>}
                 </div>
 
                 <div>
@@ -177,11 +177,11 @@ export default function EditarCliente() {
                         value={apellido}
                         onChange={handleInputChange(setApellido, 'apellido')}
                         required
-                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.apellido ? 'border-red-500' : 'border-gray-300'}`}
-                        aria-invalid={errors.apellido ? "true" : "false"}
-                        aria-describedby={errors.apellido ? "apellido-error" : undefined}
+                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.apellido ? 'border-red-500' : 'border-gray-300'}`}
+                        aria-invalid={errores.apellido ? "true" : "false"}
+                        aria-describedby={errores.apellido ? "apellido-error" : undefined}
                     />
-                    {errors.apellido && <p id="apellido-error" className="mt-1 text-xs text-red-600">{errors.apellido}</p>}
+                    {errores.apellido && <p id="apellido-error" className="mt-1 text-xs text-red-600">{errores.apellido}</p>}
                 </div>
 
                 <div className="sm:grid sm:grid-cols-2 sm:gap-4">
@@ -198,11 +198,11 @@ export default function EditarCliente() {
                             value={email}
                             onChange={handleInputChange(setEmail, 'email')}
                             required
-                            className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                            aria-invalid={errors.email ? "true" : "false"}
-                            aria-describedby={errors.email ? "email-error" : undefined}
+                            className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.email ? 'border-red-500' : 'border-gray-300'}`}
+                            aria-invalid={errores.email ? "true" : "false"}
+                            aria-describedby={errores.email ? "email-error" : undefined}
                         />
-                        {errors.email && <p id="email-error" className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                        {errores.email && <p id="email-error" className="mt-1 text-xs text-red-600">{errores.email}</p>}
                     </div>
                 </div>
 
@@ -222,11 +222,11 @@ export default function EditarCliente() {
                             required
                             placeholder="123-456-789"
                             maxLength="11"
-                            className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.telefono ? 'border-red-500' : 'border-gray-300'}`}
-                            aria-invalid={errors.telefono ? "true" : "false"}
-                            aria-describedby={errors.telefono ? "telefono-error" : undefined}
+                            className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.telefono ? 'border-red-500' : 'border-gray-300'}`}
+                            aria-invalid={errores.telefono ? "true" : "false"}
+                            aria-describedby={errores.telefono ? "telefono-error" : undefined}
                         />
-                        {errors.telefono && <p id="telefono-error" className="mt-1 text-xs text-red-600">{errors.telefono}</p>}
+                        {errores.telefono && <p id="telefono-error" className="mt-1 text-xs text-red-600">{errores.telefono}</p>}
                     </div>
                 </div>
 
@@ -248,7 +248,7 @@ export default function EditarCliente() {
                         <option value="ADMIN">ADMIN</option>
                         <option value="STAFF">STAFF</option>
                     </select>
-                    {errors.rol && <p id="rol-error" className="mt-1 text-xs text-red-600">{errors.rol}</p>}
+                    {errores.rol && <p id="rol-error" className="mt-1 text-xs text-red-600">{errores.rol}</p>}
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
@@ -260,7 +260,7 @@ export default function EditarCliente() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/clientes")}
+                        onClick={() => navegar("/clientes")}
                         className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
                     >
                         Cancelar

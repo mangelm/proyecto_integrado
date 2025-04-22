@@ -4,10 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 export default function AsignarProducto() {
     const { id } = useParams(); // Obtienes el ID del evento desde la URL
     const [productos, setProductos] = useState([]);
-    const [selectedProducto, setSelectedProducto] = useState("");
+    const [productoSeleccionado, setProductoSeleccionado] = useState("");
     const [cantidad, setCantidad] = useState(1); // Para definir la cantidad del producto
     const [evento, setEvento] = useState(null);
-    const navigate = useNavigate();
+    const navegar = useNavigate();
 
     // Cargar productos
     useEffect(() => {
@@ -36,21 +36,21 @@ export default function AsignarProducto() {
             .catch((error) => console.error("Error fetching evento:", error));
     }, [id]);
 
-    const handleAsignarProducto = () => {
-        if (!selectedProducto || !cantidad) {
+    const manejoAsignarProducto = () => {
+        if (!productoSeleccionado || !cantidad) {
             alert("Por favor, selecciona un producto y una cantidad.");
             return;
         }
 
         // Lógica para asignar el producto al evento
-        const productoSeleccionado = {
-            productoId: selectedProducto,
+        const productoElegido = {
+            productoId: productoSeleccionado,
             cantidad,
         };
 
         fetch(`http://localhost:8100/api/eventos/${id}/productos`, {
             method: "POST",
-            body: JSON.stringify(productoSeleccionado),
+            body: JSON.stringify(productoElegido),
             headers: {
                 "Content-Type": "application/json",
             },
@@ -84,8 +84,8 @@ export default function AsignarProducto() {
                 <select
                     id="producto"
                     className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
-                    value={selectedProducto}
-                    onChange={(e) => setSelectedProducto(e.target.value)}
+                    value={productoSeleccionado}
+                    onChange={(e) => setProductoSeleccionado(e.target.value)}
                 >
                     <option value="">Seleccionar producto...</option>
                     {productos && productos.length > 0 ? (
@@ -116,14 +116,14 @@ export default function AsignarProducto() {
             {/* Botones */}
             <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <button
-                    onClick={handleAsignarProducto}
+                    onClick={manejoAsignarProducto}
                     className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300 text-sm sm:text-md w-full sm:w-auto"
                 >
                     Asignar Producto
                 </button>
                 <button
                     type="button"
-                    onClick={() => navigate("/eventos")}
+                    onClick={() => navegar("/eventos")}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded-lg transition duration-300 text-sm sm:text-md w-full sm:w-auto"
                 >
                     Volver

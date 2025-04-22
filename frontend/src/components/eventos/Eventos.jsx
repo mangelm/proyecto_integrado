@@ -6,7 +6,7 @@ export default function GestionEventos() {
   const [eventos, setEventos] = useState([]);
   const [page, setpage] = useState(0);
   const size = 10;
-  const [valorpagecion] = useState(3);
+  const [valorPaginacion] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
   const [cargando, setcargando] = useState(true);
   const [productosEventos, setProductosEventos] = useState({});
@@ -66,37 +66,37 @@ export default function GestionEventos() {
     return coincideEspacio && coincideHorario && coincideEstado;
   });
 
-  // Funciones de pageción
-  const handlePrevpage = () => {
+  // Funciones de paginación
+  const manejoPaginaPrevia = () => {
     if (page > 0) {
       setpage(page - 1);
     }
   };
 
-  const handleNextpage = () => {
+  const manejoSiguentePagina = () => {
     if (page < totalPages - 1) { 
         setpage(page + 1);
     }
   };
 
-  const handleFirstpage = () => {
+  const manejoPrimeraPagina = () => {
     setpage(0);
   };
 
-  const handleLastpage = () => {
+  const manejoUltimaPagina = () => {
     setpage(totalPages - 1);
   };
 
-  const handleNextValue = () => {
-    setpage((prevpage) => Math.min(prevpage + valorpagecion, totalPages - 1));
+  const manejoSiguienteValor = () => {
+    setpage((paginaPrevia) => Math.min(paginaPrevia + valorPaginacion, totalPages - 1));
   };
 
-  const handlePrevValue = () => {
-    setpage((prevpage) => Math.max(prevpage - valorpagecion, 0));
+  const manejoValorPrevio = () => {
+    setpage((paginaPrevia) => Math.max(paginaPrevia - valorPaginacion, 0));
   };
 
   // Eliminar evento
-  const handleDelete = (id) => {
+  const manejoBorrar = (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
         setErrorEliminar(null); // Limpiar cualquier error previo
         fetch(`http://localhost:8100/api/eventos/${id}`, {
@@ -107,7 +107,7 @@ export default function GestionEventos() {
                     setEventos(eventos.filter((evento) => evento.id !== id));
                     alert("Evento eliminado con éxito");
                 } else {
-                    return response.text().then(text => { throw new Error(text || "Error al eliminar el evento."); });
+                    return response.text().then(texto => { throw new Error(texto || "Error al eliminar el evento."); });
                 }
             })
             .catch((error) => {
@@ -273,7 +273,7 @@ export default function GestionEventos() {
                       </button>
                     </Link>
                     <button
-                      onClick={() => handleDelete(evento.id)}
+                      onClick={() => manejoBorrar(evento.id)}
                       className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
                     >
                       Eliminar
@@ -307,24 +307,24 @@ export default function GestionEventos() {
   <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
       <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
         <button
-          onClick={handleFirstpage}
+          onClick={manejoPrimeraPagina}
           disabled={page === 0}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
         >
           Primero
         </button>
         <button
-          onClick={handlePrevValue}
+          onClick={manejoValorPrevio}
           disabled={page <= 0}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
         >
-          -{valorpagecion}
+          -{valorPaginacion}
         </button>
       </div>
 
       <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
         <button
-          onClick={handlePrevpage}
+          onClick={manejoPaginaPrevia}
           disabled={page === 0}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
         >
@@ -334,7 +334,7 @@ export default function GestionEventos() {
           Página {page + 1} de {totalPages}
         </span>
         <button
-          onClick={handleNextpage}
+          onClick={manejoSiguentePagina}
           disabled={page === totalPages - 1}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
         >
@@ -344,14 +344,14 @@ export default function GestionEventos() {
 
       <div className="flex gap-2 w-full md:w-auto">
         <button
-          onClick={handleNextValue}
+          onClick={manejoSiguienteValor}
           disabled={page >= totalPages - 1}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
         >
-          +{valorpagecion}
+          +{valorPaginacion}
         </button>
         <button
-          onClick={handleLastpage}
+          onClick={manejoUltimaPagina}
           disabled={page === totalPages - 1}
           className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
         >

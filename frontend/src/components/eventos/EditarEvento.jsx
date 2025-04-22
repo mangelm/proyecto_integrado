@@ -59,18 +59,18 @@ export default function EditarEvento() {
             const fechaEvento = new Date(fecha);
             const ahora = new Date();
 
-            const añoEvento = fechaEvento.getFullYear();
+            const anoEvento = fechaEvento.getFullYear();
             const mesEvento = fechaEvento.getMonth();
             const diaEvento = fechaEvento.getDate();
 
-            const añoAhora = ahora.getFullYear();
+            const anoAhora = ahora.getFullYear();
             const mesAhora = ahora.getMonth();
             const diaAhora = ahora.getDate();
 
-            if (añoEvento < añoAhora || (añoEvento === añoAhora && mesEvento < mesAhora) || (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
+            if (anoEvento < anoAhora || (anoEvento === anoAhora && mesEvento < mesAhora) || (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
                 nuevosErrores.fecha = "La fecha debe ser futura.";
                 valido = false;
-            } else if (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
+            } else if (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
                 nuevosErrores.fecha = "No se puede crear un evento para hoy.";
                 valido = false;
             }
@@ -101,7 +101,7 @@ export default function EditarEvento() {
         return valido;
     };
 
-    const handleSubmit = async (e) => {
+    const manejarEnvio = async (e) => {
         e.preventDefault();
         if (!validarFormulario()) {
             return;
@@ -149,7 +149,7 @@ export default function EditarEvento() {
                     <span className="block sm:inline">{errores.general}</span>
                 </div>}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={manejarEnvio} className="space-y-4">
                     <div>
                         <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
                         <input

@@ -11,7 +11,7 @@ export default function EditarEventoCalendario() {
     const [hora, setHora] = useState("");
     const [estado, setEstado] = useState("");
     const [error, setError] = useState(null); // Para mostrar errores al usuario
-    const navigate = useNavigate();
+    const navegar = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:8100/api/eventos/${id}`, {
@@ -40,7 +40,7 @@ export default function EditarEventoCalendario() {
         return value;
     };
 
-    const handleSubmit = async (e) => {
+    const manejoEnvio = async (e) => {
         e.preventDefault();
 
         // Validar campos requeridos
@@ -72,7 +72,7 @@ export default function EditarEventoCalendario() {
 
             if (response.ok) {
                 // Redirigir al calendario después de la actualización exitosa
-                navigate("/calendario");
+                navegar("/calendario");
             } else {
                 // Si no es una respuesta OK, intenta obtener el cuerpo de la respuesta.
                 const errorData = await response.text();
@@ -95,7 +95,7 @@ export default function EditarEventoCalendario() {
             {/* Mostrar mensaje de error si existe */}
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={manejoEnvio}>
                 <div className="mb-4">
                     <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
                     <input
@@ -196,7 +196,7 @@ export default function EditarEventoCalendario() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/calendario")}
+                        onClick={() => navegar("/calendario")}
                         className="bg-gray-300 hover:bg-gray-400 text-black p-2 rounded"
                     >
                         Cancelar

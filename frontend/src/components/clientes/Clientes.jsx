@@ -5,7 +5,7 @@ export default function GestionClientes() {
     const [clientes, setClientes] = useState([]);
     const [page, setPage] = useState(0);
     const [size] = useState(10);
-    const [paginationValue] = useState(2);
+    const [valorPaginacion] = useState(2);
     const [totalPages, setTotalPages] = useState(0);
     const [cargando, setCargando] = useState(false);
 
@@ -24,31 +24,31 @@ export default function GestionClientes() {
             .finally(() => setCargando(false));
     }, [page, size]);
 
-    const handlePrevPage = () => {
+    const manejoPaginaPrevia = () => {
         if (page > 0) setPage(page - 1);
     };
 
-    const handleNextPage = () => {
+    const manejoSiguentePagina = () => {
         if (page < totalPages - 1) setPage(page + 1);
     };
 
-    const handleFirstPage = () => {
+    const manejoPrimeraPagina = () => {
         setPage(0);
     };
 
-    const handleLastPage = () => {
+    const manejoUltimaPagina = () => {
         setPage(totalPages - 1);
     };
 
-    const handleNextValue = (paginationValue) => {
-        setPage((prevPage) => Math.min(prevPage + paginationValue, totalPages - 1));
+    const manejoSiguienteValor = (paginationValue) => {
+        setPage((paginaPrevia) => Math.min(paginaPrevia + paginationValue, totalPages - 1));
     };
 
-    const handlePrevValue = (paginationValue) => {
-        setPage((prevPage) => Math.max(prevPage - paginationValue, 0));
+    const manejoValorPrevio = (paginationValue) => {
+        setPage((paginaPrevia) => Math.max(paginaPrevia - paginationValue, 0));
     };
 
-    const handleDelete = (id) => {
+    const manejoBorrar = (id) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
             fetch(`http://localhost:8100/api/clientes/${id}`, {
                 method: "DELETE",
@@ -179,7 +179,7 @@ export default function GestionClientes() {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => handleDelete(cliente.id)}
+                                                onClick={() => manejoBorrar(cliente.id)}
                                                 className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
                                             >
                                                 Eliminar
@@ -203,24 +203,24 @@ export default function GestionClientes() {
             <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
                 <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
                     <button
-                        onClick={handleFirstPage}
+                        onClick={manejoPrimeraPagina}
                         disabled={page === 0}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
                         Primero
                     </button>
                     <button
-                        onClick={() => handlePrevValue(paginationValue)}
+                        onClick={() => manejoValorPrevio(valorPaginacion)}
                         disabled={page <= 0}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
-                        -{paginationValue}
+                        -{valorPaginacion}
                     </button>
                 </div>
 
                 <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
                     <button
-                        onClick={handlePrevPage}
+                        onClick={manejoPaginaPrevia}
                         disabled={page === 0}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto"
                     >
@@ -230,7 +230,7 @@ export default function GestionClientes() {
                         Página {page + 1} de {totalPages}
                     </span>
                     <button
-                        onClick={handleNextPage}
+                        onClick={manejoSiguentePagina}
                         disabled={page === totalPages - 1}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto"
                     >
@@ -240,14 +240,14 @@ export default function GestionClientes() {
 
                 <div className="flex gap-2 w-full md:w-auto">
                     <button
-                        onClick={() => handleNextValue(paginationValue)}
+                        onClick={() => manejoSiguienteValor(valorPaginacion)}
                         disabled={page >= totalPages - 1}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >
-                        +{paginationValue}
+                        +{valorPaginacion}
                     </button>
                     <button
-                        onClick={handleLastPage}
+                        onClick={manejoUltimaPagina}
                         disabled={page === totalPages - 1}
                         className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 sm:w-auto"
                     >

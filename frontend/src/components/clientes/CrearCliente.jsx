@@ -10,7 +10,7 @@ export default function CrearCliente() {
     const navegar = useNavigate();
 
     // Formatear teléfono a xxx-xxx-xxx 
-    const handleTelefonoChange = (e) => {
+    const manejoCambioTelefono = (e) => {
         const telefonoSinModificar = e.target.value.replace(/\D/g, ""); // Solo números
         if (telefonoSinModificar.length <= 9) {
             const telefonoformateado = telefonoSinModificar.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, p1, p2, p3) => {
@@ -21,14 +21,14 @@ export default function CrearCliente() {
             setTelefono(telefonoformateado);
              // Limpiar error específico al escribir
             if (errores.telefono) {
-                setErrores(prevErrors => ({ ...prevErrors, telefono: null }));
+                setErrores(erroresPrevios => ({ ...erroresPrevios, telefono: null }));
             }
         }
         // Si quieres limitar a exactamente 9 dígitos visualmente, puedes añadir lógica aquí
     };
 
 
-    const handleSubmit = async (e) => {
+    const manejoEnvio = async (e) => {
         e.preventDefault();
         setErrores({}); // Limpiar errores previos al intentar enviar
 
@@ -128,13 +128,13 @@ export default function CrearCliente() {
 
 
     // Funciones para limpiar errores al cambiar el input
-    const handleInputChange = (setter, fieldName) => (e) => {
+    const manejoCambioInput = (setter, nombreCampo) => (e) => {
         setter(e.target.value);
-        if (errores[fieldName]) {
-            setErrores(prevErrors => ({ ...prevErrors, [fieldName]: null }));
+        if (errores[nombreCampo]) {
+            setErrores(erroresPrevios => ({ ...erroresPrevios, [nombreCampo]: null }));
         }
         if (errores.general) { // Limpiar error general también
-            setErrores(prevErrors => ({ ...prevErrors, general: null }));
+            setErrores(erroresPrevios => ({ ...erroresPrevios, general: null }));
         }
     };
 
@@ -149,7 +149,7 @@ export default function CrearCliente() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={manejoEnvio} className="space-y-4">
                 <div>
                     <label
                         htmlFor="nombre"
@@ -161,7 +161,7 @@ export default function CrearCliente() {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={handleInputChange(setNombre, 'nombre')}
+                        onChange={manejoCambioInput(setNombre, 'nombre')}
                         required // Mantenemos required para validación del navegador
                         className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.nombre ? 'border-red-500' : 'border-gray-300'}`} // Estilo condicional
                         aria-invalid={errores.nombre ? "true" : "false"} // Accesibilidad
@@ -182,7 +182,7 @@ export default function CrearCliente() {
                         type="text"
                         id="apellido"
                         value={apellido}
-                        onChange={handleInputChange(setApellido, 'apellido')}
+                        onChange={manejoCambioInput(setApellido, 'apellido')}
                         required
                         className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.apellido ? 'border-red-500' : 'border-gray-300'}`}
                         aria-invalid={errores.apellido ? "true" : "false"}
@@ -204,7 +204,7 @@ export default function CrearCliente() {
                         type="email"
                         id="email"
                         value={email}
-                        onChange={handleInputChange(setEmail, 'email')}
+                        onChange={manejoCambioInput(setEmail, 'email')}
                         required
                         className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.email ? 'border-red-500' : 'border-gray-300'}`}
                         aria-invalid={errores.email ? "true" : "false"}
@@ -224,7 +224,7 @@ export default function CrearCliente() {
                         type="tel" // Cambiado a 'tel' para semántica y posible ayuda del navegador/móvil
                         id="telefono"
                         value={telefono}
-                        onChange={handleTelefonoChange} // Usamos el handler específico para formato/limpieza
+                        onChange={manejoCambioTelefono} // Usamos el handler específico para formato/limpieza
                         required
                         placeholder="123-456-789"
                         maxLength="11" // 9 dígitos + 2 guiones

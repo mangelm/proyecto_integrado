@@ -9,7 +9,7 @@ export default function EditarProducto() {
     const [impuesto, setImpuesto] = useState("");
     const [disponible, setDisponible] = useState("");
     const [categoria, setCategoria] = useState("");
-    const navigate = useNavigate();
+    const navegar = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:8100/api/productos/${id}`, {
@@ -41,7 +41,7 @@ export default function EditarProducto() {
         return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
     };
 
-    const handleSubmit = async (e) => {
+    const manejoEnvio = async (e) => {
         e.preventDefault();
     
         const productoActualizado = {
@@ -65,7 +65,7 @@ export default function EditarProducto() {
     
             if (response.ok) {
                 // Redirigir a la lista de productos después de la actualización exitosa
-                navigate("/productos");
+                navegar("/productos");
             } else {
                 // Si no es una respuesta OK, intenta obtener el cuerpo de la respuesta.
                 const errorData = await response.text(); // Cambiado a .text() para manejar respuestas vacías
@@ -81,7 +81,7 @@ export default function EditarProducto() {
     return (
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl mx-auto border border-gray-200">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Editar Producto</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={manejoEnvio} className="space-y-4">
                 <div>
                     <label htmlFor="nombre" className="block text-sm sm:text-md font-medium text-gray-700">Nombre</label>
                     <input
@@ -167,7 +167,7 @@ export default function EditarProducto() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/productos")}
+                        onClick={() => navegar("/productos")}
                         className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md shadow-md hover:bg-gray-400 transition duration-200 text-sm sm:text-md w-full sm:w-auto"
                     >
                         Cancelar

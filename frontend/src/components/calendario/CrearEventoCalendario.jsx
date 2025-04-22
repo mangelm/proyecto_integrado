@@ -40,18 +40,18 @@ export default function CrearEventoCalendario({ onSuccess }) {
             const fechaEvento = new Date(fecha);
             const ahora = new Date();
 
-            const añoEvento = fechaEvento.getFullYear();
+            const anoEvento = fechaEvento.getFullYear();
             const mesEvento = fechaEvento.getMonth();
             const diaEvento = fechaEvento.getDate();
 
-            const añoAhora = ahora.getFullYear();
+            const anoAhora = ahora.getFullYear();
             const mesAhora = ahora.getMonth();
             const diaAhora = ahora.getDate();
 
-            if (añoEvento < añoAhora || (añoEvento === añoAhora && mesEvento < mesAhora) || (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
+            if (anoEvento < anoAhora || (anoEvento === anoAhora && mesEvento < mesAhora) || (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
                 nuevosErrores.fecha = "La fecha debe ser futura.";
                 valido = false;
-            } else if (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
+            } else if (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
                 nuevosErrores.fecha = "No se puede crear un evento para hoy.";
                 valido = false;
             }
