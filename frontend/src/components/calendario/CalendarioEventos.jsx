@@ -12,18 +12,18 @@ export default function CalendarioEventos() {
     const [eventos, setEventos] = useState([]);
     const [view, setView] = useState("month");
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [loading, setLoading] = useState(true);
+    const [cargando, setCargando] = useState(true);
 
     // Filtros
     const [filtroEstado, setFiltroEstado] = useState("");
     const [filtroEspacio, setFiltroEspacio] = useState("");
     const [filtroHorario, setFiltroHorario] = useState("");
 
-    const navigate = useNavigate();
+    const navegar = useNavigate();
 
     // Solicitar la información al servidor
     const fetchEventos = useCallback(async () => {
-        setLoading(true);
+        setCargando(true);
         try {
             const response = await fetch("http://localhost:8100/api/eventos/todos");
             const data = await response.json();
@@ -61,7 +61,7 @@ export default function CalendarioEventos() {
         } catch (error) {
             console.error("Error al cargar eventos:", error);
         } finally {
-            setLoading(false);
+            setCargando(false);
         }
     }, []);
 
@@ -76,7 +76,7 @@ export default function CalendarioEventos() {
     // Controlar enlace y fecha al seleccionar un día
     const handleSelectSlot = ({ start }) => {
         const fechaSeleccionada = moment(start).format("YYYY-MM-DD");
-        navigate(`/calendario/crear-evento/${fechaSeleccionada}`);
+        navegar(`/calendario/crear-evento/${fechaSeleccionada}`);
     };
 
     const handleRefresh = () => {
@@ -199,13 +199,13 @@ export default function CalendarioEventos() {
         );
     };
 
-    if (loading) {
+    if (cargando) {
         return <div>Cargando calendario ...</div>;
     }
 
     const handleSelectEvent = (event) => {
         // Redirigir a la página de detalles del evento
-        navigate(`/calendario/detalle-evento/${event.id}`);
+        navegar(`/calendario/detalle-evento/${event.id}`);
     };
 
     // Textos del calendario

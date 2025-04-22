@@ -7,13 +7,13 @@ export default function GestionClientes() {
     const [size] = useState(10);
     const [paginationValue] = useState(2);
     const [totalPages, setTotalPages] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [cargando, setCargando] = useState(false);
 
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroRol, setFiltroRol] = useState("");
 
     useEffect(() => {
-        setLoading(true);
+        setCargando(true);
         fetch(`http://localhost:8100/api/clientes?page=${page}&size=${size}`)
             .then((response) => response.json())
             .then((data) => {
@@ -21,7 +21,7 @@ export default function GestionClientes() {
                 setTotalPages(data.totalPages);
             })
             .catch((error) => console.error("Error fetching clientes:", error))
-            .finally(() => setLoading(false));
+            .finally(() => setCargando(false));
     }, [page, size]);
 
     const handlePrevPage = () => {
@@ -74,7 +74,7 @@ export default function GestionClientes() {
         return coincideNombre && coincideRol;
     });
 
-    if (loading) {
+    if (cargando) {
         return <div className="text-center p-6">Cargando clientes...</div>;
     }
 
