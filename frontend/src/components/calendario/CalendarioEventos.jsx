@@ -208,6 +208,31 @@ export default function CalendarioEventos() {
         navigate(`/calendario/detalle-evento/${event.id}`);
     };
 
+    // Textos del calendario
+    const messages = {
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        today: 'Hoy',
+        previous: 'Anterior',
+        next: 'Siguiente',
+        showMore: total => `+ Ver más (${total})`,
+        date: 'Fecha',
+        time: 'Hora',
+        event: 'Evento',
+        noEventsInRange: 'No hay eventos en este rango.',
+        weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+        weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+        months: [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ],
+        monthsShort: [
+            'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
+            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+        ],
+    };
+
     return (
         <>
             <div className="p-6 bg-white rounded-lg shadow-md">
@@ -279,15 +304,7 @@ export default function CalendarioEventos() {
                             event: EventoPersonalizadoDia
                         }
                     }}
-                    messages={{
-                        month: "Mes",
-                        week: "Semana",
-                        day: "Día",
-                        today: "Hoy",
-                        previous: "Anterior",
-                        next: "Siguiente",
-                        showMore: (total) => `+ Ver ${total} más`,
-                    }}
+                    messages={messages}
                     date={currentDate}
                 />
             </div>

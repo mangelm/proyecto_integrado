@@ -4,87 +4,153 @@ import { useNavigate } from "react-router-dom";
 export default function CrearEvento({ onSuccess }) {
     const [nombre, setNombre] = useState("");
     const [fecha, setFecha] = useState("");
-    const [cantidadPersonas, setCantidadPersonas] = useState("");
+    const [cantidadAsistentes, setCantidadAsistentes] = useState("");
     const [espacio, setEspacio] = useState("");
     const [horario, setHorario] = useState("MAÑANA");
-    const [hora, setHora] = useState(""); 
-    const navigate = useNavigate();
+    const [hora, setHora] = useState("");
+    const [errores, setErrores] = useState({});
+    const navegar = useNavigate();
 
-    const sanitizeInput = (value, type) => {
-        if (type === "text") {
-            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+    const limpiarInput = (valor, tipo) => {
+        if (tipo === "texto") {
+            return valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, "");
         }
-        if (type === "number") {
-            return value.replace(/[^0-9]/g, ""); // Solo números
+        if (tipo === "numero") {
+            return valor.replace(/[^0-9]/g, "");
         }
-        return value;
+        return valor;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
+    const validarFormulario = () => {
+        let valido = true;
+        const nuevosErrores = {};
+
+        if (!nombre.trim()) {
+            nuevosErrores.nombre = "El nombre es requerido.";
+            valido = false;
+        } else if (nombre.trim().length < 3 || nombre.trim().length > 100) {
+            nuevosErrores.nombre = "El nombre debe tener entre 3 y 100 caracteres.";
+            valido = false;
+        }
+
+        if (!fecha) {
+            nuevosErrores.fecha = "La fecha es requerida.";
+            valido = false;
+        } else {
+            const fechaEvento = new Date(fecha);
+            const ahora = new Date();
+
+            const añoEvento = fechaEvento.getFullYear();
+            const mesEvento = fechaEvento.getMonth();
+            const diaEvento = fechaEvento.getDate();
+
+            const añoAhora = ahora.getFullYear();
+            const mesAhora = ahora.getMonth();
+            const diaAhora = ahora.getDate();
+
+            if (añoEvento < añoAhora || (añoEvento === añoAhora && mesEvento < mesAhora) || (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
+                nuevosErrores.fecha = "La fecha debe ser futura.";
+                valido = false;
+            } else if (añoEvento === añoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
+                nuevosErrores.fecha = "No se puede crear un evento para hoy.";
+                valido = false;
+            }
+        }
+
+        if (!cantidadAsistentes) {
+            nuevosErrores.cantidadAsistentes = "La cantidad de asistentes es requerida.";
+            valido = false;
+        } else if (parseInt(cantidadAsistentes) <= 0) {
+            nuevosErrores.cantidadAsistentes = "La cantidad de asistentes debe ser positiva.";
+            valido = false;
+        }
+
+        if (!espacio.trim()) {
+            nuevosErrores.espacio = "El espacio es requerido.";
+            valido = false;
+        } else if (espacio.trim().length > 200) {
+            nuevosErrores.espacio = "El espacio no puede exceder los 200 caracteres.";
+            valido = false;
+        }
+
+        if (!hora) {
+            nuevosErrores.hora = "La hora es requerida.";
+            valido = false;
+        }
+
+        setErrores(nuevosErrores);
+        return valido;
+    };
+
+    const manejarEnvio = async (evento) => {
+        evento.preventDefault();
+        if (!validarFormulario()) {
+            return; // No se envía si hay errores
+        }
+
         const nuevoEvento = {
-            nombre: sanitizeInput(nombre, "text"),
+            nombre: limpiarInput(nombre, "texto"),
             fecha,
-            cantidadPersonas: parseInt(cantidadPersonas) || 0,
-            espacio: sanitizeInput(espacio, "text"),
+            cantidadPersonas: parseInt(cantidadAsistentes) || 0,
+            espacio: limpiarInput(espacio, "texto"),
             horario,
-            hora, // Incluir la hora
+            hora,
         };
-    
+
         try {
-            const response = await fetch("http://localhost:8100/api/eventos", {
+            const respuesta = await fetch("http://localhost:8100/api/eventos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(nuevoEvento),
             });
-    
-            if (response.ok) {
+
+            if (respuesta.ok) {
                 if (onSuccess) {
-                    onSuccess(); // Usa la función personalizada si existe
+                    onSuccess();
                 } else {
-                    navigate("/eventos"); // Redirección por defecto
+                    navegar("/eventos");
                 }
             } else {
-                const errorData = await response.text();
-                alert(errorData); // Muestra el mensaje de error
+                const textoError = await respuesta.text();
+                setErrores({ general: textoError });
             }
-        } catch (error) {
-            const errorMessage = error.response ? await error.response.text() : "Error desconocido";
-            alert("Error al crear el evento: " + errorMessage);
+        } catch (errorDeConexion) {
+            setErrores({ general: `Error de conexión al crear el evento: ${errorDeConexion.message}` });
         }
     };
 
     return (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-md mx-auto">
             <h1 className="text-xl font-bold mb-4 text-center sm:text-2xl">Crear Evento</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={manejarEnvio} className="space-y-4">
                 <div>
                     <label htmlFor="nombre" className="block text-sm font-medium">
                         Nombre
                     </label>
-                    <input 
-                        type="text" 
-                        id="nombre" 
-                        value={nombre} 
+                    <input
+                        type="text"
+                        id="nombre"
+                        value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
-                        required 
+                        required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
+                    {errores.nombre && <p className="text-red-500 text-xs italic">{errores.nombre}</p>}
                 </div>
 
                 <div>
                     <label htmlFor="fecha" className="block text-sm font-medium">
                         Fecha
                     </label>
-                    <input 
-                        type="date" 
-                        id="fecha" 
-                        value={fecha} 
+                    <input
+                        type="date"
+                        id="fecha"
+                        value={fecha}
                         onChange={(e) => setFecha(e.target.value)}
-                        required 
+                        required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
+                    {errores.fecha && <p className="text-red-500 text-xs italic">{errores.fecha}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -92,28 +158,30 @@ export default function CrearEvento({ onSuccess }) {
                         <label htmlFor="cantidad_personas" className="block text-sm font-medium">
                             Nº Asistentes
                         </label>
-                        <input 
-                            type="number" 
-                            id="cantidad_personas" 
-                            value={cantidadPersonas}
-                            onChange={(e) => setCantidadPersonas(e.target.value)}
-                            required 
+                        <input
+                            type="number"
+                            id="cantidad_personas"
+                            value={cantidadAsistentes}
+                            onChange={(e) => setCantidadAsistentes(e.target.value)}
+                            required
                             className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
+                        {errores.cantidadAsistentes && <p className="text-red-500 text-xs italic">{errores.cantidadAsistentes}</p>}
                     </div>
 
                     <div>
                         <label htmlFor="espacio" className="block text-sm font-medium">
                             Espacio
                         </label>
-                        <input 
-                            type="text" 
-                            id="espacio" 
-                            value={espacio} 
+                        <input
+                            type="text"
+                            id="espacio"
+                            value={espacio}
                             onChange={(e) => setEspacio(e.target.value)}
-                            required 
+                            required
                             className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
+                        {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>}
                     </div>
                 </div>
 
@@ -121,43 +189,47 @@ export default function CrearEvento({ onSuccess }) {
                     <label htmlFor="horario" className="block text-sm font-medium">
                         Horario
                     </label>
-                    <select 
-                        id="horario" 
-                        value={horario} 
+                    <select
+                        id="horario"
+                        value={horario}
                         onChange={(e) => setHorario(e.target.value)}
-                        required 
+                        required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     >
                         <option value="MAÑANA">MAÑANA</option>
                         <option value="TARDE">TARDE</option>
                         <option value="NOCHE">NOCHE</option>
                     </select>
+                    {errores.horario && <p className="text-red-500 text-xs italic">{errores.horario}</p>}
                 </div>
 
                 <div>
                     <label htmlFor="hora" className="block text-sm font-medium">
                         Hora
                     </label>
-                    <input 
-                        type="time" 
-                        id="hora" 
-                        value={hora} 
+                    <input
+                        type="time"
+                        id="hora"
+                        value={hora}
                         onChange={(e) => setHora(e.target.value)}
-                        required 
+                        required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
+                    {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>}
                 </div>
 
+                {errores.general && <div className="text-red-500 mt-4">{errores.general}</div>}
+
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                     >
                         Crear Evento
                     </button>
-                    <button 
-                        type="button" 
-                        onClick={() => navigate("/eventos")} 
+                    <button
+                        type="button"
+                        onClick={() => navegar("/eventos")}
                         className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
                     >
                         Cancelar
