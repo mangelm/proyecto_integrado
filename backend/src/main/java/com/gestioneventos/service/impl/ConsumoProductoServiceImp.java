@@ -119,12 +119,12 @@ public class ConsumoProductoServiceImp implements ConsumoProductoService {
         return resultados.stream()
                 .map(resultado -> {
                     String nombreProducto = (String) resultado[0];
-                    java.sql.Time horaEvento = ((java.sql.Time) resultado[1]);
+                    java.time.LocalTime horaEvento = ((java.time.LocalTime) resultado[1]); // Correcto: es LocalTime
                     int totalConsumido = ((Number) resultado[2]).intValue();
                     Horario horario;
 
                     if (horaEvento != null) {
-                        int hora = horaEvento.toLocalTime().getHour();
+                        int hora = horaEvento.getHour();
                         if (hora >= 6 && hora <= 12) {
                             horario = Horario.MAÑANA;
                         } else if (hora > 12 && hora <= 18) {
@@ -140,7 +140,8 @@ public class ConsumoProductoServiceImp implements ConsumoProductoService {
                 .filter(dto -> dto != null) // Filtra los casos donde la hora del evento es nula
                 .collect(Collectors.toList());
     }
-
+    
+    
     @Override
     public List<ProductoConsumoPorPersonasDTO> obtenerCantidadPersonasPorProductoPorEvento(Long eventoId) {
         List<Object[]> resultados = consumoProductoRepository.contarPersonasPorProductoPorEvento(eventoId);
