@@ -21,6 +21,13 @@ export default function Estadisticas() {
         </Link>
         <br/>
         <br/>
+        <Link to="/estadisticas/tickets">
+                <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                    Generación de tickets
+                </button>
+        </Link>
+        <br/>
+        <br/>
         <Link to="/">
                 <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300">
                     Volver

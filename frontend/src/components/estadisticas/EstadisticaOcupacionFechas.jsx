@@ -1,99 +1,76 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Link } from "react-router-dom";
 
+// Componentes y librerias necesarios para los gráficos
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function EstadisticasOcupacion() {
-    const [eventos, setEventos] = useState([]);
-    const [eventoSeleccionado, setEventoSeleccionado] = useState("");
+export default function EstadisticasOcupacionFechas() {
+    const [fechaInicio, setFechaInicio] = useState("");
+    const [fechaFinal, setFechaFinal] = useState("");
     const [estadisticas, setEstadisticas] = useState([]);
     const [horariosUnicos, setHorariosUnicos] = useState([]);
-    const [horarioSeleccionadoGraficoPrincipal, setHorarioSeleccionadoGraficoPrincipal] = useState("");
+    const [horarioSeleccionado, setHorarioSeleccionado] = useState("");
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
     const [graficoHorariosMasSolicitados, setGraficoHorariosMasSolicitados] = useState(null);
     const [mostrarGraficoHorarios, setMostrarGraficoHorarios] = useState(false);
     const [graficoDiasMasSolicitados, setGraficoDiasMasSolicitados] = useState(null);
     const [mostrarGraficoDias, setMostrarGraficoDias] = useState(false);
+
     const [mostrarGraficoPrincipal, setMostrarGraficoPrincipal] = useState(true);
 
-    useEffect(() => {
-        const obtenerEventos = async () => {
-            setCargando(true);
-            setError(null);
-            try {
-                const response = await fetch("http://localhost:8100/api/eventos/todos"); 
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${await response.text()}`);
-                }
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    setEventos(data);
-                    if (data.length > 0) {
-                        setEventoSeleccionado(data[0].id);
-                    }
-                } else {
-                    setEventos([]);
-                    setError("Error: La respuesta del servidor no es un array de eventos.");
-                }
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setCargando(false);
+    const manejoCambioFechaInicio = (e) => setFechaInicio(e.target.value);
+    const manejoCambioFechaFinal = (e) => setFechaFinal(e.target.value);
+    const manejoCambioHorario = (e) => setHorarioSeleccionado(e.target.value);
+
+    //Haciendo peticion para enviar los datos
+    const manejoEnvio = async (e) => {
+        e.preventDefault();
+        setError(null);
+        setEstadisticas([]);
+        setGraficoHorariosMasSolicitados(null);
+    
+        if (new Date(fechaInicio) > new Date(fechaFinal)) {
+            setError("La fecha de inicio no puede ser posterior a la fecha final.");
+            return;
+        }
+    
+        setCargando(true);
+        try {
+            //Enviamos los filtros de las fechas al servidor para que nos devuelva los datos que queremos
+            const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${await response.text()}`);
             }
-        };
+            const data = await response.json();
+            setEstadisticas(data);
 
-        obtenerEventos();
-    }, []);
-
-    useEffect(() => {
-        const obtenerEstadisticasEvento = async () => {
-            if (!eventoSeleccionado) return;
-
-            setCargando(true);
-            setError(null);
-            setEstadisticas([]);
-            setGraficoHorariosMasSolicitados(null);
-            setGraficoDiasMasSolicitados(null);
-
-            try {
-                const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion/evento/${eventoSeleccionado}`);
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${await response.text()}`);
-                }
-                const data = await response.json();
-                setEstadisticas(data);
-
-                const horarios = [...new Set(data.map(item => item.horario))];
-                setHorariosUnicos(horarios);
-                setHorarioSeleccionadoGraficoPrincipal(horarios[0] || "");
-
-                calcularHorariosMasSolicitadosEvento(data);
-                calcularDiasMasSolicitadosEvento(data);
-
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setCargando(false);
-            }
-        };
-
-        obtenerEstadisticasEvento();
-    }, [eventoSeleccionado]);
-
-    const manejoCambioEvento = (e) => {
-        setEventoSeleccionado(e.target.value);
+            const horarios = [...new Set(data.map(item => item.horario))];
+            setHorariosUnicos(horarios);
+            setHorarioSeleccionado(horarios[0] || "");
+    
+            // Calcular horarios más solicitados
+            calcularHorariosMasSolicitados(data);
+    
+            // Calcular días más solicitados
+            calcularDiasMasSolicitados(data);
+    
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setCargando(false);
+        }
     };
-
-    const manejoCambioHorarioGraficoPrincipal = (e) => setHorarioSeleccionadoGraficoPrincipal(e.target.value);
-
+    
+    //Para ocultar el primer gráfico
     const manejoBotonClickPrincipal = () => {
         setMostrarGraficoPrincipal(prev => !prev);
     };
 
-    const calcularHorariosMasSolicitadosEvento = (data) => {
+    //Funcion que calcula los horarios con mas eventos y guardo los datos para luego ser tratados y utilizados para generar el gráfico
+    const calcularHorariosMasSolicitados = (data) => {
         const horariosSolicitados = data.reduce((acc, item) => {
             const horario = item.horario;
             acc[horario] = (acc[horario] || 0) + 1;
@@ -101,16 +78,17 @@ export default function EstadisticasOcupacion() {
         }, {});
 
         const horariosOrdenados = Object.entries(horariosSolicitados).sort((a, b) => b[1] - a[1]);
-        const topHorarios = horariosOrdenados.slice(0, 5);
+        const topHorarios = horariosOrdenados.slice(0, 5); // Los 5 horarios más solicitados
 
-        const labels = topHorarios.map(horario => horario[0]);
-        const dataHorarios = topHorarios.map(horario => horario[1]);
-
+        const labels = topHorarios.map(horario => horario[0]); // Horarios
+        const dataHorarios = topHorarios.map(horario => horario[1]); // Conteo de solicitudes
+        
+        //Datos tratados para generar el gráfico
         setGraficoHorariosMasSolicitados({
             labels: labels,
             datasets: [
                 {
-                    label: 'Horarios más frecuentes en este evento',
+                    label: 'Horarios más solicitados',
                     data: dataHorarios,
                     backgroundColor: 'rgba(153, 102, 255, 0.2)',
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -119,25 +97,27 @@ export default function EstadisticasOcupacion() {
             ]
         });
     };
-
-    const calcularDiasMasSolicitadosEvento = (data) => {
-        const espaciosPorFecha = data.reduce((acc, item) => {
-            const fecha = new Date(item.fecha).toLocaleDateString('es-ES');
-            acc[fecha] = (acc[fecha] || 0) + 1;
+    
+    //Funcion que calcula los dias mas solicitados y guardo los datos para luego ser tratados y utilizados para generar el gráfico
+    const calcularDiasMasSolicitados = (data) => {
+        const diasSolicitados = data.reduce((acc, item) => {
+            const fecha = item.fecha;
+            const fechaStr = new Date(fecha).toLocaleDateString('es-ES'); // 'dd/MM/yyyy'
+            acc[fechaStr] = (acc[fechaStr] || 0) + 1;
             return acc;
         }, {});
-
-        const diasOrdenados = Object.entries(espaciosPorFecha).sort((a, b) => b[1] - a[1]);
-        const topDias = diasOrdenados.slice(0, 5);
-
-        const labels = topDias.map(dia => dia[0]);
-        const dataDias = topDias.map(dia => dia[1]);
-
+        
+        const diasOrdenados = Object.entries(diasSolicitados).sort((a, b) => b[1] - a[1]);
+        const topDias = diasOrdenados.slice(0, 5); // Los 5 días más solicitados
+        
+        const labels = topDias.map(dia => dia[0]);  // Fechas formateadas
+        const dataDias = topDias.map(dia => dia[1]);  // Conteo de eventos
+        
         setGraficoDiasMasSolicitados({
             labels: labels,
             datasets: [
                 {
-                    label: 'Momentos con más actividad en este evento',
+                    label: 'Días más solicitados',
                     data: dataDias,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -145,12 +125,13 @@ export default function EstadisticasOcupacion() {
                 }
             ]
         });
-    };
-
+    };    
+    
+    //Renderizando para motrar el gráfico de cuantos eventos hay en ciertos espacios dentro del rango de fechas introducido
     const renderChart = () => {
-        if (!estadisticas.length || !horarioSeleccionadoGraficoPrincipal) return null;
+        if (!estadisticas.length || !horarioSeleccionado) return null;
 
-        const datosFiltrados = estadisticas.filter(item => item.horario === horarioSeleccionadoGraficoPrincipal);
+        const datosFiltrados = estadisticas.filter(item => item.horario === horarioSeleccionado);
         const espaciosUnicos = [...new Set(datosFiltrados.map(item => item.espacio))];
 
         const datasets = espaciosUnicos.map(espacio => {
@@ -166,12 +147,13 @@ export default function EstadisticasOcupacion() {
 
         return (
             <Bar
-                data={{ labels: [horarioSeleccionadoGraficoPrincipal], datasets }}
+                data={{ labels: [horarioSeleccionado], datasets }}
                 options={{ responsive: true, maintainAspectRatio: false }}
             />
         );
     };
 
+    //Renderizando para motrar el gráfico de cuantos horarios estan mas solicitados
     const renderGraficoHorariosMasSolicitados = () => {
         if (!graficoHorariosMasSolicitados) return null;
         return (
@@ -181,6 +163,7 @@ export default function EstadisticasOcupacion() {
         );
     };
 
+    //Renderizando para motrar el gráfico de que dias estan mas solicitados
     const renderGraficoDiasMasSolicitados = () => {
         if (!graficoDiasMasSolicitados) return null;
         return (
@@ -189,6 +172,7 @@ export default function EstadisticasOcupacion() {
             </div>
         );
     };
+    
 
     const manejoBotonClickHorarios = () => {
         setMostrarGraficoHorarios(prev => !prev);
@@ -197,29 +181,21 @@ export default function EstadisticasOcupacion() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
-                <h2 className="text-xl font-semibold text-center mb-4">Seleccionar Evento</h2>
-                <div className="space-y-4">
-                    <select
-                        value={eventoSeleccionado}
-                        onChange={manejoCambioEvento}
-                        className="w-full p-2 border rounded"
-                    >
-                        {cargando && <option disabled>Cargando eventos...</option>}
-                        {error && <option disabled>Error al cargar eventos</option>}
-                        {!cargando && !error && eventos.length === 0 && <option disabled>No hay eventos disponibles</option>}
-                        {!cargando && !error && eventos.map(evento => (
-                            <option key={evento.id} value={evento.id}>{evento.nombre}</option>
-                        ))}
-                    </select>
-                </div>
+                <h2 className="text-xl font-semibold text-center mb-4">Generar Estadísticas</h2>
+                {/* Donde introducidemos las fechas por las que filtraremos  */}
+                <form onSubmit={manejoEnvio} className="space-y-4">
+                    <input type="date" value={fechaInicio} onChange={manejoCambioFechaInicio} required className="w-full p-2 border rounded" />
+                    <input type="date" value={fechaFinal} onChange={manejoCambioFechaFinal} required className="w-full p-2 border rounded" />
+                    <button type="submit" disabled={!fechaInicio || !fechaFinal || cargando} className="w-full p-2 bg-blue-500 text-white rounded">{cargando ? "Generando..." : "Generar Estadísticas"}</button>
+                </form>
             </div>
-
-            {cargando && <p className="mt-4 text-gray-600">Cargando datos del evento...</p>}
+            {/* Mientras cargan los datos para añadirle dinamismo  */}
+            {cargando && <p className="mt-4 text-gray-600">Cargando datos ...</p>}
+            {/* Para controlar y mostrar los errores  */}
             {error && <p className="mt-4 text-red-600">{error}</p>}
-
             {estadisticas.length > 0 && !cargando && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
-
+            
                     <button
                         onClick={manejoBotonClickPrincipal}
                         className="mt-6 w-full p-2 bg-red-500 text-white rounded"
@@ -230,34 +206,31 @@ export default function EstadisticasOcupacion() {
                     {mostrarGraficoPrincipal && (
                         <div className="w-full h-96">
                             <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
-                            <select
-                                value={horarioSeleccionadoGraficoPrincipal}
-                                onChange={manejoCambioHorarioGraficoPrincipal}
-                                className="w-full p-2 border rounded"
-                            >
+                            <select value={horarioSeleccionado} onChange={manejoCambioHorario} className="w-full p-2 border rounded">
                                 {horariosUnicos.map(horario => (
                                     <option key={horario} value={horario}>{horario}</option>
                                 ))}
                             </select>
                             {renderChart()}
                         </div>
+                        
                     )}
 
+                    {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
                     <button
                         onClick={manejoBotonClickHorarios}
                         className="mt-24 w-full p-2 bg-green-500 text-white rounded"
                     >
-                        {mostrarGraficoHorarios ? "Ocultar Horarios Más Frecuentes" : "Ver Horarios Más Frecuentes"}
+                        {mostrarGraficoHorarios ? "Ocultar Horarios Más Solicitados" : "Ver Horarios Más Solicitados"}
                     </button>
                     {mostrarGraficoHorarios && renderGraficoHorariosMasSolicitados()}
-
                     <button
                         onClick={() => {
                             setMostrarGraficoDias(!mostrarGraficoDias);
                         }}
                         className="mt-6 w-full p-2 bg-blue-500 text-white rounded"
                     >
-                        {mostrarGraficoDias ? "Ocultar Momentos con Más Actividad" : "Ver Momentos con Más Actividad"}
+                        {mostrarGraficoDias ? "Ocultar Días Más Solicitados" : "Ver Días Más Solicitados"}
                     </button>
                     {mostrarGraficoDias && renderGraficoDiasMasSolicitados()}
                 </div>
@@ -268,4 +241,5 @@ export default function EstadisticasOcupacion() {
     );
 }
 
+//Generamos colores aleatorios hexadecimales
 const colorAleatorio = () => "#" + Math.floor(Math.random() * 16777215).toString(16);

@@ -11,15 +11,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gestioneventos.model.dto.ConsumoPromedioDTO;
+import com.gestioneventos.model.dto.ConsumoPromedioFechaDTO;
 import com.gestioneventos.model.dto.EstadisticaOcupacionDTO;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
+import com.gestioneventos.model.dto.ProductoConsumoPorHorarioFechaDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorPersonasDTO;
+import com.gestioneventos.model.dto.ProductoConsumoPorPersonasFechaDTO;
 import com.gestioneventos.model.enumeration.Horario;
 import com.gestioneventos.repository.EventoRepository;
 import com.gestioneventos.service.ConsumoProductoService;
@@ -35,7 +39,7 @@ public class EstadisticaApiController {
     
     @Autowired
     private ConsumoProductoService consumoProductoService;
-
+    
     @GetMapping("/ocupacion")
     public ResponseEntity<?> obtenerEstadisticas(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -51,7 +55,7 @@ public class EstadisticaApiController {
             logger.info("Consultando ocupación entre {} y {}", inicio, fin);
 
             // Consulta a la base de datos
-            List<Object[]> resultados = eventoRepository.countEventosPorEspacioYHorario(inicio, fin);
+            List<Object[]> resultados = eventoRepository.countEventosPorEspacioYHorarioEntreFechas(inicio, fin);
             logger.info("Resultados obtenidos: {}", resultados.size());
 
             // Convertir los resultados a DTO, incluyendo la fecha
@@ -79,8 +83,27 @@ public class EstadisticaApiController {
         }
     }
     
+    @GetMapping("/ocupacion/evento/{eventoId}")
+    public ResponseEntity<?> obtenerEstadisticasPorEvento(@PathVariable Long eventoId) {
+        logger.info("Consultando ocupación para el evento con ID: {}", eventoId);
+
+        List<Object[]> resultados = eventoRepository.countEventosPorEspacioYHorarioPorEvento(eventoId);
+        logger.info("Resultados obtenidos para el evento {}: {}", eventoId, resultados.size());
+
+        List<EstadisticaOcupacionDTO> estadisticas = resultados.stream()
+            .map(resultado -> new EstadisticaOcupacionDTO(
+                (String) resultado[0],
+                ((Horario) resultado[1]).name(),
+                ((Long) resultado[2]).intValue(),
+                ((java.sql.Date) resultado[3]) // Casting a java.sql.Date
+            ))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(estadisticas);
+    }
+    
     @GetMapping("/productos")
-    public ResponseEntity<?> obtenerConsumoPorProducto(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+    public ResponseEntity<?> obtenerConsumoPorProductoFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
             LocalDate inicio = LocalDate.parse(fechaInicio);
             LocalDate fin = LocalDate.parse(fechaFinal);
@@ -90,7 +113,7 @@ public class EstadisticaApiController {
             }
 
             logger.info("Consultando consumo de productos entre {} y {}", inicio, fin);
-            List<ProductoConsumoDTO> productos = consumoProductoService.obtenerConsumoPorProducto(inicio, fin);
+            List<ProductoConsumoDTO> productos = consumoProductoService.obtenerConsumoPorProductoFecha(inicio, fin);
 
             return ResponseEntity.ok(productos);
         } catch (DateTimeParseException e) {
@@ -103,7 +126,7 @@ public class EstadisticaApiController {
     }
     
     @GetMapping("/productos-horario")
-    public ResponseEntity<?> obtenerConsumoPorProductoYHorario(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+    public ResponseEntity<?> obtenerConsumoPorProductoYHorarioFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
             // Validación de fechas
             LocalDate inicio = LocalDate.parse(fechaInicio);
@@ -117,7 +140,7 @@ public class EstadisticaApiController {
             }
 
             // Llamada al servicio
-            List<ProductoConsumoPorHorarioDTO> productos = consumoProductoService.obtenerConsumoPorProductoYHorario(inicio, fin);
+            List<ProductoConsumoPorHorarioFechaDTO> productos = consumoProductoService.obtenerConsumoPorProductoYHorarioFecha(inicio, fin);
 
             // Comprobación de los resultados antes de enviarlos al frontend
             logger.info("Cantidad de productos por horario obtenidos: {}", productos.size());
@@ -133,7 +156,7 @@ public class EstadisticaApiController {
     }
     
     @GetMapping("/productos-personas")
-    public ResponseEntity<?> obtenerProductosMasConsumidosPorPersonas(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+    public ResponseEntity<?> obtenerProductosMasConsumidosPorPersonasFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
             // Convertimos las fechas recibidas en LocalDate
             LocalDate inicio = LocalDate.parse(fechaInicio);
@@ -147,7 +170,7 @@ public class EstadisticaApiController {
             logger.info("Consultando productos más consumidos por personas entre {} y {}", inicio, fin);
 
             // Llamada al servicio para obtener los productos más consumidos por personas
-            List<ProductoConsumoPorPersonasDTO> productos = consumoProductoService.obtenerProductosMasConsumidosPorPersonas(inicio, fin);
+            List<ProductoConsumoPorPersonasFechaDTO> productos = consumoProductoService.obtenerProductosMasConsumidosPorPersonasFecha(inicio, fin);
 
             // Devolvemos la lista de productos consumidos por personas
             return ResponseEntity.ok(productos);
@@ -161,7 +184,7 @@ public class EstadisticaApiController {
     }
 
     @GetMapping("/productos-promedio-personas")
-    public ResponseEntity<?> obtenerConsumoPromedioPorPersona(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
+    public ResponseEntity<?> obtenerConsumoPromedioPorPersonaFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
             LocalDate inicio = LocalDate.parse(fechaInicio);
             LocalDate fin = LocalDate.parse(fechaFinal);
@@ -172,7 +195,7 @@ public class EstadisticaApiController {
 
             logger.info("Consultando consumo promedio por persona entre {} y {}", inicio, fin);
 
-            List<ConsumoPromedioDTO> productos = consumoProductoService.obtenerConsumoPromedioPorPersona(inicio, fin);
+            List<ConsumoPromedioFechaDTO> productos = consumoProductoService.obtenerConsumoPromedioPorPersonaFecha(inicio, fin);
 
             return ResponseEntity.ok(productos);
         } catch (DateTimeParseException e) {
@@ -183,5 +206,24 @@ public class EstadisticaApiController {
             return ResponseEntity.internalServerError().body("Error interno en el servidor.");
         }
     }
+    
+    @GetMapping("/productos/evento/{eventoId}")
+    public ResponseEntity<List<ProductoConsumoDTO>> obtenerConsumoPorProductoPorEvento(@PathVariable Long eventoId) {
+        return ResponseEntity.ok(consumoProductoService.obtenerConsumoPorProductoPorEvento(eventoId));
+    }
 
+    @GetMapping("/productos-horario/evento/{eventoId}")
+    public ResponseEntity<List<ProductoConsumoPorHorarioDTO>> obtenerConsumoPorProductoYHorarioPorEvento(@PathVariable Long eventoId) {
+        return ResponseEntity.ok(consumoProductoService.obtenerConsumoPorProductoYHorarioPorEvento(eventoId));
+    }
+
+    @GetMapping("/productos-personas/evento/{eventoId}")
+    public ResponseEntity<List<ProductoConsumoPorPersonasDTO>> obtenerCantidadPersonasPorProductoPorEvento(@PathVariable Long eventoId) {
+        return ResponseEntity.ok(consumoProductoService.obtenerCantidadPersonasPorProductoPorEvento(eventoId));
+    }
+
+    @GetMapping("/productos-promedio-personas/evento/{eventoId}")
+    public ResponseEntity<List<ConsumoPromedioDTO>> obtenerConsumoPromedioPorPersonaPorEvento(@PathVariable Long eventoId) {
+        return ResponseEntity.ok(consumoProductoService.obtenerConsumoPromedioPorPersonaPorEvento(eventoId));
+    }
 }

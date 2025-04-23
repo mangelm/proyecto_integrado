@@ -1,42 +1,57 @@
 package com.gestioneventos.model.dto;
 
-//ProductoConsumoPorPersonasDTO
 public class ProductoConsumoPorPersonasDTO {
- private String nombre;
- private int cantidadPersonas;
- private long totalConsumido;  // Cambiar a 'long' para ser consistente
+    private String nombre;
+    private Integer cantidadPersonas;
+    private Integer totalConsumido;
 
- // Constructor
- public ProductoConsumoPorPersonasDTO(String nombre, int cantidadPersonas, long totalConsumido) {
-     this.nombre = nombre;
-     this.cantidadPersonas = cantidadPersonas;
-     this.totalConsumido = totalConsumido;
- }
+    // Constructor vacío
+    public ProductoConsumoPorPersonasDTO() {
+    }
 
- // Getters y Setters
- public String getNombre() {
-     return nombre;
- }
+    // Constructor con todos los campos
+    public ProductoConsumoPorPersonasDTO(String nombre, Integer cantidadPersonas, Integer totalConsumido) {
+        this.nombre = nombre;
+        this.cantidadPersonas = cantidadPersonas;
+        this.totalConsumido = totalConsumido;
+    }
 
- public void setNombre(String nombre) {
-     this.nombre = nombre;
- }
+    // Getter para nombre
+    public String getNombre() {
+        return nombre;
+    }
 
- public int getCantidadPersonas() {
-     return cantidadPersonas;
- }
+    // Setter para nombre
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
- public void setCantidadPersonas(int cantidadPersonas) {
-     this.cantidadPersonas = cantidadPersonas;
- }
+    // Getter para cantidadPersonas
+    public Integer getCantidadPersonas() {
+        return cantidadPersonas;
+    }
 
- public long getTotalConsumido() {
-     return totalConsumido;
- }
+    // Setter para cantidadPersonas
+    public void setCantidadPersonas(Integer cantidadPersonas) {
+        this.cantidadPersonas = cantidadPersonas;
+    }
 
- public void setTotalConsumido(long totalConsumido) {
-     this.totalConsumido = totalConsumido;
- }
+    // Getter para totalConsumido
+    public Integer getTotalConsumido() {
+        return totalConsumido;
+    }
+
+    // Setter para totalConsumido
+    public void setTotalConsumido(Integer totalConsumido) {
+        this.totalConsumido = totalConsumido;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductoConsumoPorPersonasDTO{" +
+                "nombre='" + nombre + '\'' +
+                ", cantidadPersonas=" + cantidadPersonas +
+                ", totalConsumido=" + totalConsumido +
+                '}';
+    }
 }
-
-

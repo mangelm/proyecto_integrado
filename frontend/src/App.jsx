@@ -35,13 +35,13 @@ function App() {
           <Route path="/productos" element={<GestionProductos />} />
           <Route path="/productos/editar-producto/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
           <Route path="/productos/crear-producto/" element={<CrearProducto />} /> {/* Ruta para crear */}
-          <Route path="/ticket/" element={<TicketProducto />} />
           <Route path="/clientes" element={<GestionClientes />} />
           <Route path="/clientes/editar-cliente/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
           <Route path="/clientes/crear-cliente/" element={<CrearCliente/>} /> {/* Ruta para crear */}
           <Route path="/estadisticas" element={<Estadisticas />} />
           <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primeros gráficos */}
           <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}
+          <Route path="/estadisticas/tickets" element={<TicketProducto />} />
           <Route path="/calendario" element={<CalendarioEventos />} /> {/* Ruta segundos gráficos */}
           <Route path="/calendario/crear-evento/:fecha" element={<CrearEventoCalendario />} />
           <Route path="/calendario/editar-evento/:id" element={<EditarEventoCalendario />} />
