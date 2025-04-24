@@ -2,63 +2,62 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CrearCliente() {
-    const [nombre, setNombre] = useState("");
-    const [apellido, setApellido] = useState("");
-    const [email, setEmail] = useState("");
-    const [telefono, setTelefono] = useState("");
-    const [errores, setErrores] = useState({}); // Estado para almacenar errores de validación
-    const navegar = useNavigate();
+    const [nombre, setNombre] = useState(""); // Estado para el campo nombre, inicializado como una cadena vacía.
+    const [apellido, setApellido] = useState(""); // Estado para el campo apellido, inicializado como una cadena vacía.
+    const [email, setEmail] = useState(""); // Estado para el campo email, inicializado como una cadena vacía.
+    const [telefono, setTelefono] = useState(""); // Estado para el campo teléfono, inicializado como una cadena vacía.
+    const [errores, setErrores] = useState({}); // Estado para almacenar errores de validación, inicializado como un objeto vacío.
+    const navegar = useNavigate(); // Hook para obtener la función de navegación.
 
-    // Formatear teléfono a xxx-xxx-xxx 
+    // Formatear teléfono a xxx-xxx-xxx
     const manejoCambioTelefono = (e) => {
-        const telefonoSinModificar = e.target.value.replace(/\D/g, ""); // Solo números
-        if (telefonoSinModificar.length <= 9) {
+        const telefonoSinModificar = e.target.value.replace(/\D/g, ""); // Elimina todos los caracteres que no son dígitos.
+        if (telefonoSinModificar.length <= 9) { // Permite hasta 9 dígitos.
             const telefonoformateado = telefonoSinModificar.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, p1, p2, p3) => {
-                if (p3) return `${p1}-${p2}-${p3}`;
-                if (p2) return `${p1}-${p2}`;
-                return p1;
+                if (p3) return `${p1}-${p2}-${p3}`; // Formatea a xxx-xxx-xxx si hay 9 dígitos.
+                if (p2) return `${p1}-${p2}`; // Formatea a xxx-xxx si hay entre 4 y 6 dígitos.
+                return p1; // Devuelve los primeros 3 dígitos si hay menos de 4.
             });
-            setTelefono(telefonoformateado);
+            setTelefono(telefonoformateado); // Actualiza el estado del teléfono con el formato.
              // Limpiar error específico al escribir
-            if (errores.telefono) {
-                setErrores(erroresPrevios => ({ ...erroresPrevios, telefono: null }));
+            if (errores.telefono) {  // Si había un error de teléfono.
+                setErrores(erroresPrevios => ({ ...erroresPrevios, telefono: null })); // Limpia el error de teléfono.
             }
         }
         // Si quieres limitar a exactamente 9 dígitos visualmente, puedes añadir lógica aquí
     };
 
-
+    // Función asíncrona para manejar el envío del formulario de creación.
     const manejoEnvio = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Evita la recarga de la página al enviar el formulario.
         setErrores({}); // Limpiar errores previos al intentar enviar
 
-        // Validación *básica* en frontend (opcional, la principal es la del backend)
-        let formularioValido = true;
-        let erroresVista = {};
-        const telefonoSanitizado = telefono.replace(/\D/g, "");
+        
+        let formularioValido = true; // Variable para controlar si el formulario es válido en el frontend.
+        let erroresVista = {}; // Objeto para almacenar errores de validación del frontend.
+        const telefonoSanitizado = telefono.replace(/\D/g, ""); // Obtiene el teléfono sin formato para validación de longitud.
 
-        if (!nombre) erroresVista.nombre = "El nombre es obligatorio.";
-        if (!apellido) erroresVista.apellido = "El apellido es obligatorio.";
-        if (!email) erroresVista.email = "El email es obligatorio.";
-        // Simple validación de formato email (HTML5 ya ayuda con type="email")
-        else if (!/\S+@\S+\.\S+/.test(email)) erroresVista.email = "El formato del email no es válido.";
+        if (!nombre) erroresVista.nombre = "El nombre es obligatorio."; // Error si el nombre está vacío.
+        if (!apellido) erroresVista.apellido = "El apellido es obligatorio."; // Error si el apellido está vacío.
+        if (!email) erroresVista.email = "El email es obligatorio."; // Error si el email está vacío.
+        else if (!/\S+@\S+\.\S+/.test(email)) erroresVista.email = "El formato del email no es válido."; // Error si el formato del email es incorrecto.
 
         if (!telefono) {
-            erroresVista.telefono = "El teléfono es obligatorio.";
+            erroresVista.telefono = "El teléfono es obligatorio.";  // Error si el teléfono está vacío.
         } else if (telefonoSanitizado.length !== 9) {
-            erroresVista.telefono = "El teléfono debe tener exactamente 9 dígitos.";
-            formularioValido = false; // Marcar como inválido si el teléfono no tiene 9 dígitos
+            erroresVista.telefono = "El teléfono debe tener exactamente 9 dígitos."; // Error si el teléfono no tiene 9 dígitos.
+            formularioValido = false;  // Marca el formulario como inválido si el teléfono no tiene 9 dígitos.
         }
 
-        if (Object.keys(erroresVista).length > 0) {
-            setErrores(erroresVista);
-            formularioValido = false;
+        if (Object.keys(erroresVista).length > 0) { // Si hay errores de validación en el frontend.
+            setErrores(erroresVista); // Actualiza el estado de errores con los errores del frontend.
+            formularioValido = false; // Marca el formulario como inválido.
         }
 
-        // Si la validación básica del frontend falla, no enviar
-        if (!formularioValido && erroresVista.telefono) {
-            alert("Por favor, corrige los errores del formulario.");
-            return;
+        // Si la validación del frontend falla, no enviar
+        if (!formularioValido && erroresVista.telefono) { // Si el formulario no es válido y hay un error de teléfono.
+            alert("Por favor, corrige los errores del formulario."); // Muestra una alerta.
+            return; // Detiene el envío del formulario.
         }
 
 
@@ -72,35 +71,31 @@ export default function CrearCliente() {
 
         try {
             const response = await fetch("http://localhost:8100/api/clientes", {
-                method: "POST",
+                method: "POST", // Utiliza el método POST para crear un nuevo recurso.
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json", // Indica que el cuerpo de la petición es JSON.
                 },
-                body: JSON.stringify(nuevoCliente),
-                credentials: 'same-origin', // Asegúrate que esto es necesario para tu configuración
+                body: JSON.stringify(nuevoCliente), // Convierte el objeto cliente a una cadena JSON.
+                credentials: 'same-origin', 
             });
 
-            console.log("Respuesta:", response.status, response.statusText);
+            console.log("Respuesta:", response.status, response.statusText); // Muestra en consola el estado de la respuesta.
 
-            if (response.ok) {
-                navegar("/clientes"); // Éxito, navegar a la lista
+            if (response.ok) { // Si la respuesta tiene un código de estado exitoso (2xx).
+                navegar("/clientes"); // Éxito, navegar a la lista de clientes.
             } else {
                 // Error en la respuesta, probablemente validación del backend
-                const errorData = await response.json(); // Intenta parsear como JSON
-                console.log("Error en la respuesta:", errorData);
-
+                const errorData = await response.json(); // Intenta parsear el cuerpo de la respuesta como JSON.
+                console.log("Error en la respuesta:", errorData);  // Muestra en consola los datos del error.
                 if (response.status === 400 && errorData && typeof errorData === 'object') {
-                    // Asumiendo una estructura común de error de Spring Validation
-                    // Puede ser errorData.errors o directamente un mapa campo -> mensaje
-                    const erroresServidor = {};
-                    if (Array.isArray(errorData.errors)) { // Estructura común con lista de errores
-                        errorData.errors.forEach(err => {
-                            if (err.field && err.defaultMessage) {
-                                erroresServidor[err.field] = err.defaultMessage;
+                    const erroresServidor = {};  // Objeto para almacenar errores del servidor.
+                    if (Array.isArray(errorData.errors)) { // Estructura común con lista de errores.
+                        errorData.errors.forEach(err => { // Itera sobre la lista de errores.
+                            if (err.field && err.defaultMessage) { // Si el error tiene un campo y un mensaje.
+                                erroresServidor[err.field] = err.defaultMessage; // Asigna el valor del error al campo correspondiente.
                             }
                         });
                     } else {
-                        // Intenta mapear directamente si es un objeto campo:mensaje
                         for (const key in errorData) {
                             // Evita mapear campos genéricos como timestamp, status, error, message, path
                             if (!['timestamp', 'status', 'error', 'message', 'path'].includes(key)) {
@@ -112,7 +107,7 @@ export default function CrearCliente() {
 
                     // Combina errores de frontend (si los hubiera) con los del backend
                     // Dando prioridad a los del backend si existen para el mismo campo
-                    setErrores(prev => ({ ...prev, ...erroresServidor }));
+                    setErrores(prev => ({ ...prev, ...erroresServidor })); // Actualiza el estado de errores combinando los previos con los del servidor.
 
                 } else {
                     // Error no esperado o no es de validación (e.g., 500)
@@ -121,19 +116,19 @@ export default function CrearCliente() {
             }
         } catch (error) {
             // Error de red o al parsear JSON
-            console.error("Error en fetch o procesando la respuesta:", error);
-            setErrores({ general: "No se pudo conectar con el servidor o hubo un error inesperado. Revisa la consola." });
+            console.error("Error en fetch o procesando la respuesta:", error); // Muestra el error en consola
+            setErrores({ general: "No se pudo conectar con el servidor o hubo un error inesperado. Revisa la consola." }); // Establece un error general de conexión o parseo.
         }
     };
 
 
     // Funciones para limpiar errores al cambiar el input
     const manejoCambioInput = (setter, nombreCampo) => (e) => {
-        setter(e.target.value);
-        if (errores[nombreCampo]) {
-            setErrores(erroresPrevios => ({ ...erroresPrevios, [nombreCampo]: null }));
+        setter(e.target.value); // Actualiza el estado del campo.
+        if (errores[nombreCampo]) { // Si hay un error para este campo.
+            setErrores(erroresPrevios => ({ ...erroresPrevios, [nombreCampo]: null }));  // Limpia el error de este campo.
         }
-        if (errores.general) { // Limpiar error general también
+        if (errores.general) { // Limpia el error general.
             setErrores(erroresPrevios => ({ ...erroresPrevios, general: null }));
         }
     };
@@ -149,11 +144,11 @@ export default function CrearCliente() {
                 </div>
             )}
 
-            <form onSubmit={manejoEnvio} className="space-y-4">
-                <div>
+            <form onSubmit={manejoEnvio} className="space-y-4"> {/* Formulario con el handler de envío y espaciado entre elementos. */}
+                <div>  {/* Grupo para el campo Nombre */}
                     <label
                         htmlFor="nombre"
-                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                        className="block text-sm font-medium text-gray-700 sm:text-base" //Etiqueta del campo Nombre
                     >
                         Nombre
                     </label>
@@ -161,20 +156,20 @@ export default function CrearCliente() {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={manejoCambioInput(setNombre, 'nombre')}
-                        required // Mantenemos required para validación del navegador
-                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.nombre ? 'border-red-500' : 'border-gray-300'}`} // Estilo condicional
-                        aria-invalid={errores.nombre ? "true" : "false"} // Accesibilidad
-                        aria-describedby={errores.nombre ? "nombre-error" : undefined}
+                        onChange={manejoCambioInput(setNombre, 'nombre')} //Handler para actualizar el estado y limpiar errores
+                        required 
+                        className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.nombre ? 'border-red-500' : 'border-gray-300'}`} // Estilo condicional basado en errores
+                        aria-invalid={errores.nombre ? "true" : "false"} // Accesibilidad para indicar si el campo es inválido
+                        aria-describedby={errores.nombre ? "nombre-error" : undefined} // Accesibilidad para asociar con el mensaje de error
                     />
-                    {/* Mensaje de error específico */}
+                     {/* Mensaje de error específico para el campo Nombre */}
                     {errores.nombre && <p id="nombre-error" className="mt-1 text-xs text-red-600">{errores.nombre}</p>}
                 </div>
 
-                <div>
+                <div> {/* Grupo para el campo Apellido */}
                     <label
                         htmlFor="apellido"
-                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                        className="block text-sm font-medium text-gray-700 sm:text-base" //Etiqueta del campo Apellido
                     >
                         Apellido
                     </label>
@@ -182,7 +177,7 @@ export default function CrearCliente() {
                         type="text"
                         id="apellido"
                         value={apellido}
-                        onChange={manejoCambioInput(setApellido, 'apellido')}
+                        onChange={manejoCambioInput(setApellido, 'apellido')} //Handler para actualizar el estado y limpiar errores
                         required
                         className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.apellido ? 'border-red-500' : 'border-gray-300'}`}
                         aria-invalid={errores.apellido ? "true" : "false"}
@@ -196,7 +191,7 @@ export default function CrearCliente() {
                 <div>
                     <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                        className="block text-sm font-medium text-gray-700 sm:text-base" //Etiqueta del campo Email
                     >
                         Email
                     </label>
@@ -204,7 +199,7 @@ export default function CrearCliente() {
                         type="email"
                         id="email"
                         value={email}
-                        onChange={manejoCambioInput(setEmail, 'email')}
+                        onChange={manejoCambioInput(setEmail, 'email')}  //Handler para actualizar el estado y limpiar errores
                         required
                         className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errores.email ? 'border-red-500' : 'border-gray-300'}`}
                         aria-invalid={errores.email ? "true" : "false"}
@@ -214,17 +209,18 @@ export default function CrearCliente() {
                 </div>
 
                 <div>
+                    {/* Grupo para el campo Teléfono */}
                     <label
                         htmlFor="telefono"
-                        className="block text-sm font-medium text-gray-700 sm:text-base"
+                        className="block text-sm font-medium text-gray-700 sm:text-base" //Etiqueta del campo Teléfono
                     >
                         Teléfono (XXX-XXX-XXX)
                     </label>
                     <input
-                        type="tel" // Cambiado a 'tel' para semántica y posible ayuda del navegador/móvil
+                        type="tel"
                         id="telefono"
                         value={telefono}
-                        onChange={manejoCambioTelefono} // Usamos el handler específico para formato/limpieza
+                        onChange={manejoCambioTelefono} 
                         required
                         placeholder="123-456-789"
                         maxLength="11" // 9 dígitos + 2 guiones
@@ -235,8 +231,9 @@ export default function CrearCliente() {
                     {errores.telefono && <p id="telefono-error" className="mt-1 text-xs text-red-600">{errores.telefono}</p>}
                 </div>
 
-
+                {/* Contenedor para los botones de Crear y Cancelar */}
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2 pt-4">
+                    {/* Botón de Crear Cliente */}
                     <button
                         type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto disabled:opacity-50"
@@ -245,8 +242,8 @@ export default function CrearCliente() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navegar("/clientes")}
-                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
+                        onClick={() => navegar("/clientes")} // Navega a la lista de clientes al hacer clic
+                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto" //Botón de Cancelar
                     >
                         Cancelar
                     </button>
