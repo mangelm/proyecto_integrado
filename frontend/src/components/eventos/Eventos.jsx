@@ -249,20 +249,20 @@ export default function GestionEventos() {
                 </td>
                 <td className="px-2 py-2 text-center text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block lg:hidden">
                   <div className="font-semibold text-gray-700 mb-1">Productos:</div>
-                  <ul className="list-none">
-                    {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
-                      <li key={producto.nombreProducto}>{`${producto.nombreProducto} (${producto.cantidad})`}</li>
-                    ))}
-                    {!productosEventos[evento.id] && <li>Cargando...</li>}
-                  </ul>
+                    <ul className="list-none">
+                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
+                            <li key={producto.nombreProducto}>{producto.nombreProducto}</li>
+                        ))}
+                        {!productosEventos[evento.id] && <li>Cargando...</li>}
+                    </ul>
                 </td>
                 <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
-                  <ul className="list-none">
-                    {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
-                      <li key={producto.nombreProducto} className="whitespace-nowrap">{`${producto.nombreProducto} (${producto.cantidad})`}</li>
-                    ))}
-                    {!productosEventos[evento.id] && <li>Cargando...</li>}
-                  </ul>
+                    <ul className="list-none">
+                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
+                            <li key={producto.nombreProducto} className="whitespace-nowrap">{producto.nombreProducto}</li>
+                        ))}
+                        {!productosEventos[evento.id] && <li>Cargando...</li>}
+                    </ul>
                 </td>
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden font-semibold text-center">Acciones</div>

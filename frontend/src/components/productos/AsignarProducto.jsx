@@ -5,7 +5,6 @@ export default function AsignarProducto() {
     const { id } = useParams(); // Obtienes el ID del evento desde la URL
     const [productos, setProductos] = useState([]);
     const [productoSeleccionado, setProductoSeleccionado] = useState("");
-    const [cantidad, setCantidad] = useState(1); // Para definir la cantidad del producto
     const [evento, setEvento] = useState(null);
     const navegar = useNavigate();
 
@@ -14,17 +13,16 @@ export default function AsignarProducto() {
         fetch("http://localhost:8100/api/productos/todos")
             .then((response) => response.json())
             .then((productosData) => {
-                // Verificar si 'productosData' es un array
                 if (Array.isArray(productosData)) {
-                    setProductos(productosData); // Establecemos los productos si es un array
+                    setProductos(productosData);
                 } else {
                     console.error("La respuesta de productos no es un array:", productosData);
-                    setProductos([]); // Establecer un array vacío si no es un array
+                    setProductos([]);
                 }
             })
             .catch((error) => {
                 console.error("Error fetching productos:", error);
-                setProductos([]); // Establecer un array vacío si ocurre un error
+                setProductos([]);
             });
 
         // Cargar el evento
@@ -37,15 +35,14 @@ export default function AsignarProducto() {
     }, [id]);
 
     const manejoAsignarProducto = () => {
-        if (!productoSeleccionado || !cantidad) {
-            alert("Por favor, selecciona un producto y una cantidad.");
+        if (!productoSeleccionado) {
+            alert("Por favor, selecciona un producto.");
             return;
         }
 
-        // Lógica para asignar el producto al evento
+        // Lógica para asignar el producto al evento (sin cantidad)
         const productoElegido = {
             productoId: productoSeleccionado,
-            cantidad,
         };
 
         fetch(`http://localhost:8100/api/eventos/${id}/productos`, {
@@ -64,17 +61,11 @@ export default function AsignarProducto() {
 
     return (
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Asignar Producto al Evento</h2>
-
             {/* Información del evento */}
             {evento && (
                 <div className="mb-4 text-center">
-                    <h3 className="text-lg sm:text-xl font-semibold mb-2">Evento: {evento.nombre}</h3>
-                    <p className="text-sm sm:text-md">Fecha: {evento.fecha}</p>
-                    <p className="text-sm sm:text-md">Cantidad de personas: {evento.cantidadPersonas}</p>
-                    <p className="text-sm sm:text-md">Espacio: {evento.espacio}</p>
-                    <p className="text-sm sm:text-md">Horario: {evento.horario}</p>
-                    <p className="text-sm sm:text-md">Estado: {evento.estado}</p>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Asignar Producto al Evento:</h2>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">{evento.nombre}</h2>
                 </div>
             )}
 
@@ -98,19 +89,6 @@ export default function AsignarProducto() {
                         <option disabled>No hay productos disponibles</option>
                     )}
                 </select>
-            </div>
-
-            {/* Cantidad */}
-            <div className="mb-4">
-                <label htmlFor="cantidad" className="block text-sm sm:text-md font-medium mb-1">Cantidad</label>
-                <input
-                    id="cantidad"
-                    type="number"
-                    className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
-                    value={cantidad}
-                    onChange={(e) => setCantidad(e.target.value)}
-                    min="1"
-                />
             </div>
 
             {/* Botones */}

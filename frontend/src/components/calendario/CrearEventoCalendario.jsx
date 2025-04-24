@@ -2,29 +2,32 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function CrearEventoCalendario({ onSuccess }) {
-    const { fecha } = useParams(); // Obtiene la fecha de la URL
-    const [nombre, setNombre] = useState("");
-    const [cantidadPersonas, setCantidadPersonas] = useState("");
-    const [espacio, setEspacio] = useState("");
-    const [horario, setHorario] = useState("MAÑANA");
-    const [hora, setHora] = useState("");
-    const [errores, setErrores] = useState({});
-    const navegar = useNavigate();
+    const { fecha } = useParams(); // Obtiene el parámetro 'fecha' de la URL, que representa la fecha en la que se va a crear el evento.
+    const [nombre, setNombre] = useState(""); // Estado para el nombre del evento, inicializado como cadena vacía
+    const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para la cantidad de asistentes, inicializado como una cadena vacía.
+    const [espacio, setEspacio] = useState("");// Estado para el lugar o espacio del evento, inicializado como una cadena vacía.
+    const [horario, setHorario] = useState("MAÑANA"); // Estado para el horario del evento (MAÑANA, TARDE, NOCHE), inicializado en 'MAÑANA'.
+    const [hora, setHora] = useState(""); // Estado para la hora específica del evento, inicializado como una cadena vacía.
+    const [errores, setErrores] = useState({}); // Estado para almacenar los errores de validación del formulario, inicializado como un objeto vacío.
+    const navegar = useNavigate(); // Hook para obtener la función de navegación.
 
+    // Función para limpiar los valores de los input, eliminando caracteres no deseados.
     const limpiarInput = (valor, tipo) => {
         if (tipo === "texto") {
-            return valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, "");
+            return valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Elimina caracteres que no son letras, números, acentos, ñ o espacios.
         }
         if (tipo === "numero") {
-            return valor.replace(/[^0-9]/g, "");
+            return valor.replace(/[^0-9]/g, ""); // Elimina caracteres que no son números.
         }
-        return valor;
+        return valor;  // Retorna el valor sin cambios si el tipo no es texto ni número.
     };
 
+    // Función para validar el formulario antes de enviar los datos.
     const validarFormulario = () => {
-        let valido = true;
-        const nuevosErrores = {};
+        let valido = true; // Variable para controlar si el formulario es válido, inicialmente verdadero.
+        const nuevosErrores = {}; // Objeto para almacenar los nuevos errores encontrados durante la validación.
 
+        // Validación del campo 'nombre'.
         if (!nombre.trim()) {
             nuevosErrores.nombre = "El nombre es requerido.";
             valido = false;
@@ -33,13 +36,15 @@ export default function CrearEventoCalendario({ onSuccess }) {
             valido = false;
         }
 
+        // Validación del campo 'fecha'.
         if (!fecha) {
             nuevosErrores.fecha = "La fecha es requerida.";
             valido = false;
         } else {
-            const fechaEvento = new Date(fecha);
-            const ahora = new Date();
+            const fechaEvento = new Date(fecha); // Crea un objeto Date a partir de la fecha seleccionada.
+            const ahora = new Date(); // Obtiene la fecha y hora actual.
 
+            // Extrae el año, mes y día de la fecha del evento y la fecha actual.
             const anoEvento = fechaEvento.getFullYear();
             const mesEvento = fechaEvento.getMonth();
             const diaEvento = fechaEvento.getDate();
@@ -48,6 +53,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
             const mesAhora = ahora.getMonth();
             const diaAhora = ahora.getDate();
 
+            // Comprueba si la fecha del evento es anterior a la fecha actual.
             if (anoEvento < anoAhora || (anoEvento === anoAhora && mesEvento < mesAhora) || (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
                 nuevosErrores.fecha = "La fecha debe ser futura.";
                 valido = false;
@@ -57,6 +63,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
             }
         }
 
+        // Validación del campo 'cantidadPersonas'.
         if (!cantidadPersonas) {
             nuevosErrores.cantidadPersonas = "La cantidad de asistentes es requerida.";
             valido = false;
@@ -65,6 +72,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
             valido = false;
         }
 
+        // Validación del campo 'espacio'.
         if (!espacio.trim()) {
             nuevosErrores.espacio = "El espacio es requerido.";
             valido = false;
@@ -73,52 +81,64 @@ export default function CrearEventoCalendario({ onSuccess }) {
             valido = false;
         }
 
+        // Validación del campo 'hora'.
         if (!hora) {
             nuevosErrores.hora = "La hora es requerida.";
             valido = false;
         }
 
-        setErrores(nuevosErrores);
-        return valido;
+        setErrores(nuevosErrores); // Actualiza el estado de errores con los nuevos errores encontrados.
+        return valido; // Retorna true si no hay errores, false si hay alguno.
     };
 
+    // Función asíncrona para manejar el envío del formulario.
     const manejarEnvio = async (evento) => {
-        evento.preventDefault();
+        
+        evento.preventDefault(); // Evita el comportamiento por defecto del formulario (recargar la página).
+        
         if (!validarFormulario()) {
-            return; // No se envía si hay errores
+            return; // Si la validación falla, la función se detiene aquí.
         }
 
+        // Crea un objeto con los datos del nuevo evento
         const nuevoEvento = {
-            nombre: limpiarInput(nombre, "texto"),
+            nombre: limpiarInput(nombre, "texto"), // Limpia el nombre antes de enviarlo.
             fecha,
-            cantidadPersonas: parseInt(cantidadPersonas) || 0,
-            espacio: limpiarInput(espacio, "texto"),
+            cantidadPersonas: parseInt(cantidadPersonas) || 0, // Convierte la cantidad de personas a número o usa 0 si no es un número válido.
+            espacio: limpiarInput(espacio, "texto"), // Limpia el espacio antes de enviarlo.
             horario,
             hora,
         };
 
         try {
+
+            // Realiza una petición POST a la API para crear el nuevo evento.
             const respuesta = await fetch("http://localhost:8100/api/eventos", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(nuevoEvento),
+                headers: { "Content-Type": "application/json" }, // Indica que el cuerpo de la petición es JSON.
+                body: JSON.stringify(nuevoEvento), // Convierte el objeto del evento a una cadena JSON para enviarlo.
             });
 
+            // Comprueba si la respuesta de la API fue exitosa (código de estado 2xx).
             if (respuesta.ok) {
+                // Si se proporciona una función onSuccess, la llama.
                 if (onSuccess) {
                     onSuccess();
                 } else {
+                    // Si no hay onSuccess, navega a la página de eventos.
                     navegar("/eventos");
                 }
             } else {
-                const textoError = await respuesta.text();
-                setErrores({ general: textoError });
+                const textoError = await respuesta.text(); // Obtiene el mensaje de error de la respuesta.
+                setErrores({ general: textoError }); // Actualiza el estado de errores con el mensaje general de error.
             }
         } catch (errorDeConexion) {
+            // Captura errores de conexión con la API.
             setErrores({ general: `Error de conexión al crear el evento: ${errorDeConexion.message}` });
         }
     };
 
+    // Renderiza el formulario para crear un nuevo evento.
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto">
             <h1 className="text-2xl font-bold mb-4 text-center">Crear Evento</h1>
@@ -131,11 +151,11 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
+                        onChange={(e) => setNombre(e.target.value)} // Actualiza el estado 'nombre' cuando el valor del input cambia.
                         required
                         className="mt-1 w-full p-2 border rounded-md"
                     />
-                    {errores.nombre && <p className="text-red-500 text-xs italic">{errores.nombre}</p>}
+                    {errores.nombre && <p className="text-red-500 text-xs italic">{errores.nombre}</p>} {/* Muestra el error de nombre si existe. */}
                 </div>
 
                 <div>
@@ -146,10 +166,10 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="date"
                         id="fecha"
                         value={fecha} // Muestra la fecha seleccionada
-                        readOnly // Para que el usuario no la modifique
+                        readOnly // Para que el usuario no la modifique directamente en este formulario
                         className="mt-1 w-full p-2 border rounded-md bg-gray-100"
                     />
-                    {errores.fecha && <p className="text-red-500 text-xs italic">{errores.fecha}</p>}
+                    {errores.fecha && <p className="text-red-500 text-xs italic">{errores.fecha}</p>} {/* Muestra el error de fecha si existe. */}
                 </div>
 
                 <div>
@@ -160,11 +180,11 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="number"
                         id="cantidadPersonas"
                         value={cantidadPersonas}
-                        onChange={(e) => setCantidadPersonas(e.target.value)}
+                        onChange={(e) => setCantidadPersonas(e.target.value)} // Actualiza el estado 'cantidadPersonas' cuando el valor del input cambia.
                         required
                         className="mt-1 w-full p-2 border rounded-md"
                     />
-                    {errores.cantidadPersonas && <p className="text-red-500 text-xs italic">{errores.cantidadPersonas}</p>}
+                    {errores.cantidadPersonas && <p className="text-red-500 text-xs italic">{errores.cantidadPersonas}</p>} {/* Muestra el error de cantidad de personas si existe. */}
                 </div>
 
                 <div>
@@ -175,11 +195,11 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="text"
                         id="espacio"
                         value={espacio}
-                        onChange={(e) => setEspacio(e.target.value)}
+                        onChange={(e) => setEspacio(e.target.value)} // Actualiza el estado 'horario' cuando se selecciona una opción.
                         required
                         className="mt-1 w-full p-2 border rounded-md"
                     />
-                    {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>}
+                    {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>} {/* Muestra el error de horario si existe. */}
                 </div>
 
                 <div>
@@ -192,7 +212,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
                     <select
                         id="horario"
                         value={horario}
-                        onChange={(e) => setHorario(e.target.value)}
+                        onChange={(e) => setHorario(e.target.value)} // Actualiza el estado 'horario' cuando el valor del input cambia.
                         required
                         className="mt-1 w-full p-2 border rounded-md"
                     >
@@ -200,7 +220,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         <option value="TARDE">TARDE</option>
                         <option value="NOCHE">NOCHE</option>
                     </select>
-                    {errores.horario && <p className="text-red-500 text-xs italic">{errores.horario}</p>}
+                    {errores.horario && <p className="text-red-500 text-xs italic">{errores.horario}</p>} {/* Muestra el error de horario si existe. */}
                 </div>
 
                 <div className="mb-4">
@@ -209,14 +229,14 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="time"
                         id="hora"
                         value={hora}
-                        onChange={(e) => setHora(e.target.value)}
+                        onChange={(e) => setHora(e.target.value)} // Actualiza el estado 'hora' cuando el valor del input cambia.
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
-                    {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>}
+                    {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>} {/* Muestra el error de hora si existe. */}
                 </div>
 
-                {errores.general && <div className="text-red-500 mt-4">{errores.general}</div>}
+                {errores.general && <div className="text-red-500 mt-4">{errores.general}</div>} {/* Muestra un error general si existe (por ejemplo, de la API). */}
 
                 <div className="flex justify-between">
                     <button
@@ -227,7 +247,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navegar("/calendario")}
+                        onClick={() => navegar("/calendario")} // Navega de vuelta a la página del calendario al hacer clic.
                         className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
                     >
                         Cancelar
