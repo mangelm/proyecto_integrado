@@ -212,6 +212,7 @@ export default function GestionEventos() {
       {/* Contenedor con scroll horizontal para la tabla en pantallas pequeñas. */}
       <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
       
+       {/* Encabezado de la tabla, oculto en pantallas pequeñas y mostrado como grupo de encabezado en medianas y grandes. */}
       <thead className="bg-gray-100 hidden md:table-header-group">
             <tr>
               <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
@@ -221,23 +222,31 @@ export default function GestionEventos() {
               <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Horario</th>
               <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Hora</th>
               <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Estado</th>
+              {/* Encabezado para la lista de productos, oculto en pantallas pequeñas y medianas. */}
               <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm lg:hidden">Productos</th>
+              {/* Encabezado para la lista de productos (abreviado en pantallas grandes). */}
               <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b lg:table-cell lg:px-4 lg:py-3 lg:text-sm">Productos</th>
               <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
             </tr>
       </thead>
       
       <tbody className="divide-y divide-gray-200">
+        {/* Si hay eventos filtrados, los mapea para renderizar cada fila. */}
         {eventosFiltrados.length > 0 ? (
             eventosFiltrados.map((evento) => (
               <tr key={evento.id} className="hover:bg-gray-50 md:table-row">
+                {/* En pantallas pequeñas, muestra el nombre del campo y el valor uno al lado del otro. */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+
+                  {/* Celda para el nombre del evento, mostrada como bloque en pequeñas y como celda en medianas. */}
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Nombre</span>
                     <span>{evento.nombre}</span>
                   </div>
+                  {/* En pantallas medianas y grandes, solo muestra el valor. */}
                   <div className="hidden md:block">{evento.nombre}</div>
                 </td>
+                {/* Celda para la fecha del evento. */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Fecha</span>
@@ -245,6 +254,7 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.fecha}</div>
                 </td>
+                {/* Celda para la cantidad de asistentes. */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Asistentes</span>
@@ -252,6 +262,7 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.cantidadPersonas}</div>
                 </td>
+                {/* Celda para el espacio del evento. */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Espacio</span>
@@ -259,6 +270,7 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.espacio}</div>
                 </td>
+                {/* Celda para el horario del evento (oculta en pantallas pequeñas). */}
                 <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Horario</span>
@@ -266,6 +278,7 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.horario}</div>
                 </td>
+                {/* Celda para la hora del evento (oculta en pantallas pequeñas). */}
                 <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Hora</span>
@@ -273,6 +286,7 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.hora}</div>
                 </td>
+                {/* Celda para el estado del evento. */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Estado</span>
@@ -280,42 +294,56 @@ export default function GestionEventos() {
                   </div>
                   <div className="hidden md:block">{evento.estado}</div>
                 </td>
+                {/* Celda para la lista de productos (abreviada en pantallas grandes). */}
                 <td className="px-2 py-2 text-center text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block lg:hidden">
                   <div className="font-semibold text-gray-700 mb-1">Productos:</div>
+                    {/* Lista no ordenada de productos consumidos en el evento. */}
                     <ul className="list-none">
+                        {/* Mapea la lista de productos para renderizar cada uno como un elemento de la lista. */}
                         {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
                             <li key={producto.nombreProducto}>{producto.nombreProducto}</li>
                         ))}
+                        {/* Muestra un mensaje de carga si aún no se han obtenido los productos. */}
                         {!productosEventos[evento.id] && <li>Cargando...</li>}
                     </ul>
                 </td>
+                {/* Celda para la lista de productos (oculta en pantallas pequeñas y medianas). */}
                 <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
+                  
                     <ul className="list-none">
                         {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
                             <li key={producto.nombreProducto} className="whitespace-nowrap">{producto.nombreProducto}</li>
                         ))}
+                        
                         {!productosEventos[evento.id] && <li>Cargando...</li>}
                     </ul>
                 </td>
+                {/* Celda para las acciones (botones de editar, eliminar, detalles, asignar producto). */}
                 <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                  {/* Título de la sección de acciones en pantallas pequeñas. */}
                   <div className="md:hidden font-semibold text-center">Acciones</div>
+                  {/* Contenedor para los botones de acción, con diseño de columna en pequeñas y fila en medianas. */}
                   <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
+                    {/* Enlace a la página de edición del evento. */}
                     <Link to={`/eventos/editar-evento/${evento.id}`}>
                       <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                         Editar
                       </button>
                     </Link>
+                    {/* Botón para eliminar el evento. */}
                     <button
                       onClick={() => manejoBorrar(evento.id)}
                       className="bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0"
                     >
                       Eliminar
                     </button>
+                    {/* Botón para ver los detalles del evento. */}
                     <Link to={`/eventos/detalle-evento/${evento.id}`}>
                       <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                         Detalles
                       </button>
                     </Link>
+                    {/* Botón para asignar productos. */}
                     <Link to={`/eventos/${evento.id}/productos`}>
                       <button className="bg-indigo-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-indigo-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                         Asignar Producto
@@ -326,7 +354,10 @@ export default function GestionEventos() {
               </tr>
             ))
         ) : (
+              // Si no hay eventos filtrados, muestra una fila indicándolo.
+              
               <tr>
+                {/* Celda que ocupa todas las columnas con el mensaje de no hay eventos. */}
                 <td colSpan="10" className="px-4 py-4 text-center text-sm font-medium text-gray-500">
                   No hay eventos disponibles.
                 </td>
@@ -336,9 +367,13 @@ export default function GestionEventos() {
     </table>
   </div>
 
-  {/* pageción */}
+  {/* Paginación */}
+  {/* Contenedor para los controles de paginación */}
   <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
+      
+      {/* Contenedor para los botones de ir a la primera página y retroceder varias páginas. */}
       <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
+        {/* Botón para ir a la primera página, deshabilitado si ya está en la primera. */}
         <button
           onClick={manejoPrimeraPagina}
           disabled={page === 0}
@@ -346,6 +381,7 @@ export default function GestionEventos() {
         >
           Primero
         </button>
+        {/* Botón para retroceder 'valorPaginacion' páginas, deshabilitado si está en la primera página o cerca. */}
         <button
           onClick={manejoValorPrevio}
           disabled={page <= 0}
@@ -355,7 +391,9 @@ export default function GestionEventos() {
         </button>
       </div>
 
+      {/* Contenedor para los botones de página anterior, número de página actual y página siguiente. */}
       <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
+        {/* Botón para ir a la página anterior, deshabilitado si está en la primera página. */}
         <button
           onClick={manejoPaginaPrevia}
           disabled={page === 0}
@@ -363,9 +401,11 @@ export default function GestionEventos() {
         >
           Anterior
         </button>
+        {/* Muestra el número de página actual y el total de páginas. */}
         <span className="text-xs font-medium text-gray-700 md:text-sm">
           Página {page + 1} de {totalPages}
         </span>
+        {/* Botón para ir a la página siguiente, deshabilitado si está en la última página. */}
         <button
           onClick={manejoSiguentePagina}
           disabled={page === totalPages - 1}
@@ -374,8 +414,10 @@ export default function GestionEventos() {
           Siguiente
         </button>
       </div>
-
+      
+       {/* Contenedor para los botones de avanzar varias páginas e ir a la última página. */}
       <div className="flex gap-2 w-full md:w-auto">
+        {/* Botón para avanzar 'valorPaginacion' páginas, deshabilitado si está en la última página o cerca. */}
         <button
           onClick={manejoSiguienteValor}
           disabled={page >= totalPages - 1}
@@ -383,6 +425,7 @@ export default function GestionEventos() {
         >
           +{valorPaginacion}
         </button>
+        {/* Botón para ir a la última página, deshabilitado si ya está en la última. */}
         <button
           onClick={manejoUltimaPagina}
           disabled={page === totalPages - 1}
@@ -392,9 +435,11 @@ export default function GestionEventos() {
         </button>
       </div>
     </div>
-
+    
+    {/* Contenedor para el botón de volver a la página principal. */}
     <div className="mt-6 text-center w-full md:w-auto">
       <Link to={`/`}>
+        {/* Botón estilizado para volver a la página principal. */}
         <button className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full md:w-auto">
           Volver a la página principal
         </button>
