@@ -2,21 +2,24 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 export default function DetallesEventoCalendario() {
-    const { id } = useParams();
-    const [nombre, setNombre] = useState("");
-    const [fecha, setFecha] = useState("");
-    const [cantidadPersonas, setCantidadPersonas] = useState("");
-    const [espacio, setEspacio] = useState("");
-    const [horario, setHorario] = useState("");
-    const [hora, setHora] = useState("");
-    const [estado, setEstado] = useState("");
+    const { id } = useParams(); // Obtiene el parámetro 'id' de la URL, que identifica el evento a mostrar.
+    const [nombre, setNombre] = useState(""); // Estado para el nombre del evento, inicializado como una cadena vacía.
+    const [fecha, setFecha] = useState(""); // Estado para la fecha del evento, inicializado como una cadena vacía.
+    const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para la cantidad de asistentes, inicializado como una cadena vacía.
+    const [espacio, setEspacio] = useState(""); // Estado para el lugar o espacio del evento, inicializado como una cadena vacía.
+    const [horario, setHorario] = useState(""); // Estado para el horario del evento (MAÑANA, TARDE, NOCHE), inicializado como una cadena vacía.
+    const [hora, setHora] = useState(""); // Estado para la hora específica del evento, inicializado como una cadena vacía.
+    const [estado, setEstado] = useState(""); // Estado para el estado del evento, inicializado como una cadena vacía.
 
+    // useEffect se ejecuta después de cada renderizado del componente.
     useEffect(() => {
+        // Realiza una petición fetch a la API para obtener los detalles del evento específico usando el 'id' de la URL.
         fetch(`http://localhost:8100/api/eventos/${id}`, {
-            credentials: 'include'
+            credentials: 'include' // Incluye las credenciales (como cookies) en la petición si es necesario.
         })
-            .then((response) => response.json())
+            .then((response) => response.json()) // Convierte la respuesta de la API a formato JSON.
             .then((data) => {
+                // Actualiza los estados del componente con los datos recibidos del evento.
                 setNombre(data.nombre);
                 setFecha(data.fecha);
                 setCantidadPersonas(data.cantidadPersonas);
@@ -25,9 +28,10 @@ export default function DetallesEventoCalendario() {
                 setHora(data.hora);
                 setEstado(data.estado);
             })
-            .catch((error) => console.error("Error al cargar el evento:", error));
-    }, [id]);
+            .catch((error) => console.error("Error al cargar el evento:", error)); // Captura y muestra cualquier error ocurrido durante la petición.
+    }, [id]); // El efecto se ejecuta de nuevo si el valor de 'id' cambia.
 
+    // Renderiza los detalles del evento.
     return (
         <div className="max-w-lg mx-auto p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md text-center">
             <h1 className="text-2xl font-semibold text-gray-800 mb-4 md:text-3xl">Detalles del Evento</h1>
@@ -72,7 +76,7 @@ export default function DetallesEventoCalendario() {
             <div className="mt-6 flex justify-center">
                 <button
                     type="button"
-                    onClick={() => window.history.back()} // Vuelve a la página anterior
+                    onClick={() => window.history.back()} // Utiliza la API del navegador para volver a la página anterior en el historial.
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
                 >
                     Volver
