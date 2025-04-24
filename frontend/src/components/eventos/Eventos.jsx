@@ -3,146 +3,176 @@ import { Link } from "react-router-dom";
 
 export default function GestionEventos() {
   // Estados para la gestión de eventos y paginación
-  const [eventos, setEventos] = useState([]);
-  const [page, setpage] = useState(0);
-  const size = 10;
-  const [valorPaginacion] = useState(3);
-  const [totalPages, setTotalPages] = useState(0);
-  const [cargando, setcargando] = useState(true);
-  const [productosEventos, setProductosEventos] = useState({});
-  const [errorEliminar, setErrorEliminar] = useState(null);
+  const [eventos, setEventos] = useState([]); // Estado para almacenar la lista de eventos obtenida de la API.
+  const [page, setpage] = useState(0); // Estado para controlar la página actual de la paginación, inicializado en 0.
+  const size = 10; // Define la cantidad de eventos por página.
+  const [valorPaginacion] = useState(3); // Estado para definir el número de páginas a avanzar o retroceder en los botones de paginación +/-.
+  const [totalPages, setTotalPages] = useState(0); // Estado para almacenar el número total de páginas disponibles.
+  const [cargando, setcargando] = useState(true); // Estado para indicar si los datos están en proceso de carga.
+  const [productosEventos, setProductosEventos] = useState({}); // Estado para almacenar los productos consumidos por cada evento. La clave es el ID del evento.
+  const [errorEliminar, setErrorEliminar] = useState(null); // Estado para almacenar cualquier error ocurrido durante la eliminación de un evento.
 
   // Estados para los filtros
-  const [filtroEspacio, setFiltroEspacio] = useState("");
-  const [filtroHorario, setFiltroHorario] = useState("");
-  const [filtroEstado, setFiltroEstado] = useState("");
+  const [filtroEspacio, setFiltroEspacio] = useState(""); // Estado para almacenar el texto de filtro por espacio.
+  const [filtroHorario, setFiltroHorario] = useState(""); // Estado para almacenar el valor del filtro por horario.
+  const [filtroEstado, setFiltroEstado] = useState(""); // Estado para almacenar el valor del filtro por estado del evento.
 
   // Cargar los eventos
   useEffect(() => {
-    setcargando(true);
-
-    fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`)
+    setcargando(true); // Indica que la carga de eventos ha comenzado.
+    // Este efecto se ejecuta cada vez que cambia 'page' o 'size' para cargar los eventos de la página actual.
+    fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`) // Realiza una petición GET a la API para obtener los eventos paginados.
       .then((response) => {
+        // Si la respuesta no es exitosa, lanza un error.
         if (!response.ok) throw new Error("Error al obtener los eventos");
-        return response.json();
+        return response.json(); // Convierte la respuesta a JSON.
       })
       .then(async (data) => {
-        setEventos(data.content);
-        setTotalPages(data.totalPages);
+        setEventos(data.content); // Actualiza el estado 'eventos' con el contenido de la página actual.
+        setTotalPages(data.totalPages); // Actualiza el estado 'totalPages' con el número total de páginas.
 
         // Obtener productos para cada evento utilizando el nuevo endpoint
-        const productosPorEvento = {};
+        const productosPorEvento = {}; // Objeto para almacenar los productos por ID de evento.
+
+        // Itera sobre cada evento obtenido.
         for (const evento of data.content) {
           try {
+            // Realiza una petición para obtener los productos consumidos en el evento.
             const response = await fetch(`http://localhost:8100/api/eventos/${evento.id}/productos-consumidos`);
             if (response.ok) {
-              const productosConsumidos = await response.json();
-              productosPorEvento[evento.id] = productosConsumidos;
-            } else {
+              const productosConsumidos = await response.json(); // Convierte la respuesta a JSON.
+              productosPorEvento[evento.id] = productosConsumidos; // Almacena los productos en el objeto 'productosPorEvento' usando el ID del evento como clave.
+            } 
+            // Si la respuesta no es exitosa.
+            else {
               console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, response.status);
-              productosPorEvento[evento.id] = [];
+              productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
             }
-          } catch (error) {
+          } 
+          // Captura cualquier error durante la petición.
+          catch (error) {
             console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, error);
-            productosPorEvento[evento.id] = [];
+            productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
           }
         }
-        setProductosEventos(productosPorEvento);
+        setProductosEventos(productosPorEvento); // Actualiza el estado 'productosEventos' con los datos obtenidos.
       })
       .catch((error) => {
-        console.error("Error fetching eventos:", error);
+        console.error("Error fetching eventos:", error); // Muestra un error en la consola si falla la petición inicial de eventos.
       })
       .finally(() => {
-        setcargando(false);
+        setcargando(false); // Indica que la carga de eventos ha finalizado.
       });
-  }, [page, size]);
+  }, [page, size]); // El efecto se vuelve a ejecutar cada vez que cambia 'page' o 'size'.
 
-  // Filtrar eventos
+  // Aplica filtros a la lista de eventos basándose en los estados de los filtros.
   const eventosFiltrados = eventos.filter((evento) => {
-    const coincideEspacio = evento.espacio.toLowerCase().includes(filtroEspacio.toLowerCase());
-    const coincideHorario = filtroHorario === "" || evento.horario === filtroHorario;
-    const coincideEstado = filtroEstado === "" || evento.estado === filtroEstado;
+    const coincideEspacio = evento.espacio.toLowerCase().includes(filtroEspacio.toLowerCase()); // Comprueba si el espacio del evento incluye el texto del filtro (ignorando mayúsculas/minúsculas).
+    const coincideHorario = filtroHorario === "" || evento.horario === filtroHorario; // Comprueba si el horario del evento coincide con el filtro o si no hay filtro de horario.
+    const coincideEstado = filtroEstado === "" || evento.estado === filtroEstado; // Comprueba si el estado del evento coincide con el filtro o si no hay filtro de estado.
     
-    return coincideEspacio && coincideHorario && coincideEstado;
+    return coincideEspacio && coincideHorario && coincideEstado; // Devuelve true si el evento cumple con todos los filtros.
   });
 
   // Funciones de paginación
   const manejoPaginaPrevia = () => {
+    // Decrementa el número de página si no está en la primera página.
     if (page > 0) {
       setpage(page - 1);
     }
   };
 
   const manejoSiguentePagina = () => {
+    // Incrementa el número de página si no está en la última página.
     if (page < totalPages - 1) { 
         setpage(page + 1);
     }
   };
 
   const manejoPrimeraPagina = () => {
+    // Establece la página actual a la primera página (0).
     setpage(0);
   };
 
   const manejoUltimaPagina = () => {
+    // Establece la página actual a la última página.
     setpage(totalPages - 1);
   };
 
   const manejoSiguienteValor = () => {
+    // Avanza la página actual en 'valorPaginacion' páginas, sin exceder la última página.
     setpage((paginaPrevia) => Math.min(paginaPrevia + valorPaginacion, totalPages - 1));
   };
 
   const manejoValorPrevio = () => {
+    // Retrocede la página actual en 'valorPaginacion' páginas, sin bajar de la primera página.
     setpage((paginaPrevia) => Math.max(paginaPrevia - valorPaginacion, 0));
   };
 
-  // Eliminar evento
+  // Función para eliminar un evento por su ID.
   const manejoBorrar = (id) => {
+    // Muestra una confirmación al usuario antes de eliminar.
     if (window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
         setErrorEliminar(null); // Limpiar cualquier error previo
         fetch(`http://localhost:8100/api/eventos/${id}`, {
-            method: "DELETE",
+            method: "DELETE", // Utiliza el método DELETE para eliminar el evento.
         })
             .then((response) => {
+                // Si la eliminación es exitosa
                 if (response.ok) {
-                    setEventos(eventos.filter((evento) => evento.id !== id));
-                    alert("Evento eliminado con éxito");
-                } else {
+                    setEventos(eventos.filter((evento) => evento.id !== id)); // Actualiza la lista de eventos, removiendo el evento eliminado
+                    alert("Evento eliminado con éxito");  // Muestra una alerta de éxito.
+                } 
+                // Si la eliminación falla.
+                else {
+                    // Lee el cuerpo de la respuesta para obtener más detalles del error.
                     return response.text().then(texto => { throw new Error(texto || "Error al eliminar el evento."); });
                 }
             })
             .catch((error) => {
-                console.error("Error al eliminar el evento:", error);
-                setErrorEliminar(`Error al eliminar el evento: ${error.message}`);
+                console.error("Error al eliminar el evento:", error); // Muestra el error en la consola.
+                setErrorEliminar(`Error al eliminar el evento: ${error.message}`); // Actualiza el estado de error para mostrar un mensaje al usuario.
             });
     }
   };
 
+  // Muestra un mensaje de carga mientras se obtienen los datos.
   if (cargando) {
     return <div className="text-center">Cargando eventos ...</div>;
   }
 
   return (
-    <div className="w-full p-4 rounded-lg shadow-lg bg-white md:max-w-[768px] lg:max-w-[1280px] xl:max-w-7xl">
 
-    <h1 className="text-2xl font-semibold text-gray-900 text-center mb-4 md:text-3xl">Gestión de Eventos</h1>
+  // Contenedor principal 
+  <div className="w-full p-4 rounded-lg shadow-lg bg-white md:max-w-[768px] lg:max-w-[1280px] xl:max-w-7xl">
 
-    <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
-      <Link to="/eventos/crear-evento">
-        <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
-          Crear Evento
-        </button>
-      </Link>
-    </div>
+      {/* Título de la sección con estilos para el tamaño de la fuente, peso, color y centrado. */}
+      <h1 className="text-2xl font-semibold text-gray-900 text-center mb-4 md:text-3xl">Gestión de Eventos</h1>
 
+      {/* Contenedor para el botón de creación de eventos*/}
+      <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
+        {/* Enlace a la página de creación de eventos. */}
+        <Link to="/eventos/crear-evento">
+          <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
+            Crear Evento
+          </button>
+        </Link>
+      </div>
+
+    {/* Muestra un mensaje de error si 'errorEliminar' tiene un valor. */}
     {errorEliminar && (
+      // Contenedor para el mensaje de error
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
         <strong className="font-bold">Error!</strong>
+         {/* Muestra el mensaje de error. */}
         <span className="block sm:inline">{errorEliminar}</span>
       </div>
     )}
 
     {/* Sección de Filtros */}
     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
+
+      {/* Campo de texto para filtrar por espacio. */}
       <input
         type="text"
         placeholder="Buscar por espacio"
@@ -151,6 +181,7 @@ export default function GestionEventos() {
         className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:p-3"
       />
 
+      {/* Selector para filtrar por horario del evento. */}
       <select
         value={filtroHorario}
         onChange={(e) => setFiltroHorario(e.target.value)}
@@ -162,6 +193,7 @@ export default function GestionEventos() {
         <option value="NOCHE">NOCHE</option>
       </select>
 
+      {/* Selector para filtrar por el estado del evento. */}
       <select
         value={filtroEstado}
         onChange={(e) => setFiltroEstado(e.target.value)}
@@ -177,6 +209,7 @@ export default function GestionEventos() {
 
     {/* Tabla de Eventos */}
     <div className="overflow-x-auto">
+      {/* Contenedor con scroll horizontal para la tabla en pantallas pequeñas. */}
       <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
       
       <thead className="bg-gray-100 hidden md:table-header-group">
