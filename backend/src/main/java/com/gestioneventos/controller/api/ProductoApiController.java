@@ -26,10 +26,15 @@ import com.gestioneventos.service.ProductoService;
 @RequestMapping("/api/productos")
 public class ProductoApiController {
 	
+    // Inyectamos el servicio de productos
+    // para manejar la lógica de negocio relacionada con los productos
+    // y la interacción con la base de datos.
+    // El servicio se inyecta a través de la anotación @Autowired,
 	@Autowired
     private ProductoService productoService;
 	
-	//listar productos sin paginación
+	//LLamada a metodo para obtener todos los productos sin paginacion
+    // Este método se utiliza para obtener una lista completa de productos sin paginación.
     @GetMapping("/todos")
     public ResponseEntity<List<Producto>> listarProductos() {
         List<Producto> productos = productoService.obtenerTodosLosProductos();
@@ -37,6 +42,9 @@ public class ProductoApiController {
     }
 	
 	//LLamada a metodo para obtener todos los productos con paginacion
+    // Se utiliza la anotación @RequestParam para recibir los parámetros de paginación
+    // y se establece un valor por defecto para la página y el tamaño de la página.
+    // La paginación se maneja a través de la interfaz Pageable de Spring Data.
     @GetMapping
     public ResponseEntity<Page<Producto>> listarProductos(
         @RequestParam(defaultValue = "0") int page, 
@@ -48,14 +56,16 @@ public class ProductoApiController {
         return ResponseEntity.ok(productos);
     }
 
-    //LLamada a metodo crearProducto
+    //LLamada a metodo para crear un producto
+    // Este método se utiliza para crear un nuevo producto.
     @PostMapping
     public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
         System.out.println("Recibiendo solicitud POST para crear un producto: " + producto);
         return ResponseEntity.ok(productoService.crearProducto(producto));
     }
     
-    //LLamada a metodo para obtener el producto por Id
+    //LLamada a metodo para obtener un producto por su ID
+    // Se utiliza la anotación @PathVariable para recibir el ID del producto desde la URL.
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
         try {
@@ -67,7 +77,8 @@ public class ProductoApiController {
     }
     
     
-    //LLamada a metodo actualizarProducto
+    //LLamada a metodo para actualizar un producto
+    // Se utiliza la anotación @PathVariable para recibir el ID del producto desde la URL.
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
         System.out.println("Solicitud PUT recibida para ID: " + id);
@@ -78,6 +89,7 @@ public class ProductoApiController {
     }
 
     //LLamada a metodo eliminarProducto
+    // Se utiliza la anotación @PathVariable para recibir el ID del producto desde la URL.
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         try {

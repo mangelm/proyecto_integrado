@@ -32,14 +32,23 @@ import com.gestioneventos.service.ConsumoProductoService;
 @RequestMapping("/api/estadisticas")
 public class EstadisticaApiController {
 
+    // Logger para registrar información y errores
+    // Se utiliza SLF4J para la abstracción de logging, lo que permite cambiar la implementación de logging sin modificar el código
     private static final Logger logger = LoggerFactory.getLogger(EstadisticaApiController.class);
 
+    // Inyección de dependencias para el repositorio de eventos y el servicio de consumo de productos
+    // Esto permite acceder a la base de datos y realizar operaciones CRUD sobre los eventos y productos consumidos
     @Autowired
     private EventoRepository eventoRepository;
     
+    // Servicio que maneja la lógica de negocio relacionada con el consumo de productos
+    // Se encarga de interactuar con el repositorio y realizar cálculos o transformaciones necesarias
+    // para obtener los datos requeridos por el controlador
     @Autowired
     private ConsumoProductoService consumoProductoService;
     
+    // Endpoint para obtener estadísticas de ocupación entre dos fechas
+    // Se espera que las fechas sean pasadas como parámetros en formato YYYY-MM-DD
     @GetMapping("/ocupacion")
     public ResponseEntity<?> obtenerEstadisticas(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -83,6 +92,8 @@ public class EstadisticaApiController {
         }
     }
     
+    // Endpoint para obtener estadísticas de ocupación por evento
+    // Se espera que el ID del evento sea pasado como parámetro en la URL
     @GetMapping("/ocupacion/evento/{eventoId}")
     public ResponseEntity<?> obtenerEstadisticasPorEvento(@PathVariable Long eventoId) {
         logger.info("Consultando ocupación para el evento con ID: {}", eventoId);
@@ -102,6 +113,8 @@ public class EstadisticaApiController {
         return ResponseEntity.ok(estadisticas);
     }
     
+    // Endpoint para obtener estadísticas de consumo de productos entre dos fechas
+    // Se espera que las fechas sean pasadas como parámetros en formato YYYY-MM-DD
     @GetMapping("/productos")
     public ResponseEntity<?> obtenerConsumoPorProductoFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -125,6 +138,8 @@ public class EstadisticaApiController {
         }
     }
     
+    // Endpoint para obtener estadísticas de consumo de productos por horario entre dos fechas
+    // Se espera que las fechas sean pasadas como parámetros en formato YYYY-MM-DD
     @GetMapping("/productos-horario")
     public ResponseEntity<?> obtenerConsumoPorProductoYHorarioFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -155,6 +170,8 @@ public class EstadisticaApiController {
         }
     }
     
+    // Endpoint para obtener estadísticas de productos más consumidos por personas entre dos fechas
+    // Se espera que las fechas sean pasadas como parámetros en formato YYYY-MM-DD
     @GetMapping("/productos-personas")
     public ResponseEntity<?> obtenerProductosMasConsumidosPorPersonasFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -183,6 +200,8 @@ public class EstadisticaApiController {
         }
     }
 
+    // Endpoint para obtener estadísticas de consumo promedio por persona entre dos fechas
+    // Se espera que las fechas sean pasadas como parámetros en formato YYYY-MM-DD
     @GetMapping("/productos-promedio-personas")
     public ResponseEntity<?> obtenerConsumoPromedioPorPersonaFecha(@RequestParam String fechaInicio, @RequestParam String fechaFinal) {
         try {
@@ -207,21 +226,30 @@ public class EstadisticaApiController {
         }
     }
     
+    // Endpoints para obtener estadísticas de consumo por evento
+    // Se espera que el ID del evento sea pasado como parámetro en la URL
     @GetMapping("/productos/evento/{eventoId}")
     public ResponseEntity<List<ProductoConsumoDTO>> obtenerConsumoPorProductoPorEvento(@PathVariable Long eventoId) {
         return ResponseEntity.ok(consumoProductoService.obtenerConsumoPorProductoPorEvento(eventoId));
     }
 
+    // Endpoint para obtener estadísticas de consumo por producto y horario por evento
+    // Se espera que el ID del evento sea pasado como parámetro en la URL
     @GetMapping("/productos-horario/evento/{eventoId}")
     public ResponseEntity<List<ProductoConsumoPorHorarioDTO>> obtenerConsumoPorProductoYHorarioPorEvento(@PathVariable Long eventoId) {
         return ResponseEntity.ok(consumoProductoService.obtenerConsumoPorProductoYHorarioPorEvento(eventoId));
     }
 
+    // Endpoint para obtener estadísticas de productos más consumidos por personas por evento
+    // Se espera que el ID del evento sea pasado como parámetro en la URL
     @GetMapping("/productos-personas/evento/{eventoId}")
     public ResponseEntity<List<ProductoConsumoPorPersonasDTO>> obtenerCantidadPersonasPorProductoPorEvento(@PathVariable Long eventoId) {
         return ResponseEntity.ok(consumoProductoService.obtenerCantidadPersonasPorProductoPorEvento(eventoId));
     }
 
+    // Endpoint para obtener estadísticas de consumo promedio por persona por evento
+    // Se espera que el ID del evento sea pasado como parámetro en la URL
+    // Este endpoint devuelve una lista de objetos ConsumoPromedioDTO que contienen el ID del producto y el consumo promedio por persona
     @GetMapping("/productos-promedio-personas/evento/{eventoId}")
     public ResponseEntity<List<ConsumoPromedioDTO>> obtenerConsumoPromedioPorPersonaPorEvento(@PathVariable Long eventoId) {
         return ResponseEntity.ok(consumoProductoService.obtenerConsumoPromedioPorPersonaPorEvento(eventoId));
