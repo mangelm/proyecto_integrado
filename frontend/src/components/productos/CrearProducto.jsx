@@ -2,14 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CrearProducto() {
-    const [nombre, setNombre] = useState("");
-    const [descripcion, setDescripcion] = useState("");
-    const [precio, setPrecio] = useState("");
-    const [impuesto, setImpuesto] = useState("");
-    const [disponible, setDisponible] = useState(false);
-    const [categoria, setCategoria] = useState("BEBIDA");
-    const navegar = useNavigate();
+    const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre del producto
+    const [descripcion, setDescripcion] = useState(""); // Estado para almacenar la descripción del producto
+    const [precio, setPrecio] = useState(""); // Estado para almacenar el precio del producto
+    const [impuesto, setImpuesto] = useState(""); // Estado para almacenar el impuesto del producto
+    const [disponible, setDisponible] = useState(false); // Estado para almacenar la disponibilidad del producto
+    const [categoria, setCategoria] = useState("BEBIDA"); // Estado para almacenar la categoría del producto
+    const navegar = useNavigate(); // Hook para navegar entre rutas
 
+    /* 
+        Función para sanitizar la entrada del usuario.
+        Permite solo letras, números y espacios para el nombre y la descripción.
+        Permite solo números para el precio y el impuesto.
+        Permite solo un punto decimal para el precio y el impuesto.
+    */
     const sanitizeInput = (value, type) => {
         if (type === "text") {
             return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
@@ -20,13 +26,18 @@ export default function CrearProducto() {
         return value;
     };
     
+    // Sanitiza el valor del precio y el impuesto para permitir solo números y un punto decimal
+    // Reemplaza cualquier carácter que no sea un número o un punto decimal
     const sanitizeDecimal = (value) => {
         return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
     };
 
+    // Función para manejar el envío del formulario
+    // Se encarga de crear un nuevo producto y enviarlo a la API
     const manejarEnvio = async (e) => {
         e.preventDefault();
 
+        // Sanitiza los valores de entrada
         const nuevoProducto = {
             nombre: sanitizeInput(nombre, "text"),
             descripcion: sanitizeInput(descripcion, "text"),
@@ -44,6 +55,7 @@ export default function CrearProducto() {
                 },
                 body: JSON.stringify(nuevoProducto),
                 credentials: 'same-origin',
+                // Incluye las credenciales de la sesión (cookies) en la solicitud
             });
 
             console.log("Respuesta:", response);
