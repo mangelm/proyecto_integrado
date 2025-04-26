@@ -2,19 +2,21 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function GestionProductos() {
-    const [productos, setProductos] = useState([]);
-    const [page, setPage] = useState(0);
-    const [size] = useState(5);
-    const [valorPaginacion] = useState(2);
-    const [totalPages, setTotalPages] = useState(0);
-    const [cargando, setCargando] = useState(false);
+    const [productos, setProductos] = useState([]); // Estado para almacenar los productos
+    const [page, setPage] = useState(0); // Estado para almacenar la página actual
+    const [size] = useState(5); // Estado para almacenar el tamaño de la página (número de productos por página)
+    const [valorPaginacion] = useState(2); // Estado para almacenar el valor de paginación (número de páginas a avanzar o retroceder)
+    const [totalPages, setTotalPages] = useState(0); // Estado para almacenar el número total de páginas
+    const [cargando, setCargando] = useState(false); // Estado para indicar si los productos están siendo cargados
 
     // Filtros
-    const [filtroNombre, setFiltroNombre] = useState("");
-    const [filtroCategoria, setFiltroCategoria] = useState("");
+    const [filtroNombre, setFiltroNombre] = useState(""); // Estado para almacenar el filtro de nombre
+    const [filtroCategoria, setFiltroCategoria] = useState(""); // Estado para almacenar el filtro de categoría
 
     useEffect(() => {
         setCargando(true);
+        // Realiza una solicitud a la API para obtener los productos paginados
+        // y actualiza el estado de productos y totalPages
         fetch(`http://localhost:8100/api/productos?page=${page}&size=${size}`)
             .then((response) => response.json())
             .then((data) => {
@@ -27,18 +29,20 @@ export default function GestionProductos() {
 
     // Filtrar productos
     const productosFiltrados = productos.filter((producto) => {
+        // Verifica si el nombre del producto incluye el filtro de nombre
+        // y si la categoría del producto coincide con el filtro de categoría
         const coincideNombre = producto.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
         const coincideCategoria = filtroCategoria === "" || producto.categoria === filtroCategoria;
         return coincideNombre && coincideCategoria;
     });
 
-    // Funciones de paginación
-    const manejoPaginaPrevia = () => page > 0 && setPage(page - 1);
-    const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1);
-    const manejoPrimeraPagina = () => setPage(0);
-    const manejoUltimaPagina = () => setPage(totalPages - 1);
-    const manejoSiguienteValor = () => setPage(valorPrevio => Math.min(valorPrevio + valorPaginacion, totalPages - 1));
-    const manejoValorPrevio = () => setPage(valorPrevio => Math.max(valorPrevio - valorPaginacion, 0));
+    // Manejo de paginación
+    const manejoPaginaPrevia = () => page > 0 && setPage(page - 1); // Retrocede una página
+    const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1); // Avanza una página
+    const manejoPrimeraPagina = () => setPage(0); // Regresa a la primera página
+    const manejoUltimaPagina = () => setPage(totalPages - 1); // Regresa a la última página
+    const manejoSiguienteValor = () => setPage(valorPrevio => Math.min(valorPrevio + valorPaginacion, totalPages - 1)); // Avanza un número específico de páginas
+    const manejoValorPrevio = () => setPage(valorPrevio => Math.max(valorPrevio - valorPaginacion, 0)); // Retrocede un número específico de páginas
 
     // Eliminar producto
     const manejoBorrar = (id) => {
@@ -116,6 +120,8 @@ export default function GestionProductos() {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
+                        {/* // Mapea los productos filtrados y muestra cada uno en una fila de la tabla
+                        // Si no hay productos, muestra un mensaje indicando que no hay productos disponibles */}
                         {productosFiltrados.length > 0 ? (
                             productosFiltrados.map((producto) => (
                                 <tr key={producto.id} className="hover:bg-gray-50 md:table-row">
@@ -147,6 +153,7 @@ export default function GestionProductos() {
                                         </div>
                                         <div className="hidden md:block">{producto.impuesto}</div>
                                     </td>
+                                    {/* Nueva columna para mostrar el total (precio + impuesto) */}
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                                         <div className="md:hidden flex justify-between">
                                             <span className="font-semibold text-gray-700">Total</span>
