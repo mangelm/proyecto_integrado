@@ -2,17 +2,20 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function AsignarProducto() {
-    const { id } = useParams(); // Obtienes el ID del evento desde la URL
-    const [productos, setProductos] = useState([]);
-    const [productoSeleccionado, setProductoSeleccionado] = useState("");
-    const [evento, setEvento] = useState(null);
-    const navegar = useNavigate();
+    const { id } = useParams(); // Extrae el ID del evento de la URL
+    const [productos, setProductos] = useState([]); // Estado para almacenar los productos
+    const [productoSeleccionado, setProductoSeleccionado] = useState(""); // Estado para almacenar el producto seleccionado
+    const [evento, setEvento] = useState(null); // Estado para almacenar el evento
+    const navegar = useNavigate(); // Hook para navegar entre rutas
 
-    // Cargar productos
+    // Cargar los productos y el evento al montar el componente
     useEffect(() => {
+        // Cargar los productos
         fetch("http://localhost:8100/api/productos/todos")
+            // Realiza una solicitud GET a la API para obtener todos los productos
             .then((response) => response.json())
             .then((productosData) => {
+                // Si la respuesta es un array, lo asignamos al estado de productos
                 if (Array.isArray(productosData)) {
                     setProductos(productosData);
                 } else {
@@ -25,7 +28,7 @@ export default function AsignarProducto() {
                 setProductos([]);
             });
 
-        // Cargar el evento
+        /// Cargar el evento específico
         fetch(`http://localhost:8100/api/eventos/${id}`)
             .then((response) => response.json())
             .then((eventoData) => {
@@ -34,6 +37,14 @@ export default function AsignarProducto() {
             .catch((error) => console.error("Error fetching evento:", error));
     }, [id]);
 
+    /*
+        Función para manejar la asignación del producto al evento.
+        Se encarga de validar la selección del producto y enviar la solicitud a la API. 
+        Si no se selecciona un producto, muestra una alerta.
+        Si se selecciona un producto, envía una solicitud POST a la API para asignar el producto al evento.
+        Si la asignación es exitosa, muestra una alerta de éxito.
+        Si ocurre un error, lo muestra en la consola.
+    */
     const manejoAsignarProducto = () => {
         if (!productoSeleccionado) {
             alert("Por favor, selecciona un producto.");
