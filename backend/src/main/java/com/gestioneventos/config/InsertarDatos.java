@@ -30,33 +30,60 @@ import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
 import com.github.javafaker.Faker;
 
+// Importante: Asegúrate de que la clase esté en el paquete correcto para que Spring la detecte como un componente.
 @Component
+// Esta anotación indica que esta clase es un componente de Spring y se debe registrar en el contexto de la aplicación.
+// Esto permite que Spring la gestione y la inyecte donde sea necesario.
 public class InsertarDatos implements CommandLineRunner {
-
+    // Logger para registrar información y errores
+    // Se utiliza para registrar mensajes de información, advertencia y error durante la ejecución de la aplicación.
     private static final Logger logger = LoggerFactory.getLogger(InsertarDatos.class);
 
+    // Repositorios para interactuar con la base de datos
+    // Estos repositorios son interfaces que extienden de Spring Data JPA y permiten realizar operaciones CRUD en las entidades correspondientes.
+    
+    // Repositorio para gestionar los clientes
+    // Este repositorio permite realizar operaciones CRUD en la entidad Cliente.
     @Autowired
     private ClienteRepository clienteRepository;
 
+    // Repositorio para gestionar los eventos
+    // Este repositorio permite realizar operaciones CRUD en la entidad Evento.
     @Autowired
     private EventoRepository eventoRepository;
 
+    // Repositorio para gestionar los productos
+    // Este repositorio permite realizar operaciones CRUD en la entidad Producto.
     @Autowired
     private ProductoRepository productoRepository;
 
+    // Repositorio para gestionar los consumos de productos en eventos
+    // Este repositorio permite realizar operaciones CRUD en la entidad ConsumoProducto.
     @Autowired
     private ConsumoProductoRepository consumoProductoRepository;
 
+    // Faker para generar datos aleatorios
+    // Se utiliza para generar datos ficticios como nombres, direcciones, correos electrónicos, etc.
+    // Esto es útil para poblar la base de datos con datos de prueba durante el desarrollo o las pruebas.
+    // Se establece la localización en español (es) para generar datos en español.
     private final Faker faker = new Faker(Locale.forLanguageTag("es"));
     private final Random random = new Random();
 
+    // Método que se ejecuta al iniciar la aplicación
+    // Este método se utiliza para cargar datos iniciales en la base de datos al iniciar la aplicación.
+    // La anotación @Transactional indica que este método se ejecutará dentro de una transacción.
+    // Si ocurre un error durante la ejecución, se revertirán todos los cambios realizados en la base de datos.
     @Override
     @Transactional
+    // Este método se ejecuta al iniciar la aplicación y se utiliza para cargar datos iniciales en la base de datos
     public void run(String... args) {
         try {
             logger.info("🔄 Iniciando la carga de datos...");
 
             // --- Crear clientes ---
+            // Se crea una lista de clientes para almacenar los objetos Cliente generados
+            // Se utiliza un bucle para crear 20 clientes con datos aleatorios
+            // Cada cliente tiene un nombre, apellido, correo electrónico y teléfono generado aleatoriamente
             List<Cliente> clientes = new ArrayList<>();
             for (int i = 0; i < 20; i++) {
                 Cliente cliente = new Cliente();
@@ -65,12 +92,20 @@ public class InsertarDatos implements CommandLineRunner {
                 cliente.setEmail(faker.internet().emailAddress());
                 cliente.setTelefono(generarTelefonoFormato());
                 clientes.add(cliente);
+                // Se añade el cliente a la lista de clientes
             }
+            // Se guardan todos los clientes en la base de datos utilizando el repositorio clienteRepository
             clienteRepository.saveAll(clientes);
+            // Se asegura que los cambios se persistan en la base de datos
             clienteRepository.flush();
             logger.info("✅ Clientes creados y guardados ({}).", clientes.size());
 
             // --- Crear productos ---
+            // Se crea una lista de productos para almacenar los objetos Producto generados
+            // Se utiliza un bucle para crear 15 productos con datos aleatorios
+            // Cada producto tiene un nombre, descripción, precio, impuesto y disponibilidad generados aleatoriamente
+            // Además, se asigna una categoría aleatoria de las definidas en la enumeración Categoria
+            // Se utiliza un Random para seleccionar una categoría aleatoria
             List<Producto> productos = new ArrayList<>();
             for (int i = 0; i < 15; i++) {
                 Producto producto = new Producto();
@@ -87,13 +122,17 @@ public class InsertarDatos implements CommandLineRunner {
             logger.info("✅ Productos creados y guardados ({}).", productos.size());
 
             // --- Crear eventos ---
+            // Se crea una lista de eventos para almacenar los objetos Evento generados
+            // Se utiliza un bucle para crear eventos para cada cliente persistido
+            // Cada evento tiene un nombre, fecha, cantidad de personas, espacio, hora, horario y estado generados aleatoriamente
+            // Además, se asigna un cliente aleatorio de la lista de clientes persistidos
             List<Evento> eventos = new ArrayList<>();
             List<Cliente> clientesPersistidos = clienteRepository.findAll();
             List<Producto> productosPersistidos = productoRepository.findAll();
 
             if (clientesPersistidos.isEmpty()) {
-                 logger.warn("⚠️ No hay clientes persistidos para asignar a eventos.");
-                 return;
+                logger.warn("⚠️ No hay clientes persistidos para asignar a eventos.");
+                return;
             }
 
             for (Cliente cliente : clientesPersistidos) {
@@ -111,6 +150,7 @@ public class InsertarDatos implements CommandLineRunner {
                     evento.setHorario(Horario.values()[random.nextInt(Horario.values().length)]);
                     evento.setEstado(Estado.values()[random.nextInt(Estado.values().length)]);
                     evento.setCliente(cliente);
+                    
                     evento.setConsumos(new ArrayList<>());
                     eventos.add(evento);
                 }
@@ -119,30 +159,35 @@ public class InsertarDatos implements CommandLineRunner {
             eventoRepository.flush();
             logger.info("✅ Eventos creados y guardados ({}).", eventos.size());
 
-            // --- Crear consumos de productos en eventos ---
+            // --- Crear consumos de productos ---
+            // Se crea una lista de consumos para almacenar los objetos ConsumoProducto generados
+            // Se utiliza un bucle para crear consumos de productos para cada evento persistido
+            // Cada consumo tiene un evento, producto, cantidad, precio unitario e impuesto generados aleatoriamente
+            // Se asigna un producto aleatorio de la lista de productos persistidos
             List<ConsumoProducto> consumos = new ArrayList<>();
-             List<Evento> eventosPersistidos = eventoRepository.findAll();
+            
+            List<Evento> eventosPersistidos = eventoRepository.findAll();
 
-             if (eventosPersistidos.isEmpty() || productosPersistidos.isEmpty()) {
-                  logger.warn("⚠️ No hay eventos o productos persistidos para crear consumos.");
-             } else {
-                 for (Evento evento : eventosPersistidos) {
-                     Collections.shuffle(productosPersistidos);
-                     int numProductosAAnadir = faker.number().numberBetween(0, Math.min(6, productosPersistidos.size()));
-                     for (int k = 0; k < numProductosAAnadir; k++) {
-                         Producto productoSeleccionado = productosPersistidos.get(k);
-                         ConsumoProducto consumo = new ConsumoProducto();
-                         consumo.setEvento(evento);
-                         consumo.setProducto(productoSeleccionado);
-                         consumo.setCantidad(faker.number().numberBetween(1, 10));
-                         consumo.setPrecioUnitario(productoSeleccionado.getPrecio());
-                         consumo.setImpuesto(productoSeleccionado.getImpuesto());
-                         consumos.add(consumo);
-                     }
-                 }
-                 consumoProductoRepository.saveAll(consumos);
-                 consumoProductoRepository.flush();
-                 logger.info("✅ Consumos de productos creados y guardados ({}).", consumos.size());
+            if (eventosPersistidos.isEmpty() || productosPersistidos.isEmpty()) {
+                logger.warn("⚠️ No hay eventos o productos persistidos para crear consumos.");
+            } else {
+                for (Evento evento : eventosPersistidos) {
+                    Collections.shuffle(productosPersistidos);
+                    int numProductosAAnadir = faker.number().numberBetween(0, Math.min(6, productosPersistidos.size()));
+                    for (int k = 0; k < numProductosAAnadir; k++) {
+                        Producto productoSeleccionado = productosPersistidos.get(k);
+                        ConsumoProducto consumo = new ConsumoProducto();
+                        consumo.setEvento(evento);
+                        consumo.setProducto(productoSeleccionado);
+                        consumo.setCantidad(faker.number().numberBetween(1, 10));
+                        consumo.setPrecioUnitario(productoSeleccionado.getPrecio());
+                        consumo.setImpuesto(productoSeleccionado.getImpuesto());
+                        consumos.add(consumo);
+                    }
+                }
+                consumoProductoRepository.saveAll(consumos);
+                consumoProductoRepository.flush();
+                logger.info("✅ Consumos de productos creados y guardados ({}).", consumos.size());
             }
 
             logger.info("🎉 Inicialización de datos completada con éxito.");
@@ -151,6 +196,9 @@ public class InsertarDatos implements CommandLineRunner {
         }
     }
 
+    // Método para generar un número de teléfono en formato "XXX-XXX-XXX"
+    // Este método utiliza un Random para generar tres grupos de números aleatorios de 3 dígitos cada uno
+    // y los formatea en una cadena con guiones entre ellos.
     private String generarTelefonoFormato() {
         return String.format("%03d-%03d-%03d",
                 random.nextInt(1000),
@@ -158,6 +206,12 @@ public class InsertarDatos implements CommandLineRunner {
                 random.nextInt(1000));
     }
 
+    // Método para ajustar la longitud de un texto a un rango específico
+    // Este método toma un texto y lo ajusta a una longitud mínima y máxima especificadas.
+    // Si el texto es nulo, se rellena con caracteres "x" hasta la longitud mínima.
+    // Si el texto es más corto que la longitud mínima, se rellena con espacios hasta alcanzar la longitud mínima.
+    // Si el texto es más largo que la longitud máxima, se corta a la longitud máxima.
+    // Si el texto está dentro del rango, se devuelve tal cual.
     private String ajustarLongitud(String texto, int minLen, int maxLen) {
         if (texto == null) {
             texto = String.join("", Collections.nCopies(minLen, "x"));
