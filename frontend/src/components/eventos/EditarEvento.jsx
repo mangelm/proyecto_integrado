@@ -2,21 +2,28 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditarEvento() {
-    const { id } = useParams();
-    const [nombre, setNombre] = useState("");
-    const [fecha, setFecha] = useState("");
-    const [cantidadPersonas, setCantidadPersonas] = useState("");
-    const [espacio, setEspacio] = useState("");
-    const [horario, setHorario] = useState("");
-    const [hora, setHora] = useState("");
-    const [estado, setEstado] = useState("");
-    const [errores, setErrores] = useState({});
-    const navigate = useNavigate();
+    const { id } = useParams(); // Extrae el ID del evento de la URL
+    const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre del evento
+    const [fecha, setFecha] = useState(""); // Estado para almacenar la fecha del evento
+    const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para almacenar la cantidad de personas
+    const [espacio, setEspacio] = useState(""); // Estado para almacenar el espacio del evento
+    const [horario, setHorario] = useState(""); // Estado para almacenar el horario del evento
+    const [hora, setHora] = useState(""); // Estado para almacenar la hora del evento
+    const [estado, setEstado] = useState(""); // Estado para almacenar el estado del evento
+    const [errores, setErrores] = useState({}); // Estado para almacenar los errores de validación
+    const navigate = useNavigate(); // Hook para navegar a otras rutas
 
+    // useEffect es un hook de React que se utiliza para manejar efectos secundarios en componentes funcionales.
+    // En este caso, se utiliza para realizar una solicitud a la API cuando el componente se monta.
     useEffect(() => {
         fetch(`http://localhost:8100/api/eventos/${id}`, {
+            // Realiza una solicitud GET a la API para obtener los detalles del evento
+            method: "GET",
             credentials: 'include',
-        })
+            // Incluye las credenciales de la sesión (cookies) en la solicitud
+        })  
+            // Convierte la respuesta a JSON
+            // y actualiza el estado del componente con los datos del evento
             .then((response) => response.json())
             .then((data) => {
                 setNombre(data.nombre);
@@ -27,9 +34,15 @@ export default function EditarEvento() {
                 setHora(data.hora);
                 setEstado(data.estado);
             })
+            // Maneja cualquier error que ocurra durante la solicitud
+            // y lo muestra en la consola
             .catch((error) => console.error("Error al cargar el evento:", error));
     }, [id]);
 
+    // Función para limpiar el input de texto o número
+    // dependiendo del tipo de dato que se espera
+    // Se utiliza una expresión regular para eliminar caracteres no deseados
+    // y devolver el valor limpio
     const limpiarInput = (valor, tipo) => {
         if (tipo === "texto") {
             return valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, "");
@@ -40,6 +53,17 @@ export default function EditarEvento() {
         return valor;
     };
 
+    /*  
+        Función para validar el formulario antes de enviarlo
+        Se verifica que los campos requeridos no estén vacíos y que cumplan con las restricciones de longitud
+        Se valida que la fecha sea futura y que la cantidad de personas sea positiva
+        Se actualiza el estado de errores con los mensajes correspondientes 
+        y se devuelve un valor booleano indicando si el formulario es válido o no
+        Se utiliza una expresión regular para validar el formato de la fecha
+        y se compara con la fecha actual para asegurarse de que sea futura
+        Se utiliza el método getFullYear(), getMonth() y getDate() para obtener el año, mes y día de la fecha
+        y se compara con la fecha actual para asegurarse de que sea futura 
+    */
     const validarFormulario = () => {
         let valido = true;
         const nuevosErrores = {};
@@ -100,7 +124,28 @@ export default function EditarEvento() {
         setErrores(nuevosErrores);
         return valido;
     };
-
+    
+    /*
+        Función para manejar el envío del formulario
+        Se previene el comportamiento por defecto del formulario
+        Se valida el formulario y si es válido, se crea un objeto con los datos del evento
+        Se realiza una solicitud PUT a la API para actualizar el evento
+        Si la respuesta es exitosa, se navega a la lista de eventos
+        Si hay un error, se actualiza el estado de errores con el mensaje de error
+        Se utiliza el método fetch para realizar la solicitud a la API
+        y se envían los datos del evento en formato JSON
+        Se utiliza el método JSON.stringify para convertir el objeto a una cadena JSON
+        y se envía en el cuerpo de la solicitud
+        Se utiliza el método navigate para redirigir al usuario a la lista de eventos
+        y se utiliza el método response.ok para verificar si la respuesta fue exitosa
+        y se maneja cualquier error que ocurra durante la solicitud
+        y se muestra en la consola
+        Se utiliza el método response.text() para obtener el mensaje de error
+        y se actualiza el estado de errores con el mensaje de error
+        y se muestra en la consola
+        Se utiliza el método setErrores para actualizar el estado de errores
+        y se muestra el mensaje de error en la interfaz de usuario
+    */
     const manejarEnvio = async (e) => {
         e.preventDefault();
         if (!validarFormulario()) {
@@ -121,8 +166,11 @@ export default function EditarEvento() {
             const response = await fetch(`http://localhost:8100/api/eventos/${id}`, {
                 method: "PUT",
                 headers: {
+                    // "Content-Type" es un encabezado que indica el tipo de contenido que se 
+                    // está enviando en la solicitud
                     "Content-Type": "application/json",
                 },
+                
                 body: JSON.stringify(eventoActualizado),
                 credentials: 'same-origin',
             });
