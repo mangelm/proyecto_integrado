@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.dto.ConsumoPromedioDTO;
-import com.gestioneventos.model.dto.ConsumoPromedioFechaDTO;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioFechaDTO;
@@ -89,11 +88,11 @@ public class ConsumoProductoServiceImp implements ConsumoProductoService {
     }
 
     @Override
-    public List<ConsumoPromedioFechaDTO> obtenerConsumoPromedioPorPersonaFecha(LocalDate fechaInicio, LocalDate fechaFinal) {
+    public List<ConsumoPromedioDTO> obtenerConsumoPromedioPorPersonaFecha(LocalDate fechaInicio, LocalDate fechaFinal) {
         List<Object[]> resultados = consumoProductoRepository.obtenerConsumoPromedioPorPersona(fechaInicio, fechaFinal);
 
         return resultados.stream()
-                .map(obj -> new ConsumoPromedioFechaDTO(
+                .map(obj -> new ConsumoPromedioDTO(
                         (String) obj[0],                  // Nombre del producto
                         ((Number) obj[1]).intValue(),      // Cantidad de personas
                         ((Number) obj[2]).doubleValue()   // Consumo promedio

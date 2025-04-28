@@ -1,9 +1,11 @@
 package com.gestioneventos.model.dto;
 
+// DTO para representar el consumo promedio de un producto en un evento
+// Se utiliza para enviar datos al cliente y recibirlos del servicio correspondiente
 public class ConsumoPromedioDTO {
-    private String producto;
-    private Integer cantidadPersonasQueConsumieron;
-    private Double consumoPromedio;
+    private String producto; // Nombre del producto
+    private Integer cantidadPersonasQueConsumieron; // Cantidad de personas que consumieron el producto
+    private Double consumoPromedio; // Consumo promedio del producto
 
     public ConsumoPromedioDTO() {
     }
@@ -38,6 +40,8 @@ public class ConsumoPromedioDTO {
         this.consumoPromedio = consumoPromedio;
     }
 
+    // Método para representar el objeto como una cadena de texto
+    // Se utiliza para facilitar la depuración y el registro de información
     @Override
     public String toString() {
         return "ConsumoPromedioDTO{" +

@@ -7,9 +7,10 @@ import org.springframework.data.domain.Pageable;
 
 import com.gestioneventos.model.Cliente;
 
-//Interfaz creada para que siempre se cumpla la misma estructura en cuanto a funciones y parametros
+// Esta interfaz define los métodos que se implementarán en la clase de servicio para manejar la lógica de negocio relacionada con la entidad Cliente.
+// La implementación de esta interfaz se encargará de interactuar con el repositorio de Cliente y realizar operaciones CRUD.
 public interface ClienteService {
-	//Metodos para implementar
+	// Métodos para manejar la lógica de negocio relacionada con la entidad Cliente.
 	Cliente crearCliente(Cliente cliente);
 	List<Cliente> obtenerTodosLosClientes();
 	Cliente obtenerClientePorId(Long id);

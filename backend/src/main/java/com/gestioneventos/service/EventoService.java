@@ -9,7 +9,8 @@ import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
 
-//Interfaz creada para que siempre se cumpla la misma estructura en cuanto a funciones y parametros
+// Esta interfaz define los métodos que se implementarán en la clase de servicio para manejar la lógica de negocio relacionada con la entidad Evento.
+// La implementación de esta interfaz se encargará de interactuar con el repositorio de Evento y realizar operaciones CRUD.
 public interface EventoService {
 	//Metodos para implementar
 	Evento crearEvento(Evento evento);

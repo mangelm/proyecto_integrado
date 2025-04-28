@@ -7,9 +7,11 @@ import org.springframework.data.domain.Pageable;
 
 import com.gestioneventos.model.Producto;
 
-//Interfaz creada para que siempre se cumpla la misma estructura en cuanto a funciones y parametros
+// Esta interfaz define los métodos que se implementarán en la clase de servicio para manejar la lógica de negocio relacionada con la entidad Producto.
+// La implementación de esta interfaz se encargará de interactuar con el repositorio de Producto y realizar operaciones CRUD.
 public interface ProductoService {
-	// Métodos CRUD
+	// Métodos para manejar la lógica de negocio relacionada con la entidad Producto.
+	// Estos métodos se implementarán en la clase de servicio correspondiente.
 	Producto crearProducto(Producto producto);
 	List<Producto> obtenerTodosLosProductos();
 	Producto obtenerProductoPorId(Long id);

@@ -2,12 +2,14 @@ package com.gestioneventos.model.dto;
 
 import java.math.BigDecimal;
 
+// DTO para agregar productos a un evento
+// Se utiliza para recibir los datos del cliente y enviarlos al servicio correspondiente
 public class AgregarProductosDTO {
 	
-	private Long productoId;
-    private Integer cantidad;
-    private BigDecimal precioUnitario;
-    private BigDecimal impuesto;
+	private Long productoId; // ID del producto a agregar
+    private Integer cantidad; // Cantidad de productos a agregar
+    private BigDecimal precioUnitario; // Precio unitario del producto
+    private BigDecimal impuesto; // Impuesto aplicado al producto
     
 	public Long getProductoId() {
 		return productoId;
