@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores"; // Importa el componente para mostrar errores generales.
 
 export default function CrearEventoCalendario({ onSuccess }) {
     const { fecha } = useParams(); // Obtiene el parámetro 'fecha' de la URL, que representa la fecha en la que se va a crear el evento.
-    const [nombre, setNombre] = useState(""); // Estado para el nombre del evento, inicializado como cadena vacía
+    const [nombre, setNombre] = useState(""); // Estado para el nombre del evento, inicializado como cadena vacía.
     const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para la cantidad de asistentes, inicializado como una cadena vacía.
-    const [espacio, setEspacio] = useState("");// Estado para el lugar o espacio del evento, inicializado como una cadena vacía.
+    const [espacio, setEspacio] = useState(""); // Estado para el lugar o espacio del evento, inicializado como una cadena vacía.
     const [horario, setHorario] = useState("MAÑANA"); // Estado para el horario del evento (MAÑANA, TARDE, NOCHE), inicializado en 'MAÑANA'.
     const [hora, setHora] = useState(""); // Estado para la hora específica del evento, inicializado como una cadena vacía.
     const [errores, setErrores] = useState({}); // Estado para almacenar los errores de validación del formulario, inicializado como un objeto vacío.
+    const [erroresGenerales, setErroresGenerales] = useState([]); // Estado para manejar errores generales no controlados por el formulario.
     const navegar = useNavigate(); // Hook para obtener la función de navegación.
 
     // Función para limpiar los valores de los input, eliminando caracteres no deseados.
@@ -19,7 +21,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
         if (tipo === "numero") {
             return valor.replace(/[^0-9]/g, ""); // Elimina caracteres que no son números.
         }
-        return valor;  // Retorna el valor sin cambios si el tipo no es texto ni número.
+        return valor; // Retorna el valor sin cambios si el tipo no es texto ni número.
     };
 
     // Función para validar el formulario antes de enviar los datos.
@@ -93,9 +95,8 @@ export default function CrearEventoCalendario({ onSuccess }) {
 
     // Función asíncrona para manejar el envío del formulario.
     const manejarEnvio = async (evento) => {
-        
         evento.preventDefault(); // Evita el comportamiento por defecto del formulario (recargar la página).
-        
+
         if (!validarFormulario()) {
             return; // Si la validación falla, la función se detiene aquí.
         }
@@ -111,7 +112,6 @@ export default function CrearEventoCalendario({ onSuccess }) {
         };
 
         try {
-
             // Realiza una petición POST a la API para crear el nuevo evento.
             const respuesta = await fetch("http://localhost:8100/api/eventos", {
                 method: "POST",
@@ -130,11 +130,14 @@ export default function CrearEventoCalendario({ onSuccess }) {
                 }
             } else {
                 const textoError = await respuesta.text(); // Obtiene el mensaje de error de la respuesta.
-                setErrores({ general: textoError }); // Actualiza el estado de errores con el mensaje general de error.
+                setErroresGenerales((prev) => [...prev, textoError]); // Actualiza los errores generales.
             }
         } catch (errorDeConexion) {
             // Captura errores de conexión con la API.
-            setErrores({ general: `Error de conexión al crear el evento: ${errorDeConexion.message}` });
+            setErroresGenerales((prev) => [
+                ...prev,
+                `Error de conexión al crear el evento: ${errorDeConexion.message}`,
+            ]);
         }
     };
 
@@ -142,6 +145,10 @@ export default function CrearEventoCalendario({ onSuccess }) {
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-lg mx-auto">
             <h1 className="text-2xl font-bold mb-4 text-center">Crear Evento</h1>
+
+            {/* Mostrar errores generales con MensajesDeErrores */}
+            {erroresGenerales.length > 0 && <MensajesDeErrores messages={erroresGenerales} />}
+
             <form onSubmit={manejarEnvio} className="space-y-4">
                 <div>
                     <label htmlFor="nombre" className="block text-sm font-medium">
@@ -195,18 +202,15 @@ export default function CrearEventoCalendario({ onSuccess }) {
                         type="text"
                         id="espacio"
                         value={espacio}
-                        onChange={(e) => setEspacio(e.target.value)} // Actualiza el estado 'horario' cuando se selecciona una opción.
+                        onChange={(e) => setEspacio(e.target.value)} // Actualiza el estado 'espacio' cuando el valor del input cambia.
                         required
                         className="mt-1 w-full p-2 border rounded-md"
                     />
-                    {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>} {/* Muestra el error de horario si existe. */}
+                    {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>} {/* Muestra el error de espacio si existe. */}
                 </div>
 
                 <div>
-                    <label
-                        htmlFor="horario"
-                        className="block text-sm font-medium"
-                    >
+                    <label htmlFor="horario" className="block text-sm font-medium">
                         Horario
                     </label>
                     <select
@@ -224,7 +228,9 @@ export default function CrearEventoCalendario({ onSuccess }) {
                 </div>
 
                 <div className="mb-4">
-                    <label htmlFor="hora" className="block text-sm font-medium text-gray-700">Hora</label>
+                    <label htmlFor="hora" className="block text-sm font-medium text-gray-700">
+                        Hora
+                    </label>
                     <input
                         type="time"
                         id="hora"
@@ -235,8 +241,6 @@ export default function CrearEventoCalendario({ onSuccess }) {
                     />
                     {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>} {/* Muestra el error de hora si existe. */}
                 </div>
-
-                {errores.general && <div className="text-red-500 mt-4">{errores.general}</div>} {/* Muestra un error general si existe (por ejemplo, de la API). */}
 
                 <div className="flex justify-between">
                     <button

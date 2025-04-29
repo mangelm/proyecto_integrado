@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Link } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -12,82 +13,99 @@ export default function AnalisisConsumoFechas() {
     const [datosPorHorario, setDatosPorHorario] = useState(null);
     const [datosPorPersonas, setDatosPorPersonas] = useState(null);
     const [datosPromedioPorPersona, setDatosPromedioPorPersona] = useState(null);
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
 
-    //Controlar visibilidad de los gráficos
+    // Controlar visibilidad de los gráficos
     const [mostrarGraficoTotal, setMostrarGraficoTotal] = useState(false);
     const [mostrarGraficoHorario, setMostrarGraficoHorario] = useState(false);
     const [mostrarGraficoPorPersonas, setMostrarGraficoPorPersonas] = useState(false);
-    const [mostrarGraficoPromedio, setMostrarGraficoPromedio] = useState(false); 
+    const [mostrarGraficoPromedio, setMostrarGraficoPromedio] = useState(false);
 
     // Enviamos la petición para obtener los datos de consumo de productos
     const fetchConsumo = async (e) => {
         e.preventDefault();
+        setErrores([]);
         if (!fechaInicio || !fechaFinal) return;
         try {
             const response = await fetch(`http://localhost:8100/api/estadisticas/productos?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener datos: ${response.status}`);
+            }
             const data = await response.json();
             setDatos(data);
         } catch (error) {
             console.error("Error al obtener datos", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos: ${error.message}`]);
         }
     };
 
     // Enviamos la petición para obtener los datos de consumo por horario
     const fetchConsumoPorHorario = async () => {
+        setErrores([]);
         if (!fechaInicio || !fechaFinal) return;
         try {
             const response = await fetch(`http://localhost:8100/api/estadisticas/productos-horario?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener datos por horario: ${response.status}`);
+            }
             const data = await response.json();
             setDatosPorHorario(data);
         } catch (error) {
             console.error("Error al obtener datos por horario", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos por horario: ${error.message}`]);
         }
     };
 
     // Enviamos la petición para obtener los productos más consumidos por cantidad de personas
     const fetchConsumoPorPersonas = async (e) => {
         e.preventDefault();
+        setErrores([]);
         if (!fechaInicio || !fechaFinal) return;
         try {
             const response = await fetch(`http://localhost:8100/api/estadisticas/productos-personas?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener datos por cantidad de personas: ${response.status}`);
+            }
             const data = await response.json();
-            setDatosPorPersonas(data); // Guardamos los datos de cantidad de personas
+            setDatosPorPersonas(data);
         } catch (error) {
             console.error("Error al obtener datos por cantidad de personas", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos por cantidad de personas: ${error.message}`]);
         }
     };
 
     // Petición para obtener el promedio de consumo por persona
     const fetchPromedioPorPersona = async (e) => {
         e.preventDefault();
+        setErrores([]);
         if (!fechaInicio || !fechaFinal) return;
-    
         try {
             const response = await fetch(`http://localhost:8100/api/estadisticas/productos-promedio-personas?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
-    
             if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`); // Captura errores HTTP
+                throw new Error(`Error al obtener promedio por persona: ${response.status}`);
             }
-    
-            const text = await response.text(); // Obtiene el cuerpo como texto
-            const data = text ? JSON.parse(text) : []; // Si el texto no está vacío, lo convierte en JSON
-    
-            setDatosPromedioPorPersona(data); // Guarda los datos del promedio
+            const text = await response.text();
+            const data = text ? JSON.parse(text) : [];
+            setDatosPromedioPorPersona(data);
         } catch (error) {
             console.error("Error al obtener datos de promedio por persona:", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener promedio por persona: ${error.message}`]);
         }
     };
-    
 
     // Creación de datos para Cantidad Consumida Total
-    const chartData = datos ? {
-        labels: datos.map(p => p.nombre),
-        datasets: [{
-            label: "Cantidad Consumida Total",
-            data: datos.map(p => p.totalConsumido),
-            backgroundColor: "rgba(54, 162, 235, 0.6)",
-        }]
-    } : null;
+    const chartData = datos
+        ? {
+              labels: datos.map((p) => p.nombre),
+              datasets: [
+                  {
+                      label: "Cantidad Consumida Total",
+                      data: datos.map((p) => p.totalConsumido),
+                      backgroundColor: "rgba(54, 162, 235, 0.6)",
+                  },
+              ],
+          }
+        : null;
 
     // Función para agrupar los datos por producto y horario
     const agruparPorProductoYHorario = (datos) => {
@@ -103,61 +121,88 @@ export default function AnalisisConsumoFechas() {
     };
 
     // Datos para el gráfico por horario
-    const chartDataHorario = datosPorHorario ? {
-        labels: Object.keys(agruparPorProductoYHorario(datosPorHorario)),
-        datasets: [
-            {
-                label: "MAÑANA",
-                data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map(item => item.MAÑANA),
-                backgroundColor: "rgba(255, 159, 64, 0.6)",
-            },
-            {
-                label: "TARDE",
-                data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map(item => item.TARDE),
-                backgroundColor: "rgba(54, 162, 235, 0.6)",
-            },
-            {
-                label: "NOCHE",
-                data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map(item => item.NOCHE),
-                backgroundColor: "rgba(75, 192, 192, 0.6)",
-            },
-        ]
-    } : null;
+    const chartDataHorario = datosPorHorario
+        ? {
+            labels: Object.keys(agruparPorProductoYHorario(datosPorHorario)),
+            datasets: [
+                {
+                    label: "MAÑANA",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.MAÑANA),
+                    backgroundColor: "rgba(255, 159, 64, 0.6)",
+                },
+                {
+                    label: "TARDE",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.TARDE),
+                    backgroundColor: "rgba(54, 162, 235, 0.6)",
+                },
+                {
+                    label: "NOCHE",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.NOCHE),
+                    backgroundColor: "rgba(75, 192, 192, 0.6)",
+                },
+            ],
+        }
+        : null;
 
     // Datos para el gráfico de cantidad de personas
-    const chartDataPorPersonas = datosPorPersonas ? {
-        labels: datosPorPersonas.map(p => p.nombre),
-        datasets: [{
-            label: "Cantidad de Personas que Consumen el Producto",
-            data: datosPorPersonas.map(p => p.cantidadPersonas),
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
-        }]
-    } : null;
+    const chartDataPorPersonas = datosPorPersonas
+        ? {
+            labels: datosPorPersonas.map((p) => p.nombre),
+            datasets: [
+                {
+                    label: "Cantidad de Personas que Consumen el Producto",
+                    data: datosPorPersonas.map((p) => p.cantidadPersonas),
+                    backgroundColor: "rgba(75, 192, 192, 0.6)",
+                },
+            ],
+        }
+        : null;
 
     // Datos para el gráfico del promedio de consumo por persona
-    const chartDataPromedioPorPersona = datosPromedioPorPersona ? {
-        labels: datosPromedioPorPersona.map(p => p.producto), // Usamos `producto` para las etiquetas
-        datasets: [{
-            label: "Promedio de Consumo por Persona",
-            data: datosPromedioPorPersona.map(p => p.consumoPromedio), // Cambié `promedioConsumo` por `consumoPromedio`
-            backgroundColor: "rgba(255, 99, 132, 0.6)",
-        }]
-    } : null;
-    
+    const chartDataPromedioPorPersona = datosPromedioPorPersona
+    ? {
+            labels: datosPromedioPorPersona.map((p) => p.producto),
+            datasets: [
+                {
+                    label: "Promedio de Consumo por Persona",
+                    data: datosPromedioPorPersona.map((p) => p.consumoPromedio),
+                    backgroundColor: "rgba(255, 99, 132, 0.6)",
+                },
+            ],
+        }
+    : null;
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
                 <h2 className="text-xl font-semibold text-center mb-4">Generar Análisis</h2>
+
+                {/* Mostrar errores */}
+                {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
                 <form onSubmit={fetchConsumo} className="space-y-4">
-                    <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required className="w-full p-2 border rounded" />
-                    <input type="date" value={fechaFinal} onChange={(e) => setFechaFinal(e.target.value)} required className="w-full p-2 border rounded" />
-                    <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">Generar</button>
+                    <input
+                        type="date"
+                        value={fechaInicio}
+                        onChange={(e) => setFechaInicio(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        type="date"
+                        value={fechaFinal}
+                        onChange={(e) => setFechaFinal(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
+                    />
+                    <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
+                        Generar
+                    </button>
                 </form>
 
                 {/* Botón para mostrar/ocultar el gráfico de consumo total */}
                 {chartData && (
-                    <button 
+                    <button
                         onClick={() => setMostrarGraficoTotal(!mostrarGraficoTotal)}
                         className="w-full p-2 bg-purple-500 text-white rounded mt-4"
                     >
@@ -165,39 +210,43 @@ export default function AnalisisConsumoFechas() {
                     </button>
                 )}
 
-
                 {/* Botón para mostrar/ocultar el gráfico de cantidad de personas */}
-                <button 
+                <button
                     onClick={(e) => {
                         setMostrarGraficoPorPersonas(!mostrarGraficoPorPersonas);
-                        fetchConsumoPorPersonas(e); // Pasamos el evento correctamente
-                    }} 
+                        fetchConsumoPorPersonas(e);
+                    }}
                     className="w-full p-2 bg-yellow-500 text-white rounded mt-4"
                 >
-                    {mostrarGraficoPorPersonas ? "Ocultar Consumo de Productos por Cantidad Personas" : "Ver Consumo de Productos por Cantidad Personas"}
+                    {mostrarGraficoPorPersonas
+                        ? "Ocultar Consumo de Productos por Cantidad Personas"
+                        : "Ver Consumo de Productos por Cantidad Personas"}
                 </button>
 
-
                 {/* Botón para mostrar/ocultar el gráfico por horario */}
-                <button 
+                <button
                     onClick={() => {
                         setMostrarGraficoHorario(!mostrarGraficoHorario);
-                        fetchConsumoPorHorario(); // Llamar a la función para obtener los datos por horario
-                    }} 
+                        fetchConsumoPorHorario();
+                    }}
                     className="w-full p-2 bg-green-500 text-white rounded mt-4"
                 >
-                    {mostrarGraficoHorario ? "Ocultar Consumo de Productos por Horario" : "Ver Consumo de Productos por Horario"}
+                    {mostrarGraficoHorario
+                        ? "Ocultar Consumo de Productos por Horario"
+                        : "Ver Consumo de Productos por Horario"}
                 </button>
 
                 {/* Botón para mostrar/ocultar el gráfico del promedio de consumo por persona */}
-                <button 
+                <button
                     onClick={(e) => {
                         setMostrarGraficoPromedio(!mostrarGraficoPromedio);
                         fetchPromedioPorPersona(e);
-                    }} 
+                    }}
                     className="w-full p-2 bg-red-500 text-white rounded mt-4"
                 >
-                    {mostrarGraficoPromedio ? "Ocultar Promedio de Consumo por Persona" : "Ver Promedio de Consumo por Persona"}
+                    {mostrarGraficoPromedio
+                        ? "Ocultar Promedio de Consumo por Persona"
+                        : "Ver Promedio de Consumo por Persona"}
                 </button>
             </div>
 
@@ -213,14 +262,17 @@ export default function AnalisisConsumoFechas() {
             {mostrarGraficoHorario && chartDataHorario && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
                     <h2 className="text-xl font-semibold text-center mb-4">Productos Más Consumidos por Horario</h2>
-                    <Bar data={chartDataHorario} options={{
-                        responsive: true,
-                        plugins: { legend: { display: true } },
-                        scales: {
-                            x: { stacked: true },
-                            y: { stacked: true }
-                        }
-                    }} />
+                    <Bar
+                        data={chartDataHorario}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                x: { stacked: true },
+                                y: { stacked: true },
+                            },
+                        }}
+                    />
                 </div>
             )}
 
@@ -228,13 +280,16 @@ export default function AnalisisConsumoFechas() {
             {mostrarGraficoPorPersonas && chartDataPorPersonas && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
                     <h2 className="text-xl font-semibold text-center mb-4">Cantidad de Personas que Consumen el Producto</h2>
-                    <Bar data={chartDataPorPersonas} options={{
-                        responsive: true,
-                        plugins: { legend: { display: true } },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }} />
+                    <Bar
+                        data={chartDataPorPersonas}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                y: { beginAtZero: true },
+                            },
+                        }}
+                    />
                 </div>
             )}
 
@@ -242,17 +297,22 @@ export default function AnalisisConsumoFechas() {
             {mostrarGraficoPromedio && chartDataPromedioPorPersona && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
                     <h2 className="text-xl font-semibold text-center mb-4">Promedio de Consumo por Persona</h2>
-                    <Bar data={chartDataPromedioPorPersona} options={{
-                        responsive: true,
-                        plugins: { legend: { display: true } },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }} />
+                    <Bar
+                        data={chartDataPromedioPorPersona}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                y: { beginAtZero: true },
+                            },
+                        }}
+                    />
                 </div>
             )}
 
-            <Link to="/estadisticas" className="p-4 bg-green-500 text-white rounded mt-4">Volver</Link>
+            <Link to="/estadisticas" className="p-4 bg-green-500 text-white rounded mt-4">
+                Volver
+            </Link>
         </div>
     );
 }

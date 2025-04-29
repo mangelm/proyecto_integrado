@@ -1,26 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
-// Este componente permite crear un nuevo evento. Utiliza hooks de React para manejar el estado y la navegación.
+// Este componente permite crear un nuevo evento.
 export default function CrearEvento({ onSuccess }) {
-    
     const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre del evento
     const [fecha, setFecha] = useState(""); // Estado para almacenar la fecha del evento
-    const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para almacenar la cantidad de personas que asistirán al evento
-    const [espacio, setEspacio] = useState(""); // Estado para almacenar el espacio donde se llevará a cabo el evento
-    const [horario, setHorario] = useState("MAÑANA"); // Estado para almacenar el horario del evento (MAÑANA, TARDE, NOCHE)
+    const [cantidadPersonas, setCantidadPersonas] = useState(""); // Estado para almacenar la cantidad de personas
+    const [espacio, setEspacio] = useState(""); // Estado para almacenar el espacio del evento
+    const [horario, setHorario] = useState("MAÑANA"); // Estado para almacenar el horario del evento
     const [hora, setHora] = useState(""); // Estado para almacenar la hora del evento
-    const [errores, setErrores] = useState({}); // Estado para almacenar los errores de validación del formulario
+    const [erroresFormulario, setErroresFormulario] = useState({}); // Estado para errores específicos del formulario
+    const [erroresGenerales, setErroresGenerales] = useState([]); // Estado para errores generales
     const navegar = useNavigate(); // Hook de React Router para navegar entre rutas
 
-    
-    /* Función para limpiar el input, eliminando caracteres no deseados según el tipo (texto o número)
-    Esta función se utiliza para limpiar los valores de los inputs antes de enviarlos al servidor.
-    Se utiliza una expresión regular para eliminar caracteres no deseados.
-    Si el tipo es "texto", se eliminan caracteres que no sean letras, números o espacios.
-    Si el tipo es "numero", se eliminan caracteres que no sean dígitos.
-    Si no se especifica un tipo, se devuelve el valor original. */
-    const limpiarInput = (valor, tipo) => { 
+    // Función para limpiar el input
+    const limpiarInput = (valor, tipo) => {
         if (tipo === "texto") {
             return valor.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, "");
         }
@@ -30,22 +25,7 @@ export default function CrearEvento({ onSuccess }) {
         return valor;
     };
 
-    /* 
-        Función para validar el formulario antes de enviarlo.
-        Se verifica que todos los campos requeridos estén completos y que los valores sean válidos.
-        Si hay errores, se actualiza el estado de errores y se devuelve false.
-        Si no hay errores, se devuelve true.
-        Se valida el nombre, la fecha (debe ser futura y no puede ser hoy), la cantidad de personas 
-        (debe ser positiva), el espacio (no puede exceder 200 caracteres) y la hora (no puede estar vacía).
-        Si algún campo no es válido, se agrega un mensaje de error correspondiente al estado de errores.
-        Si todos los campos son válidos, se devuelve true.
-        Si el nombre no es válido, se agrega un mensaje de error correspondiente al estado de errores
-        Si la fecha no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-        Si la cantidad de personas no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-        Si el espacio no es válido, se agrega un mensaje de error correspondiente al estado de errores.
-        Si la hora no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-        Si todos los campos son válidos, se devuelve true.
-    */
+    // Validar el formulario
     const validarFormulario = () => {
         let valido = true;
         const nuevosErrores = {};
@@ -64,20 +44,8 @@ export default function CrearEvento({ onSuccess }) {
         } else {
             const fechaEvento = new Date(fecha);
             const ahora = new Date();
-
-            const anoEvento = fechaEvento.getFullYear();
-            const mesEvento = fechaEvento.getMonth();
-            const diaEvento = fechaEvento.getDate();
-
-            const anoAhora = ahora.getFullYear();
-            const mesAhora = ahora.getMonth();
-            const diaAhora = ahora.getDate();
-
-            if (anoEvento < anoAhora || (anoEvento === anoAhora && mesEvento < mesAhora) || (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento < diaAhora)) {
+            if (fechaEvento <= ahora) {
                 nuevosErrores.fecha = "La fecha debe ser futura.";
-                valido = false;
-            } else if (anoEvento === anoAhora && mesEvento === mesAhora && diaEvento === diaAhora) {
-                nuevosErrores.fecha = "No se puede crear un evento para hoy.";
                 valido = false;
             }
         }
@@ -103,24 +71,11 @@ export default function CrearEvento({ onSuccess }) {
             valido = false;
         }
 
-        setErrores(nuevosErrores);
+        setErroresFormulario(nuevosErrores);
         return valido;
     };
-    
-    
-    /* 
-        Función para manejar el envío del formulario.
-        Se previene el comportamiento por defecto del formulario y se valida el formulario.
-        Si hay errores, no se envía el formulario.
-        Si no hay errores, se crea un nuevo evento con los datos del formulario y se envía una solicitud POST al servidor.
-        Si la respuesta es exitosa, se navega a la página de eventos o se llama a la función onSuccess si está definida.
-        Si hay un error en la conexión o en la respuesta, se actualiza el estado de errores con el mensaje correspondiente.
-        Se utiliza la función limpiarInput para limpiar los valores de los inputs antes de enviarlos al servidor.
-        Se utiliza la función validarFormulario para validar los datos del formulario antes de enviarlos al servidor.
-        Se utiliza la función setErrores para actualizar el estado de errores con los mensajes de error correspondientes.
-        Se utiliza la función setNombre, setFecha, setCantidadPersonas, setEspacio, setHorario y setHora para actualizar 
-        el estado de los inputs con los valores correspondientes.
-    */
+
+    // Manejar el envío del formulario
     const manejarEnvio = async (evento) => {
         evento.preventDefault();
         if (!validarFormulario()) {
@@ -137,7 +92,6 @@ export default function CrearEvento({ onSuccess }) {
         };
 
         try {
-            // Se envía una solicitud POST al servidor para crear un nuevo evento
             const respuesta = await fetch("http://localhost:8100/api/eventos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -145,26 +99,33 @@ export default function CrearEvento({ onSuccess }) {
             });
 
             if (respuesta.ok) {
-                // Si la respuesta es exitosa, se navega a la página de eventos o se llama a la función onSuccess si está definida
                 if (onSuccess) {
                     onSuccess();
                 } else {
                     navegar("/eventos");
                 }
             } else {
-                // Si hay un error en la respuesta, se actualiza el estado de errores con el mensaje correspondiente
                 const textoError = await respuesta.text();
-                setErrores({ general: textoError });
+                setErroresGenerales((prevErrores) => [
+                    ...prevErrores,
+                    textoError || "Error al crear el evento. Intenta nuevamente.",
+                ]);
             }
         } catch (errorDeConexion) {
-            // Si hay un error en la conexión, se actualiza el estado de errores con el mensaje correspondiente
-            setErrores({ general: `Error de conexión al crear el evento: ${errorDeConexion.message}` });
+            setErroresGenerales((prevErrores) => [
+                ...prevErrores,
+                `Error de conexión al crear el evento: ${errorDeConexion.message}`,
+            ]);
         }
     };
 
     return (
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-md mx-auto">
             <h1 className="text-xl font-bold mb-4 text-center sm:text-2xl">Crear Evento</h1>
+
+            {/* Mostrar errores generales */}
+            {erroresGenerales.length > 0 && <MensajesDeErrores messages={erroresGenerales} />}
+
             <form onSubmit={manejarEnvio} className="space-y-4">
                 <div>
                     <label htmlFor="nombre" className="block text-sm font-medium">
@@ -174,12 +135,11 @@ export default function CrearEvento({ onSuccess }) {
                         type="text"
                         id="nombre"
                         value={nombre}
-                        onChange={(e) => setNombre(e.target.value)} // Se utiliza la función limpiarInput para limpiar el valor del input 
+                        onChange={(e) => setNombre(e.target.value)}
                         required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {errores.nombre && <p className="text-red-500 text-xs italic">{errores.nombre}</p>}
-                    
+                    {erroresFormulario.nombre && <p className="text-red-500 text-xs italic">{erroresFormulario.nombre}</p>}
                 </div>
 
                 <div>
@@ -190,27 +150,11 @@ export default function CrearEvento({ onSuccess }) {
                         type="date"
                         id="fecha"
                         value={fecha}
-                        onChange={(e) => setFecha(e.target.value)} //
-                        /* 
-                            Función para validar el formulario antes de enviarlo.
-                            Se verifica que todos los campos requeridos estén completos y que los valores sean válidos.
-                            Si hay errores, se actualiza el estado de errores y se devuelve false.
-                            Si no hay errores, se devuelve true.
-                            Se valida el nombre, la fecha (debe ser futura y no puede ser hoy), la cantidad de personas 
-                            (debe ser positiva), el espacio (no puede exceder 200 caracteres) y la hora (no puede estar vacía).
-                            Si algún campo no es válido, se agrega un mensaje de error correspondiente al estado de errores.
-                            Si todos los campos son válidos, se devuelve true.
-                            Si el nombre no es válido, se agrega un mensaje de error correspondiente al estado de errores
-                            Si la fecha no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-                            Si la cantidad de personas no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-                            Si el espacio no es válido, se agrega un mensaje de error correspondiente al estado de errores.
-                            Si la hora no es válida, se agrega un mensaje de error correspondiente al estado de errores.
-                            Si todos los campos son válidos, se devuelve true.
-                        */
+                        onChange={(e) => setFecha(e.target.value)}
                         required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {errores.fecha && <p className="text-red-500 text-xs italic">{errores.fecha}</p>}
+                    {erroresFormulario.fecha && <p className="text-red-500 text-xs italic">{erroresFormulario.fecha}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -219,14 +163,16 @@ export default function CrearEvento({ onSuccess }) {
                             Nº Asistentes
                         </label>
                         <input
-                            type="number"  
+                            type="number"
                             id="cantidad_personas"
-                            value={cantidadPersonas} 
-                            onChange={(e) => setCantidadPersonas(e.target.value)} 
+                            value={cantidadPersonas}
+                            onChange={(e) => setCantidadPersonas(e.target.value)}
                             required
                             className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.cantidadPersonas && <p className="text-red-500 text-xs italic">{errores.cantidadPersonass}</p>}
+                        {erroresFormulario.cantidadPersonas && (
+                            <p className="text-red-500 text-xs italic">{erroresFormulario.cantidadPersonas}</p>
+                        )}
                     </div>
 
                     <div>
@@ -241,7 +187,7 @@ export default function CrearEvento({ onSuccess }) {
                             required
                             className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>}
+                        {erroresFormulario.espacio && <p className="text-red-500 text-xs italic">{erroresFormulario.espacio}</p>}
                     </div>
                 </div>
 
@@ -260,8 +206,6 @@ export default function CrearEvento({ onSuccess }) {
                         <option value="TARDE">TARDE</option>
                         <option value="NOCHE">NOCHE</option>
                     </select>
-                    {errores.horario && <p className="text-red-500 text-xs italic">{errores.horario}</p>}
-                
                 </div>
 
                 <div>
@@ -276,12 +220,8 @@ export default function CrearEvento({ onSuccess }) {
                         required
                         className="mt-1 w-full p-2 border rounded-md text-gray-900 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>}
+                    {erroresFormulario.hora && <p className="text-red-500 text-xs italic">{erroresFormulario.hora}</p>}
                 </div>
-
-                {/* Se muestra un mensaje de error general si hay algún error en la conexión o en la respuesta
-                al crear el evento */}
-                {errores.general && <div className="text-red-500 mt-4">{errores.general}</div>}
 
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                     <button
@@ -292,8 +232,6 @@ export default function CrearEvento({ onSuccess }) {
                     </button>
                     <button
                         type="button"
-                        // Se utiliza la función navegar para redirigir al usuario a la página de eventos
-                        // al hacer clic en el botón "Cancelar"
                         onClick={() => navegar("/eventos")}
                         className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
                     >

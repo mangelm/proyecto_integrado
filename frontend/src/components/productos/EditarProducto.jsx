@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 export default function EditarProducto() {
     const { id } = useParams();
@@ -7,15 +8,21 @@ export default function EditarProducto() {
     const [descripcion, setDescripcion] = useState("");
     const [precio, setPrecio] = useState("");
     const [impuesto, setImpuesto] = useState("");
-    const [disponible, setDisponible] = useState("");
+    const [disponible, setDisponible] = useState(false);
     const [categoria, setCategoria] = useState("");
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
     const navegar = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:8100/api/productos/${id}`, {
-            credentials: 'include'
+            credentials: "include",
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al cargar el producto: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then((data) => {
                 setNombre(data.nombre);
                 setDescripcion(data.descripcion);
@@ -24,7 +31,10 @@ export default function EditarProducto() {
                 setDisponible(data.disponible);
                 setCategoria(data.categoria);
             })
-            .catch((error) => console.error("Error al cargar el producto:", error));
+            .catch((error) => {
+                console.error("Error al cargar el producto:", error.message);
+                setErrores((prevErrores) => [...prevErrores, "Error al cargar el producto. Intenta nuevamente."]);
+            });
     }, [id]);
 
     const sanitizeInput = (value, type) => {
@@ -36,23 +46,23 @@ export default function EditarProducto() {
         }
         return value;
     };
-    
+
     const sanitizeDecimal = (value) => {
         return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
     };
 
     const manejoEnvio = async (e) => {
         e.preventDefault();
-    
+
         const productoActualizado = {
             nombre: sanitizeInput(nombre, "text"),
             descripcion: sanitizeInput(descripcion, "text"),
-            precio: parseFloat(precio) || 0, 
+            precio: parseFloat(precio) || 0,
             impuesto: parseFloat(impuesto) || 0,
             disponible,
             categoria,
         };
-        
+
         try {
             const response = await fetch(`http://localhost:8100/api/productos/${id}`, {
                 method: "PUT",
@@ -60,30 +70,35 @@ export default function EditarProducto() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(productoActualizado),
-                credentials: 'same-origin',
+                credentials: "same-origin",
             });
-    
+
             if (response.ok) {
                 // Redirigir a la lista de productos después de la actualización exitosa
                 navegar("/productos");
             } else {
                 // Si no es una respuesta OK, intenta obtener el cuerpo de la respuesta.
                 const errorData = await response.text(); // Cambiado a .text() para manejar respuestas vacías
-                throw new Error(errorData || 'Error al actualizar el producto');
+                throw new Error(errorData || "Error al actualizar el producto");
             }
         } catch (error) {
-            console.error("Error al editar el producto:", error);
+            console.error("Error al editar el producto:", error.message);
+            setErrores((prevErrores) => [...prevErrores, "Error al actualizar el producto. Intenta nuevamente."]);
         }
     };
-    
-    
 
     return (
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl mx-auto border border-gray-200">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Editar Producto</h1>
+
+            {/* Mostrar errores */}
+            {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
             <form onSubmit={manejoEnvio} className="space-y-4">
                 <div>
-                    <label htmlFor="nombre" className="block text-sm sm:text-md font-medium text-gray-700">Nombre</label>
+                    <label htmlFor="nombre" className="block text-sm sm:text-md font-medium text-gray-700">
+                        Nombre
+                    </label>
                     <input
                         type="text"
                         id="nombre"
@@ -95,7 +110,9 @@ export default function EditarProducto() {
                 </div>
 
                 <div>
-                    <label htmlFor="descripcion" className="block text-sm sm:text-md font-medium text-gray-700">Descripción</label>
+                    <label htmlFor="descripcion" className="block text-sm sm:text-md font-medium text-gray-700">
+                        Descripción
+                    </label>
                     <input
                         type="text"
                         id="descripcion"
@@ -108,7 +125,9 @@ export default function EditarProducto() {
 
                 <div className="sm:grid sm:grid-cols-2 sm:gap-4">
                     <div>
-                        <label htmlFor="precio" className="block text-sm sm:text-md font-medium text-gray-700">Precio</label>
+                        <label htmlFor="precio" className="block text-sm sm:text-md font-medium text-gray-700">
+                            Precio
+                        </label>
                         <input
                             type="number"
                             id="precio"
@@ -120,7 +139,9 @@ export default function EditarProducto() {
                     </div>
 
                     <div>
-                        <label htmlFor="impuesto" className="block text-sm sm:text-md font-medium text-gray-700">Impuesto</label>
+                        <label htmlFor="impuesto" className="block text-sm sm:text-md font-medium text-gray-700">
+                            Impuesto
+                        </label>
                         <input
                             type="number"
                             id="impuesto"
@@ -133,7 +154,9 @@ export default function EditarProducto() {
                 </div>
 
                 <div>
-                    <label htmlFor="disponible" className="block text-sm sm:text-md font-medium text-gray-700">Disponible</label>
+                    <label htmlFor="disponible" className="block text-sm sm:text-md font-medium text-gray-700">
+                        Disponible
+                    </label>
                     <input
                         type="checkbox"
                         id="disponible"
@@ -144,7 +167,9 @@ export default function EditarProducto() {
                 </div>
 
                 <div>
-                    <label htmlFor="categoria" className="block text-sm sm:text-md font-medium text-gray-700">Categoría</label>
+                    <label htmlFor="categoria" className="block text-sm sm:text-md font-medium text-gray-700">
+                        Categoría
+                    </label>
                     <select
                         id="categoria"
                         value={categoria}

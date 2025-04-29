@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gestioneventos.model.dto.ConsumoPromedioDTO;
-import com.gestioneventos.model.dto.ConsumoPromedioFechaDTO;
 import com.gestioneventos.model.dto.EstadisticaOcupacionDTO;
 import com.gestioneventos.model.dto.ProductoConsumoDTO;
 import com.gestioneventos.model.dto.ProductoConsumoPorHorarioDTO;
@@ -214,7 +213,7 @@ public class EstadisticaApiController {
 
             logger.info("Consultando consumo promedio por persona entre {} y {}", inicio, fin);
 
-            List<ConsumoPromedioFechaDTO> productos = consumoProductoService.obtenerConsumoPromedioPorPersonaFecha(inicio, fin);
+            List<ConsumoPromedioDTO> productos = consumoProductoService.obtenerConsumoPromedioPorPersonaFecha(inicio, fin);
 
             return ResponseEntity.ok(productos);
         } catch (DateTimeParseException e) {

@@ -10,7 +10,8 @@ export default function EditarEvento() {
     const [horario, setHorario] = useState(""); // Estado para almacenar el horario del evento
     const [hora, setHora] = useState(""); // Estado para almacenar la hora del evento
     const [estado, setEstado] = useState(""); // Estado para almacenar el estado del evento
-    const [errores, setErrores] = useState({}); // Estado para almacenar los errores de validación
+    const [erroresFormulario, setErroresFormulario] = useState({}); // Estado para almacenar los errores de validación
+    const [erroresGenerales, setErroresGenerales] = useState({});
     const navigate = useNavigate(); // Hook para navegar a otras rutas
 
     // useEffect es un hook de React que se utiliza para manejar efectos secundarios en componentes funcionales.
@@ -24,7 +25,12 @@ export default function EditarEvento() {
         })  
             // Convierte la respuesta a JSON
             // y actualiza el estado del componente con los datos del evento
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Error al cargar los datos del evento.");
+                }
+                return response.json();
+            })
             .then((data) => {
                 setNombre(data.nombre);
                 setFecha(data.fecha);
@@ -33,10 +39,13 @@ export default function EditarEvento() {
                 setHorario(data.horario);
                 setHora(data.hora);
                 setEstado(data.estado);
-            })
-            // Maneja cualquier error que ocurra durante la solicitud
-            // y lo muestra en la consola
-            .catch((error) => console.error("Error al cargar el evento:", error));
+            }).catch((error) => {
+                console.error("Error al cargar el evento:", error.message);
+                setErroresGenerales((prevErrores) => [
+                    ...prevErrores,
+                    "Error al cargar los datos del evento. Intenta nuevamente.",
+                ]);
+            });
     }, [id]);
 
     // Función para limpiar el input de texto o número
@@ -121,7 +130,7 @@ export default function EditarEvento() {
             valido = false;
         }
 
-        setErrores(nuevosErrores);
+        setErroresFormulario(nuevosErrores);
         return valido;
     };
     
@@ -179,11 +188,17 @@ export default function EditarEvento() {
                 navigate("/eventos");
             } else {
                 const errorData = await response.text();
-                setErrores({ general: errorData });
+                setErroresGenerales((prevErrores) => [
+                    ...prevErrores,
+                    errorData || "Error al actualizar el evento. Intenta nuevamente.",
+                ]);
             }
         } catch (error) {
-            console.error("Error al editar el evento:", error);
-            setErrores({ general: "Hubo un error al intentar actualizar el evento. Inténtalo más tarde." });
+            console.error("Error al editar el evento:", error.message);
+            setErroresGenerales((prevErrores) => [
+                ...prevErrores,
+                "Hubo un error al intentar actualizar el evento. Inténtalo más tarde.",
+            ]);
         }
     };
 
@@ -192,10 +207,8 @@ export default function EditarEvento() {
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Editar Evento</h1>
 
-                {errores.general && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <strong className="font-bold">Error!</strong>
-                    <span className="block sm:inline">{errores.general}</span>
-                </div>}
+                {/* Mostrar errores generales */}
+                {erroresGenerales.length > 0 && <MensajesDeErrores messages={erroresGenerales} />}
 
                 <form onSubmit={manejarEnvio} className="space-y-4">
                     <div>
@@ -208,7 +221,7 @@ export default function EditarEvento() {
                             required
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.nombre && <p className="text-red-500 text-xs italic">{errores.nombre}</p>}
+                        {erroresFormulario.nombre && <p className="text-red-500 text-xs italic">{erroresFormulario.nombre}</p>}
                     </div>
 
                     <div>
@@ -221,7 +234,7 @@ export default function EditarEvento() {
                             required
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.fecha && <p className="text-red-500 text-xs italic">{errores.fecha}</p>}
+                        {erroresFormulario.fecha && <p className="text-red-500 text-xs italic">{erroresFormulario.fecha}</p>}
                     </div>
 
                     <div>
@@ -234,7 +247,7 @@ export default function EditarEvento() {
                             required
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.cantidadPersonas && <p className="text-red-500 text-xs italic">{errores.cantidadPersonas}</p>}
+                        {erroresFormulario.cantidadPersonas && <p className="text-red-500 text-xs italic">{erroresFormulario.cantidadPersonas}</p>}
                     </div>
 
                     <div>
@@ -247,7 +260,7 @@ export default function EditarEvento() {
                             required
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.espacio && <p className="text-red-500 text-xs italic">{errores.espacio}</p>}
+                        {erroresFormulario.espacio && <p className="text-red-500 text-xs italic">{erroresFormulario.espacio}</p>}
                     </div>
 
                     <div>
@@ -263,7 +276,7 @@ export default function EditarEvento() {
                             <option value="TARDE">TARDE</option>
                             <option value="NOCHE">NOCHE</option>
                         </select>
-                        {errores.horario && <p className="text-red-500 text-xs italic">{errores.horario}</p>}
+                        {erroresFormulario.horario && <p className="text-red-500 text-xs italic">{erroresFormulario.horario}</p>}
                     </div>
 
                     <div>
@@ -276,7 +289,7 @@ export default function EditarEvento() {
                             required
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         />
-                        {errores.hora && <p className="text-red-500 text-xs italic">{errores.hora}</p>}
+                        {erroresFormulario.hora && <p className="text-red-500 text-xs italic">{erroresFormulario.hora}</p>}
                     </div>
 
                     <div>
@@ -293,7 +306,7 @@ export default function EditarEvento() {
                             <option value="CANCELADO">CANCELADO</option>
                             <option value="FINALIZADO">FINALIZADO</option>
                         </select>
-                        {errores.estado && <p className="text-red-500 text-xs italic">{errores.estado}</p>}
+                        {erroresFormulario.estado && <p className="text-red-500 text-xs italic">{erroresFormulario.estado}</p>}
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 justify-end">

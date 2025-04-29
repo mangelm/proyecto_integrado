@@ -1,57 +1,60 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 export default function AsignarProducto() {
     const { id } = useParams(); // Extrae el ID del evento de la URL
     const [productos, setProductos] = useState([]); // Estado para almacenar los productos
     const [productoSeleccionado, setProductoSeleccionado] = useState(""); // Estado para almacenar el producto seleccionado
     const [evento, setEvento] = useState(null); // Estado para almacenar el evento
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
     const navegar = useNavigate(); // Hook para navegar entre rutas
 
     // Cargar los productos y el evento al montar el componente
     useEffect(() => {
         // Cargar los productos
         fetch("http://localhost:8100/api/productos/todos")
-            // Realiza una solicitud GET a la API para obtener todos los productos
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al cargar productos: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then((productosData) => {
-                // Si la respuesta es un array, lo asignamos al estado de productos
                 if (Array.isArray(productosData)) {
                     setProductos(productosData);
                 } else {
-                    console.error("La respuesta de productos no es un array:", productosData);
-                    setProductos([]);
+                    throw new Error("La respuesta de productos no es un array válido.");
                 }
             })
             .catch((error) => {
-                console.error("Error fetching productos:", error);
-                setProductos([]);
+                console.error("Error al cargar productos:", error.message);
+                setErrores((prevErrores) => [...prevErrores, "Error al cargar los productos. Intenta nuevamente."]);
             });
 
-        /// Cargar el evento específico
+        // Cargar el evento específico
         fetch(`http://localhost:8100/api/eventos/${id}`)
-            .then((response) => response.json())
-            .then((eventoData) => {
-                setEvento(eventoData); // Establecemos el evento
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al cargar evento: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
             })
-            .catch((error) => console.error("Error fetching evento:", error));
+            .then((eventoData) => {
+                setEvento(eventoData);
+            })
+            .catch((error) => {
+                console.error("Error al cargar evento:", error.message);
+                setErrores((prevErrores) => [...prevErrores, "Error al cargar el evento. Intenta nuevamente."]);
+            });
     }, [id]);
 
-    /*
-        Función para manejar la asignación del producto al evento.
-        Se encarga de validar la selección del producto y enviar la solicitud a la API. 
-        Si no se selecciona un producto, muestra una alerta.
-        Si se selecciona un producto, envía una solicitud POST a la API para asignar el producto al evento.
-        Si la asignación es exitosa, muestra una alerta de éxito.
-        Si ocurre un error, lo muestra en la consola.
-    */
     const manejoAsignarProducto = () => {
         if (!productoSeleccionado) {
             alert("Por favor, selecciona un producto.");
             return;
         }
 
-        // Lógica para asignar el producto al evento (sin cantidad)
         const productoElegido = {
             productoId: productoSeleccionado,
         };
@@ -63,15 +66,26 @@ export default function AsignarProducto() {
                 "Content-Type": "application/json",
             },
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al asignar producto: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(() => {
                 alert("Producto asignado con éxito");
             })
-            .catch((error) => console.error("Error al asignar producto:", error));
+            .catch((error) => {
+                console.error("Error al asignar producto:", error.message);
+                setErrores((prevErrores) => [...prevErrores, "Error al asignar el producto. Intenta nuevamente."]);
+            });
     };
 
     return (
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+            {/* Mostrar errores */}
+            {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
             {/* Información del evento */}
             {evento && (
                 <div className="mb-4 text-center">

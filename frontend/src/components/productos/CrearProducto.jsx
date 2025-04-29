@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 export default function CrearProducto() {
     const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre del producto
@@ -8,14 +9,9 @@ export default function CrearProducto() {
     const [impuesto, setImpuesto] = useState(""); // Estado para almacenar el impuesto del producto
     const [disponible, setDisponible] = useState(false); // Estado para almacenar la disponibilidad del producto
     const [categoria, setCategoria] = useState("BEBIDA"); // Estado para almacenar la categoría del producto
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
     const navegar = useNavigate(); // Hook para navegar entre rutas
 
-    /* 
-        Función para sanitizar la entrada del usuario.
-        Permite solo letras, números y espacios para el nombre y la descripción.
-        Permite solo números para el precio y el impuesto.
-        Permite solo un punto decimal para el precio y el impuesto.
-    */
     const sanitizeInput = (value, type) => {
         if (type === "text") {
             return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
@@ -25,23 +21,18 @@ export default function CrearProducto() {
         }
         return value;
     };
-    
-    // Sanitiza el valor del precio y el impuesto para permitir solo números y un punto decimal
-    // Reemplaza cualquier carácter que no sea un número o un punto decimal
+
     const sanitizeDecimal = (value) => {
         return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1"); // Permite solo un punto decimal
     };
 
-    // Función para manejar el envío del formulario
-    // Se encarga de crear un nuevo producto y enviarlo a la API
     const manejarEnvio = async (e) => {
         e.preventDefault();
 
-        // Sanitiza los valores de entrada
         const nuevoProducto = {
             nombre: sanitizeInput(nombre, "text"),
             descripcion: sanitizeInput(descripcion, "text"),
-            precio: parseFloat(precio) || 0, 
+            precio: parseFloat(precio) || 0,
             impuesto: parseFloat(impuesto) || 0,
             disponible,
             categoria,
@@ -54,52 +45,48 @@ export default function CrearProducto() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(nuevoProducto),
-                credentials: 'same-origin',
-                // Incluye las credenciales de la sesión (cookies) en la solicitud
+                credentials: "same-origin",
             });
 
-            console.log("Respuesta:", response);
             if (response.ok) {
                 navegar("/productos");
             } else {
                 const errorData = await response.text();
-                console.log("Error en la respuesta:", errorData);
-                throw new Error(errorData || 'Error al crear el producto');
+                throw new Error(errorData || "Error al crear el producto");
             }
         } catch (error) {
-            console.error("Error al crear el producto:", error);
-            alert("Error al crear el producto. Verifica la consola para más detalles.");
+            console.error("Error al crear el producto:", error.message);
+            setErrores((prevErrores) => [
+                ...prevErrores,
+                "Error al crear el producto. Intenta nuevamente más tarde.",
+            ]);
         }
     };
-    
 
     return (
         <div className="p-4 sm:p-6 md:p-8 lg:p-10 bg-white rounded-lg shadow-md max-w-md sm:max-w-lg md:max-w-xl mx-auto">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Crear Producto</h1>
-            <form
-                onSubmit={manejarEnvio}
-                className="space-y-4"
-            >
+
+            {/* Mostrar errores */}
+            {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
+            <form onSubmit={manejarEnvio} className="space-y-4">
                 <div>
-                    <label
-                        htmlFor="nombre"
-                        className="block text-sm sm:text-md font-medium"
-                    >
+                    <label htmlFor="nombre" className="block text-sm sm:text-md font-medium">
                         Nombre
                     </label>
                     <input
-                        type="text" id="nombre"
+                        type="text"
+                        id="nombre"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
                         required
-                        className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md" />
+                        className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
+                    />
                 </div>
 
                 <div>
-                    <label
-                        htmlFor="descripcion"
-                        className="block text-sm sm:text-md font-medium"
-                    >
+                    <label htmlFor="descripcion" className="block text-sm sm:text-md font-medium">
                         Descripción
                     </label>
                     <input
@@ -114,10 +101,7 @@ export default function CrearProducto() {
 
                 <div className="sm:grid sm:grid-cols-2 sm:gap-4">
                     <div>
-                        <label
-                            htmlFor="precio"
-                            className="block text-sm sm:text-md font-medium"
-                        >
+                        <label htmlFor="precio" className="block text-sm sm:text-md font-medium">
                             Precio
                         </label>
                         <input
@@ -131,10 +115,7 @@ export default function CrearProducto() {
                     </div>
 
                     <div>
-                        <label
-                            htmlFor="impuesto"
-                            className="block text-sm sm:text-md font-medium"
-                        >
+                        <label htmlFor="impuesto" className="block text-sm sm:text-md font-medium">
                             Impuesto
                         </label>
                         <input
@@ -156,11 +137,15 @@ export default function CrearProducto() {
                         onChange={(e) => setDisponible(e.target.checked)}
                         className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring focus:ring-blue-200"
                     />
-                    <label htmlFor="disponible" className="text-sm sm:text-md font-medium">Disponible</label>
+                    <label htmlFor="disponible" className="text-sm sm:text-md font-medium">
+                        Disponible
+                    </label>
                 </div>
 
                 <div>
-                    <label htmlFor="categoria" className="block text-sm sm:text-md font-medium">Categoría</label>
+                    <label htmlFor="categoria" className="block text-sm sm:text-md font-medium">
+                        Categoría
+                    </label>
                     <select
                         id="categoria"
                         value={categoria}

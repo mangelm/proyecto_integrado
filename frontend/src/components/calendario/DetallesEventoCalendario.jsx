@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores"; // Importa el componente para mostrar errores generales.
 
 export default function DetallesEventoCalendario() {
     const { id } = useParams(); // Obtiene el parámetro 'id' de la URL, que identifica el evento a mostrar.
@@ -10,14 +11,20 @@ export default function DetallesEventoCalendario() {
     const [horario, setHorario] = useState(""); // Estado para el horario del evento (MAÑANA, TARDE, NOCHE), inicializado como una cadena vacía.
     const [hora, setHora] = useState(""); // Estado para la hora específica del evento, inicializado como una cadena vacía.
     const [estado, setEstado] = useState(""); // Estado para el estado del evento, inicializado como una cadena vacía.
+    const [erroresGenerales, setErroresGenerales] = useState([]); // Estado para manejar errores generales.
 
     // useEffect se ejecuta después de cada renderizado del componente.
     useEffect(() => {
         // Realiza una petición fetch a la API para obtener los detalles del evento específico usando el 'id' de la URL.
         fetch(`http://localhost:8100/api/eventos/${id}`, {
-            credentials: 'include' // Incluye las credenciales (como cookies) en la petición si es necesario.
+            credentials: "include", // Incluye las credenciales (como cookies) en la petición si es necesario.
         })
-            .then((response) => response.json()) // Convierte la respuesta de la API a formato JSON.
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                return response.json(); // Convierte la respuesta de la API a formato JSON.
+            })
             .then((data) => {
                 // Actualiza los estados del componente con los datos recibidos del evento.
                 setNombre(data.nombre);
@@ -28,14 +35,23 @@ export default function DetallesEventoCalendario() {
                 setHora(data.hora);
                 setEstado(data.estado);
             })
-            .catch((error) => console.error("Error al cargar el evento:", error)); // Captura y muestra cualquier error ocurrido durante la petición.
+            .catch((error) => {
+                console.error("Error al cargar el evento:", error); // Captura y muestra cualquier error ocurrido durante la petición.
+                setErroresGenerales((prev) => [
+                    ...prev,
+                    "No se pudo cargar la información del evento. Inténtalo de nuevo más tarde.",
+                ]);
+            });
     }, [id]); // El efecto se ejecuta de nuevo si el valor de 'id' cambia.
 
     // Renderiza los detalles del evento.
     return (
         <div className="max-w-lg mx-auto p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md text-center">
             <h1 className="text-2xl font-semibold text-gray-800 mb-4 md:text-3xl">Detalles del Evento</h1>
-            
+
+            {/* Mostrar errores generales con MensajesDeErrores */}
+            {erroresGenerales.length > 0 && <MensajesDeErrores messages={erroresGenerales} />}
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="flex flex-col">
                     <label className="text-sm font-medium text-gray-700 mb-1">Nombre</label>

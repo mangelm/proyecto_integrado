@@ -10,7 +10,7 @@ export default function GestionEventos() {
   const [totalPages, setTotalPages] = useState(0); // Estado para almacenar el número total de páginas disponibles.
   const [cargando, setcargando] = useState(true); // Estado para indicar si los datos están en proceso de carga.
   const [productosEventos, setProductosEventos] = useState({}); // Estado para almacenar los productos consumidos por cada evento. La clave es el ID del evento.
-  const [errorEliminar, setErrorEliminar] = useState(null); // Estado para almacenar cualquier error ocurrido durante la eliminación de un evento.
+  const [errores, setErrores] = useState([]); // Estado para manejar errores
 
   // Estados para los filtros
   const [filtroEspacio, setFiltroEspacio] = useState(""); // Estado para almacenar el texto de filtro por espacio.
@@ -47,18 +47,27 @@ export default function GestionEventos() {
             else {
               console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, response.status);
               productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
+              setErrores((prevErrores) => [
+                ...prevErrores,
+                `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
+              ]);
             }
           } 
           // Captura cualquier error durante la petición.
           catch (error) {
             console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, error);
             productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
+            setErrores((prevErrores) => [
+              ...prevErrores,
+              `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
+            ]);
           }
         }
         setProductosEventos(productosPorEvento); // Actualiza el estado 'productosEventos' con los datos obtenidos.
       })
       .catch((error) => {
-        console.error("Error fetching eventos:", error); // Muestra un error en la consola si falla la petición inicial de eventos.
+        console.error("Error al obtener eventos:", error); // Muestra un error en la consola si falla la petición inicial de eventos.
+        setErrores((prevErrores) => [...prevErrores, "Error al obtener los eventos. Intenta nuevamente."]);
       })
       .finally(() => {
         setcargando(false); // Indica que la carga de eventos ha finalizado.
@@ -113,7 +122,6 @@ export default function GestionEventos() {
   const manejoBorrar = (id) => {
     // Muestra una confirmación al usuario antes de eliminar.
     if (window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
-        setErrorEliminar(null); // Limpiar cualquier error previo
         fetch(`http://localhost:8100/api/eventos/${id}`, {
             method: "DELETE", // Utiliza el método DELETE para eliminar el evento.
         })
@@ -125,13 +133,14 @@ export default function GestionEventos() {
                 } 
                 // Si la eliminación falla.
                 else {
-                    // Lee el cuerpo de la respuesta para obtener más detalles del error.
-                    return response.text().then(texto => { throw new Error(texto || "Error al eliminar el evento."); });
+                  return response.text().then((texto) => {
+                    throw new Error(texto || "Error al eliminar el evento.");
+                  });
                 }
             })
             .catch((error) => {
                 console.error("Error al eliminar el evento:", error); // Muestra el error en la consola.
-                setErrorEliminar(`Error al eliminar el evento: ${error.message}`); // Actualiza el estado de error para mostrar un mensaje al usuario.
+                setErrores((prevErrores) => [...prevErrores, "Error al eliminar el evento"]); // Actualiza el estado de error para mostrar un mensaje al usuario.
             });
     }
   };
@@ -149,6 +158,9 @@ export default function GestionEventos() {
       {/* Título de la sección con estilos para el tamaño de la fuente, peso, color y centrado. */}
       <h1 className="text-2xl font-semibold text-gray-900 text-center mb-4 md:text-3xl">Gestión de Eventos</h1>
 
+      {/* Mostrar errores */}
+      {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
       {/* Contenedor para el botón de creación de eventos*/}
       <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
         {/* Enlace a la página de creación de eventos. */}
@@ -158,16 +170,6 @@ export default function GestionEventos() {
           </button>
         </Link>
       </div>
-
-    {/* Muestra un mensaje de error si 'errorEliminar' tiene un valor. */}
-    {errorEliminar && (
-      // Contenedor para el mensaje de error
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong className="font-bold">Error!</strong>
-         {/* Muestra el mensaje de error. */}
-        <span className="block sm:inline">{errorEliminar}</span>
-      </div>
-    )}
 
     {/* Sección de Filtros */}
     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">

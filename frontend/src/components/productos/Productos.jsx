@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 export default function GestionProductos() {
     const [productos, setProductos] = useState([]); // Estado para almacenar los productos
     const [page, setPage] = useState(0); // Estado para almacenar la página actual
-    const [size] = useState(5); // Estado para almacenar el tamaño de la página (número de productos por página)
+    const [size] = useState(10); // Estado para almacenar el tamaño de la página (número de productos por página)
     const [valorPaginacion] = useState(2); // Estado para almacenar el valor de paginación (número de páginas a avanzar o retroceder)
     const [totalPages, setTotalPages] = useState(0); // Estado para almacenar el número total de páginas
     const [cargando, setCargando] = useState(false); // Estado para indicar si los productos están siendo cargados
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
 
     // Filtros
     const [filtroNombre, setFiltroNombre] = useState(""); // Estado para almacenar el filtro de nombre
@@ -15,34 +17,38 @@ export default function GestionProductos() {
 
     useEffect(() => {
         setCargando(true);
-        // Realiza una solicitud a la API para obtener los productos paginados
-        // y actualiza el estado de productos y totalPages
         fetch(`http://localhost:8100/api/productos?page=${page}&size=${size}`)
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al obtener productos: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then((data) => {
                 setProductos(data.content);
                 setTotalPages(data.totalPages);
             })
-            .catch((error) => console.error("Error fetching productos:", error))
+            .catch((error) => {
+                console.error("Error fetching productos:", error.message);
+                setErrores((prevErrores) => [...prevErrores, "Error al obtener los productos."]);
+            })
             .finally(() => setCargando(false));
     }, [page, size]);
 
     // Filtrar productos
     const productosFiltrados = productos.filter((producto) => {
-        // Verifica si el nombre del producto incluye el filtro de nombre
-        // y si la categoría del producto coincide con el filtro de categoría
         const coincideNombre = producto.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
         const coincideCategoria = filtroCategoria === "" || producto.categoria === filtroCategoria;
         return coincideNombre && coincideCategoria;
     });
 
     // Manejo de paginación
-    const manejoPaginaPrevia = () => page > 0 && setPage(page - 1); // Retrocede una página
-    const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1); // Avanza una página
-    const manejoPrimeraPagina = () => setPage(0); // Regresa a la primera página
-    const manejoUltimaPagina = () => setPage(totalPages - 1); // Regresa a la última página
-    const manejoSiguienteValor = () => setPage(valorPrevio => Math.min(valorPrevio + valorPaginacion, totalPages - 1)); // Avanza un número específico de páginas
-    const manejoValorPrevio = () => setPage(valorPrevio => Math.max(valorPrevio - valorPaginacion, 0)); // Retrocede un número específico de páginas
+    const manejoPaginaPrevia = () => page > 0 && setPage(page - 1);
+    const manejoSiguentePagina = () => page < totalPages - 1 && setPage(page + 1);
+    const manejoPrimeraPagina = () => setPage(0);
+    const manejoUltimaPagina = () => setPage(totalPages - 1);
+    const manejoSiguienteValor = () => setPage((valorPrevio) => Math.min(valorPrevio + valorPaginacion, totalPages - 1));
+    const manejoValorPrevio = () => setPage((valorPrevio) => Math.max(valorPrevio - valorPaginacion, 0));
 
     // Eliminar producto
     const manejoBorrar = (id) => {
@@ -55,10 +61,13 @@ export default function GestionProductos() {
                         setProductos(productos.filter((producto) => producto.id !== id));
                         alert("Producto eliminado con éxito");
                     } else {
-                        alert("Error al eliminar el producto.");
+                        throw new Error("Error al eliminar el producto.");
                     }
                 })
-                .catch((error) => console.error("Error al eliminar el producto:", error));
+                .catch((error) => {
+                    console.error("Error al eliminar el producto:", error.message);
+                    setErrores((prevErrores) => [...prevErrores, "Error al eliminar el producto."]);
+                });
         }
     };
 
@@ -70,9 +79,11 @@ export default function GestionProductos() {
         <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-md max-w-7xl mx-auto">
             <h1 className="text-xl font-bold mb-4 sm:text-2xl md:text-3xl text-center">Gestión de Productos</h1>
 
+            {/* Mostrar errores */}
+            {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
             {/* Filtros */}
             <div className="mb-4 flex flex-wrap gap-2 sm:gap-4 items-center justify-between">
-
                 <input
                     type="text"
                     placeholder="Buscar por nombre"
@@ -105,14 +116,12 @@ export default function GestionProductos() {
             {/* Tabla de Productos */}
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
-
                     <thead className="bg-gray-100 hidden md:table-header-group">
                         <tr>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Descripción</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Precio</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Impuesto</th>
-                            <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Total</th> {/* Nueva columna */}
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Disponible</th>
                             <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Categoría</th>
                             <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
@@ -120,63 +129,28 @@ export default function GestionProductos() {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
-                        {/* // Mapea los productos filtrados y muestra cada uno en una fila de la tabla
-                        // Si no hay productos, muestra un mensaje indicando que no hay productos disponibles */}
                         {productosFiltrados.length > 0 ? (
                             productosFiltrados.map((producto) => (
                                 <tr key={producto.id} className="hover:bg-gray-50 md:table-row">
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Nombre</span>
-                                            <span>{producto.nombre}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.nombre}</div>
+                                        {producto.nombre}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Descripción</span>
-                                            <span>{producto.descripcion}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.descripcion}</div>
+                                        {producto.descripcion}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Precio</span>
-                                            <span>{producto.precio}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.precio}</div>
+                                        {producto.precio}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Impuesto</span>
-                                            <span>{producto.impuesto}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.impuesto}</div>
-                                    </td>
-                                    {/* Nueva columna para mostrar el total (precio + impuesto) */}
-                                    <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Total</span>
-                                            <span>{(producto.precio + producto.impuesto).toFixed(2)}</span>
-                                        </div>
-                                        <div className="hidden md:block">{(producto.precio + producto.impuesto).toFixed(2)}</div> {/* Cálculo del total */}
+                                        {producto.impuesto}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Disponible</span>
-                                            <span>{producto.disponible ? 'Sí' : 'No'}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.disponible ? 'Sí' : 'No'}</div>
+                                        {producto.disponible ? "Sí" : "No"}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden flex justify-between">
-                                            <span className="font-semibold text-gray-700">Categoria</span>
-                                            <span>{producto.categoria}</span>
-                                        </div>
-                                        <div className="hidden md:block">{producto.categoria}</div>
+                                        {producto.categoria}
                                     </td>
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
-                                        <div className="md:hidden font-semibold text-center">Acciones</div>
                                         <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
                                             <Link to={`/productos/editar-producto/${producto.id}`}>
                                                 <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">

@@ -1,245 +1,318 @@
 import { useState } from "react";
-import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import { Bar } from "react-chartjs-2";
 import { Link } from "react-router-dom";
+import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
-// Componentes y librerias necesarios para los gráficos
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function EstadisticasOcupacionFechas() {
+export default function AnalisisConsumoFechas() {
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFinal, setFechaFinal] = useState("");
-    const [estadisticas, setEstadisticas] = useState([]);
-    const [horariosUnicos, setHorariosUnicos] = useState([]);
-    const [horarioSeleccionado, setHorarioSeleccionado] = useState("");
-    const [cargando, setCargando] = useState(false);
-    const [error, setError] = useState(null);
-    const [graficoHorariosMasSolicitados, setGraficoHorariosMasSolicitados] = useState(null);
-    const [mostrarGraficoHorarios, setMostrarGraficoHorarios] = useState(false);
-    const [graficoDiasMasSolicitados, setGraficoDiasMasSolicitados] = useState(null);
-    const [mostrarGraficoDias, setMostrarGraficoDias] = useState(false);
+    const [datos, setDatos] = useState(null);
+    const [datosPorHorario, setDatosPorHorario] = useState(null);
+    const [datosPorPersonas, setDatosPorPersonas] = useState(null);
+    const [datosPromedioPorPersona, setDatosPromedioPorPersona] = useState(null);
+    const [errores, setErrores] = useState([]); // Estado para manejar errores
 
-    const [mostrarGraficoPrincipal, setMostrarGraficoPrincipal] = useState(true);
+    // Controlar visibilidad de los gráficos
+    const [mostrarGraficoTotal, setMostrarGraficoTotal] = useState(false);
+    const [mostrarGraficoHorario, setMostrarGraficoHorario] = useState(false);
+    const [mostrarGraficoPorPersonas, setMostrarGraficoPorPersonas] = useState(false);
+    const [mostrarGraficoPromedio, setMostrarGraficoPromedio] = useState(false);
 
-    const manejoCambioFechaInicio = (e) => setFechaInicio(e.target.value);
-    const manejoCambioFechaFinal = (e) => setFechaFinal(e.target.value);
-    const manejoCambioHorario = (e) => setHorarioSeleccionado(e.target.value);
-
-    //Haciendo peticion para enviar los datos
-    const manejoEnvio = async (e) => {
+    // Enviamos la petición para obtener los datos de consumo de productos
+    const fetchConsumo = async (e) => {
         e.preventDefault();
-        setError(null);
-        setEstadisticas([]);
-        setGraficoHorariosMasSolicitados(null);
-    
-        if (new Date(fechaInicio) > new Date(fechaFinal)) {
-            setError("La fecha de inicio no puede ser posterior a la fecha final.");
-            return;
-        }
-    
-        setCargando(true);
+        setErrores([]);
+        if (!fechaInicio || !fechaFinal) return;
         try {
-            //Enviamos los filtros de las fechas al servidor para que nos devuelva los datos que queremos
-            const response = await fetch(`http://localhost:8100/api/estadisticas/ocupacion?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            const response = await fetch(`http://localhost:8100/api/estadisticas/productos?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
             if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${await response.text()}`);
+                throw new Error(`Error al obtener datos: ${response.status}`);
             }
             const data = await response.json();
-            setEstadisticas(data);
-
-            const horarios = [...new Set(data.map(item => item.horario))];
-            setHorariosUnicos(horarios);
-            setHorarioSeleccionado(horarios[0] || "");
-    
-            // Calcular horarios más solicitados
-            calcularHorariosMasSolicitados(data);
-    
-            // Calcular días más solicitados
-            calcularDiasMasSolicitados(data);
-    
+            setDatos(data);
         } catch (error) {
-            setError(error.message);
-        } finally {
-            setCargando(false);
+            console.error("Error al obtener datos", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos: ${error.message}`]);
         }
     };
-    
-    //Para ocultar el primer gráfico
-    const manejoBotonClickPrincipal = () => {
-        setMostrarGraficoPrincipal(prev => !prev);
+
+    // Enviamos la petición para obtener los datos de consumo por horario
+    const fetchConsumoPorHorario = async () => {
+        setErrores([]);
+        if (!fechaInicio || !fechaFinal) return;
+        try {
+            const response = await fetch(`http://localhost:8100/api/estadisticas/productos-horario?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener datos por horario: ${response.status}`);
+            }
+            const data = await response.json();
+            setDatosPorHorario(data);
+        } catch (error) {
+            console.error("Error al obtener datos por horario", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos por horario: ${error.message}`]);
+        }
     };
 
-    //Funcion que calcula los horarios con mas eventos y guardo los datos para luego ser tratados y utilizados para generar el gráfico
-    const calcularHorariosMasSolicitados = (data) => {
-        const horariosSolicitados = data.reduce((acc, item) => {
-            const horario = item.horario;
-            acc[horario] = (acc[horario] || 0) + 1;
+    // Enviamos la petición para obtener los productos más consumidos por cantidad de personas
+    const fetchConsumoPorPersonas = async (e) => {
+        e.preventDefault();
+        setErrores([]);
+        if (!fechaInicio || !fechaFinal) return;
+        try {
+            const response = await fetch(`http://localhost:8100/api/estadisticas/productos-personas?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener datos por cantidad de personas: ${response.status}`);
+            }
+            const data = await response.json();
+            setDatosPorPersonas(data);
+        } catch (error) {
+            console.error("Error al obtener datos por cantidad de personas", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener datos por cantidad de personas: ${error.message}`]);
+        }
+    };
+
+    // Petición para obtener el promedio de consumo por persona
+    const fetchPromedioPorPersona = async (e) => {
+        e.preventDefault();
+        setErrores([]);
+        if (!fechaInicio || !fechaFinal) return;
+        try {
+            const response = await fetch(`http://localhost:8100/api/estadisticas/productos-promedio-personas?fechaInicio=${fechaInicio}&fechaFinal=${fechaFinal}`);
+            if (!response.ok) {
+                throw new Error(`Error al obtener promedio por persona: ${response.status}`);
+            }
+            const text = await response.text();
+            const data = text ? JSON.parse(text) : [];
+            setDatosPromedioPorPersona(data);
+        } catch (error) {
+            console.error("Error al obtener datos de promedio por persona:", error);
+            setErrores((prevErrores) => [...prevErrores, `Error al obtener promedio por persona: ${error.message}`]);
+        }
+    };
+
+    // Creación de datos para Cantidad Consumida Total
+    const chartData = datos
+    ? {
+            labels: datos.map((p) => p.nombre),
+            datasets: [
+                {
+                    label: "Cantidad Consumida Total",
+                    data: datos.map((p) => p.totalConsumido),
+                    backgroundColor: "rgba(54, 162, 235, 0.6)",
+                },
+            ],
+        }
+    : null;
+
+    // Función para agrupar los datos por producto y horario
+    const agruparPorProductoYHorario = (datos) => {
+        const productosAgrupados = datos.reduce((acc, item) => {
+            if (!acc[item.nombre]) {
+                acc[item.nombre] = { MAÑANA: 0, TARDE: 0, NOCHE: 0 };
+            }
+            acc[item.nombre][item.horario] += item.totalConsumido;
             return acc;
         }, {});
 
-        const horariosOrdenados = Object.entries(horariosSolicitados).sort((a, b) => b[1] - a[1]);
-        const topHorarios = horariosOrdenados.slice(0, 5); // Los 5 horarios más solicitados
+        return productosAgrupados;
+    };
 
-        const labels = topHorarios.map(horario => horario[0]); // Horarios
-        const dataHorarios = topHorarios.map(horario => horario[1]); // Conteo de solicitudes
-        
-        //Datos tratados para generar el gráfico
-        setGraficoHorariosMasSolicitados({
-            labels: labels,
+    // Datos para el gráfico por horario
+    const chartDataHorario = datosPorHorario
+        ? {
+            labels: Object.keys(agruparPorProductoYHorario(datosPorHorario)),
             datasets: [
                 {
-                    label: 'Horarios más solicitados',
-                    data: dataHorarios,
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    borderWidth: 1
-                }
-            ]
-        });
-    };
-    
-    //Funcion que calcula los dias mas solicitados y guardo los datos para luego ser tratados y utilizados para generar el gráfico
-    const calcularDiasMasSolicitados = (data) => {
-        const diasSolicitados = data.reduce((acc, item) => {
-            const fecha = item.fecha;
-            const fechaStr = new Date(fecha).toLocaleDateString('es-ES'); // 'dd/MM/yyyy'
-            acc[fechaStr] = (acc[fechaStr] || 0) + 1;
-            return acc;
-        }, {});
-        
-        const diasOrdenados = Object.entries(diasSolicitados).sort((a, b) => b[1] - a[1]);
-        const topDias = diasOrdenados.slice(0, 5); // Los 5 días más solicitados
-        
-        const labels = topDias.map(dia => dia[0]);  // Fechas formateadas
-        const dataDias = topDias.map(dia => dia[1]);  // Conteo de eventos
-        
-        setGraficoDiasMasSolicitados({
-            labels: labels,
+                    label: "MAÑANA",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.MAÑANA),
+                    backgroundColor: "rgba(255, 159, 64, 0.6)",
+                },
+                {
+                    label: "TARDE",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.TARDE),
+                    backgroundColor: "rgba(54, 162, 235, 0.6)",
+                },
+                {
+                    label: "NOCHE",
+                    data: Object.values(agruparPorProductoYHorario(datosPorHorario)).map((item) => item.NOCHE),
+                    backgroundColor: "rgba(75, 192, 192, 0.6)",
+                },
+            ],
+        }
+    : null;
+
+    // Datos para el gráfico de cantidad de personas
+    const chartDataPorPersonas = datosPorPersonas
+    ? {
+            labels: datosPorPersonas.map((p) => p.nombre),
             datasets: [
                 {
-                    label: 'Días más solicitados',
-                    data: dataDias,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }
-            ]
-        });
-    };    
-    
-    //Renderizando para motrar el gráfico de cuantos eventos hay en ciertos espacios dentro del rango de fechas introducido
-    const renderChart = () => {
-        if (!estadisticas.length || !horarioSeleccionado) return null;
+                    label: "Cantidad de Personas que Consumen el Producto",
+                    data: datosPorPersonas.map((p) => p.cantidadPersonas),
+                    backgroundColor: "rgba(75, 192, 192, 0.6)",
+                },
+            ],
+        }
+    : null;
 
-        const datosFiltrados = estadisticas.filter(item => item.horario === horarioSeleccionado);
-        const espaciosUnicos = [...new Set(datosFiltrados.map(item => item.espacio))];
-
-        const datasets = espaciosUnicos.map(espacio => {
-            const totalEventos = datosFiltrados.find(item => item.espacio === espacio)?.totalEventos || 0;
-            return {
-                label: espacio,
-                data: [totalEventos],
-                backgroundColor: colorAleatorio(),
-                borderColor: 'rgba(0, 0, 0, 0.1)',
-                borderWidth: 1
-            };
-        });
-
-        return (
-            <Bar
-                data={{ labels: [horarioSeleccionado], datasets }}
-                options={{ responsive: true, maintainAspectRatio: false }}
-            />
-        );
-    };
-
-    //Renderizando para motrar el gráfico de cuantos horarios estan mas solicitados
-    const renderGraficoHorariosMasSolicitados = () => {
-        if (!graficoHorariosMasSolicitados) return null;
-        return (
-            <div className="w-full h-96 mt-6">
-                <Bar data={graficoHorariosMasSolicitados} options={{ responsive: true, maintainAspectRatio: false }} />
-            </div>
-        );
-    };
-
-    //Renderizando para motrar el gráfico de que dias estan mas solicitados
-    const renderGraficoDiasMasSolicitados = () => {
-        if (!graficoDiasMasSolicitados) return null;
-        return (
-            <div className="w-full h-96 mt-6">
-                <Bar data={graficoDiasMasSolicitados} options={{ responsive: true, maintainAspectRatio: false }} />
-            </div>
-        );
-    };
-    
-
-    const manejoBotonClickHorarios = () => {
-        setMostrarGraficoHorarios(prev => !prev);
-    };
+    // Datos para el gráfico del promedio de consumo por persona
+    const chartDataPromedioPorPersona = datosPromedioPorPersona
+    ? {
+            labels: datosPromedioPorPersona.map((p) => p.producto),
+            datasets: [
+                {
+                    label: "Promedio de Consumo por Persona",
+                    data: datosPromedioPorPersona.map((p) => p.consumoPromedio),
+                    backgroundColor: "rgba(255, 99, 132, 0.6)",
+                },
+            ],
+        }
+    : null;
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
             <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
-                <h2 className="text-xl font-semibold text-center mb-4">Generar Estadísticas</h2>
-                {/* Donde introducidemos las fechas por las que filtraremos  */}
-                <form onSubmit={manejoEnvio} className="space-y-4">
-                    <input type="date" value={fechaInicio} onChange={manejoCambioFechaInicio} required className="w-full p-2 border rounded" />
-                    <input type="date" value={fechaFinal} onChange={manejoCambioFechaFinal} required className="w-full p-2 border rounded" />
-                    <button type="submit" disabled={!fechaInicio || !fechaFinal || cargando} className="w-full p-2 bg-blue-500 text-white rounded">{cargando ? "Generando..." : "Generar Estadísticas"}</button>
+                <h2 className="text-xl font-semibold text-center mb-4">Generar Análisis</h2>
+
+                {/* Mostrar errores */}
+                {errores.length > 0 && <MensajesDeErrores messages={errores} />}
+
+                <form onSubmit={fetchConsumo} className="space-y-4">
+                    <input
+                        type="date"
+                        value={fechaInicio}
+                        onChange={(e) => setFechaInicio(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        type="date"
+                        value={fechaFinal}
+                        onChange={(e) => setFechaFinal(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
+                    />
+                    <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
+                        Generar
+                    </button>
                 </form>
+
+                {/* Botón para mostrar/ocultar el gráfico de consumo total */}
+                {chartData && (
+                    <button
+                        onClick={() => setMostrarGraficoTotal(!mostrarGraficoTotal)}
+                        className="w-full p-2 bg-purple-500 text-white rounded mt-4"
+                    >
+                        {mostrarGraficoTotal ? "Ocultar Consumo de Productos Totales" : "Ver Consumo de Productos Totales"}
+                    </button>
+                )}
+
+                {/* Botón para mostrar/ocultar el gráfico de cantidad de personas */}
+                <button
+                    onClick={(e) => {
+                        setMostrarGraficoPorPersonas(!mostrarGraficoPorPersonas);
+                        fetchConsumoPorPersonas(e);
+                    }}
+                    className="w-full p-2 bg-yellow-500 text-white rounded mt-4"
+                >
+                    {mostrarGraficoPorPersonas
+                        ? "Ocultar Consumo de Productos por Cantidad Personas"
+                        : "Ver Consumo de Productos por Cantidad Personas"}
+                </button>
+
+                {/* Botón para mostrar/ocultar el gráfico por horario */}
+                <button
+                    onClick={() => {
+                        setMostrarGraficoHorario(!mostrarGraficoHorario);
+                        fetchConsumoPorHorario();
+                    }}
+                    className="w-full p-2 bg-green-500 text-white rounded mt-4"
+                >
+                    {mostrarGraficoHorario
+                        ? "Ocultar Consumo de Productos por Horario"
+                        : "Ver Consumo de Productos por Horario"}
+                </button>
+
+                {/* Botón para mostrar/ocultar el gráfico del promedio de consumo por persona */}
+                <button
+                    onClick={(e) => {
+                        setMostrarGraficoPromedio(!mostrarGraficoPromedio);
+                        fetchPromedioPorPersona(e);
+                    }}
+                    className="w-full p-2 bg-red-500 text-white rounded mt-4"
+                >
+                    {mostrarGraficoPromedio
+                        ? "Ocultar Promedio de Consumo por Persona"
+                        : "Ver Promedio de Consumo por Persona"}
+                </button>
             </div>
-            {/* Mientras cargan los datos para añadirle dinamismo  */}
-            {cargando && <p className="mt-4 text-gray-600">Cargando datos ...</p>}
-            {/* Para controlar y mostrar los errores  */}
-            {error && <p className="mt-4 text-red-600">{error}</p>}
-            {estadisticas.length > 0 && !cargando && (
+
+            {/* Gráfico de productos más consumidos (Total) */}
+            {mostrarGraficoTotal && chartData && (
                 <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
-            
-                    <button
-                        onClick={manejoBotonClickPrincipal}
-                        className="mt-6 w-full p-2 bg-red-500 text-white rounded"
-                    >
-                        {mostrarGraficoPrincipal ? "Ocultar Tasa de Ocupación por Espacio y Horario" : "Mostrar Tasa de Ocupación por Espacio y Horario"}
-                    </button>
-
-                    {mostrarGraficoPrincipal && (
-                        <div className="w-full h-96">
-                            <h2 className="text-xl font-semibold text-center mb-4">Tasa de Ocupación por Espacio y Horario</h2>
-                            <select value={horarioSeleccionado} onChange={manejoCambioHorario} className="w-full p-2 border rounded">
-                                {horariosUnicos.map(horario => (
-                                    <option key={horario} value={horario}>{horario}</option>
-                                ))}
-                            </select>
-                            {renderChart()}
-                        </div>
-                        
-                    )}
-
-                    {/* Vamos montando y desmontando el componente segun ocultamos y mostramos  */}
-                    <button
-                        onClick={manejoBotonClickHorarios}
-                        className="mt-24 w-full p-2 bg-green-500 text-white rounded"
-                    >
-                        {mostrarGraficoHorarios ? "Ocultar Horarios Más Solicitados" : "Ver Horarios Más Solicitados"}
-                    </button>
-                    {mostrarGraficoHorarios && renderGraficoHorariosMasSolicitados()}
-                    <button
-                        onClick={() => {
-                            setMostrarGraficoDias(!mostrarGraficoDias);
-                        }}
-                        className="mt-6 w-full p-2 bg-blue-500 text-white rounded"
-                    >
-                        {mostrarGraficoDias ? "Ocultar Días Más Solicitados" : "Ver Días Más Solicitados"}
-                    </button>
-                    {mostrarGraficoDias && renderGraficoDiasMasSolicitados()}
+                    <h2 className="text-xl font-semibold text-center mb-4">Productos Más Consumidos (General)</h2>
+                    <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
                 </div>
             )}
 
-            <Link to="/estadisticas" className="p-4 bg-green-500 text-white rounded mt-4">Volver</Link>
+            {/* Gráfico por horario */}
+            {mostrarGraficoHorario && chartDataHorario && (
+                <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
+                    <h2 className="text-xl font-semibold text-center mb-4">Productos Más Consumidos por Horario</h2>
+                    <Bar
+                        data={chartDataHorario}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                x: { stacked: true },
+                                y: { stacked: true },
+                            },
+                        }}
+                    />
+                </div>
+            )}
+
+            {/* Gráfico por cantidad de personas */}
+            {mostrarGraficoPorPersonas && chartDataPorPersonas && (
+                <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
+                    <h2 className="text-xl font-semibold text-center mb-4">Cantidad de Personas que Consumen el Producto</h2>
+                    <Bar
+                        data={chartDataPorPersonas}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                y: { beginAtZero: true },
+                            },
+                        }}
+                    />
+                </div>
+            )}
+
+            {/* Gráfico del promedio de consumo por persona */}
+            {mostrarGraficoPromedio && chartDataPromedioPorPersona && (
+                <div className="bg-white shadow-md rounded-lg p-6 mt-6 w-full max-w-2xl">
+                    <h2 className="text-xl font-semibold text-center mb-4">Promedio de Consumo por Persona</h2>
+                    <Bar
+                        data={chartDataPromedioPorPersona}
+                        options={{
+                            responsive: true,
+                            plugins: { legend: { display: true } },
+                            scales: {
+                                y: { beginAtZero: true },
+                            },
+                        }}
+                    />
+                </div>
+            )}
+
+            <Link to="/estadisticas" className="p-4 bg-green-500 text-white rounded mt-4">
+                Volver
+            </Link>
         </div>
     );
 }
-
-//Generamos colores aleatorios hexadecimales
-const colorAleatorio = () => "#" + Math.floor(Math.random() * 16777215).toString(16);
