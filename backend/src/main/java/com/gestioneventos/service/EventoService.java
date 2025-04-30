@@ -21,4 +21,5 @@ public interface EventoService {
 	Page<Evento> obtenerTodosLosEventos(Pageable pageable); // Metodo con paginacion
 	Evento agregarProducto(Long eventoId, AgregarProductosDTO productoId);
 	List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId);
+	Page<Evento> obtenerEventosFiltrados(Pageable pageable, String nombre, String horario, String estado);
 }

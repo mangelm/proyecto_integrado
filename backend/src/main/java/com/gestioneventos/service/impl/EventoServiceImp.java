@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.model.ConsumoProducto;
@@ -14,6 +15,8 @@ import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.Producto;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
+import com.gestioneventos.model.enumeration.Estado;
+import com.gestioneventos.model.enumeration.Horario;
 import com.gestioneventos.repository.ConsumoProductoRepository;
 import com.gestioneventos.repository.EventoRepository;
 import com.gestioneventos.repository.ProductoRepository;
@@ -21,6 +24,7 @@ import com.gestioneventos.service.EventoService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Expression;
 
 import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.exception.ConflictoRecursoException;
@@ -166,5 +170,36 @@ public class EventoServiceImp implements EventoService {
             throw new RecursoNoEncontradoException("Evento no encontrado con ID: " + eventoId);
         }
         return eventoRepository.findProductosConCantidadPorEventoId(eventoId);
+    }
+
+    @Override
+    public Page<Evento> obtenerEventosFiltrados(Pageable pageable, String nombre, String horario, String estado) {
+        logger.info("Obteniendo eventos filtrados - nombre: {}, horario: {}, estado: {}", nombre, horario, estado);
+        
+        Specification<Evento> spec = Specification.where(null);
+        
+        if (nombre != null && !nombre.isEmpty()) {
+            spec = spec.and((root, query, cb) -> {
+                // Convertimos el nombre del evento a minúsculas
+                Expression<String> nombreEvento = cb.lower(root.get("nombre"));
+                // Convertimos el término de búsqueda a minúsculas
+                String terminoBusqueda = nombre.toLowerCase();
+                
+                // Creamos una expresión para buscar coincidencias parciales
+                return cb.like(nombreEvento, "%" + terminoBusqueda + "%");
+            });
+        }
+        
+        if (horario != null && !horario.isEmpty()) {
+            spec = spec.and((root, query, cb) -> 
+                cb.equal(root.get("horario"), Horario.valueOf(horario)));
+        }
+        
+        if (estado != null && !estado.isEmpty()) {
+            spec = spec.and((root, query, cb) -> 
+                cb.equal(root.get("estado"), Estado.valueOf(estado)));
+        }
+        
+        return eventoRepository.findAll(spec, pageable);
     }
 }

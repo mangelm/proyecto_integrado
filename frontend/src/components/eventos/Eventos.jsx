@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 
 export default function GestionEventos() {
@@ -16,72 +16,79 @@ export default function GestionEventos() {
   const [filtroNombre, setFiltroNombre] = useState(""); // Estado para almacenar el texto de filtro por espacio.
   const [filtroHorario, setFiltroHorario] = useState(""); // Estado para almacenar el valor del filtro por horario.
   const [filtroEstado, setFiltroEstado] = useState(""); // Estado para almacenar el valor del filtro por estado del evento.
+  const [nombreTemporal, setNombreTemporal] = useState("");
+
+  // Función para manejar el debounce del nombre
+  const debounceNombre = useCallback((value) => {
+    setNombreTemporal(value);
+  }, []);
+
+  // Efecto para el debounce del nombre
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFiltroNombre(nombreTemporal);
+    }, 500); // Espera 500ms después de que el usuario deje de escribir
+
+    return () => clearTimeout(timer);
+  }, [nombreTemporal]);
 
   // Cargar los eventos
   useEffect(() => {
-    setcargando(true); // Indica que la carga de eventos ha comenzado.
-    // Este efecto se ejecuta cada vez que cambia 'page' o 'size' para cargar los eventos de la página actual.
-    fetch(`http://localhost:8100/api/eventos?page=${page}&size=${size}`) // Realiza una petición GET a la API para obtener los eventos paginados.
+    setcargando(true);
+    const params = new URLSearchParams({
+      page: page,
+      size: size,
+      ...(filtroNombre && { nombre: filtroNombre }),
+      ...(filtroHorario && { horario: filtroHorario }),
+      ...(filtroEstado && { estado: filtroEstado })
+    });
+
+    fetch(`http://localhost:8100/api/eventos?${params.toString()}`)
       .then((response) => {
-        // Si la respuesta no es exitosa, lanza un error.
         if (!response.ok) throw new Error("Error al obtener los eventos");
-        return response.json(); // Convierte la respuesta a JSON.
+        return response.json();
       })
       .then(async (data) => {
-        setEventos(data.content); // Actualiza el estado 'eventos' con el contenido de la página actual.
-        setTotalPages(data.totalPages); // Actualiza el estado 'totalPages' con el número total de páginas.
+        setEventos(data.content);
+        setTotalPages(data.totalPages);
 
-        // Obtener productos para cada evento utilizando el nuevo endpoint
-        const productosPorEvento = {}; // Objeto para almacenar los productos por ID de evento.
-
-        // Itera sobre cada evento obtenido.
+        const productosPorEvento = {};
         for (const evento of data.content) {
           try {
-            // Realiza una petición para obtener los productos consumidos en el evento.
             const response = await fetch(`http://localhost:8100/api/eventos/${evento.id}/productos-consumidos`);
             if (response.ok) {
-              const productosConsumidos = await response.json(); // Convierte la respuesta a JSON.
-              productosPorEvento[evento.id] = productosConsumidos; // Almacena los productos en el objeto 'productosPorEvento' usando el ID del evento como clave.
-            } 
-            // Si la respuesta no es exitosa.
-            else {
+              const productosConsumidos = await response.json();
+              productosPorEvento[evento.id] = productosConsumidos;
+            } else {
               console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, response.status);
-              productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
+              productosPorEvento[evento.id] = [];
               setErrores((prevErrores) => [
                 ...prevErrores,
                 `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
               ]);
             }
-          } 
-          // Captura cualquier error durante la petición.
-          catch (error) {
+          } catch (error) {
             console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, error);
-            productosPorEvento[evento.id] = []; // Establece un array vacío si hay un error.
+            productosPorEvento[evento.id] = [];
             setErrores((prevErrores) => [
               ...prevErrores,
               `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
             ]);
           }
         }
-        setProductosEventos(productosPorEvento); // Actualiza el estado 'productosEventos' con los datos obtenidos.
+        setProductosEventos(productosPorEvento);
       })
       .catch((error) => {
-        console.error("Error al obtener eventos:", error); // Muestra un error en la consola si falla la petición inicial de eventos.
+        console.error("Error al obtener eventos:", error);
         setErrores((prevErrores) => [...prevErrores, "Error al obtener los eventos. Intenta nuevamente."]);
       })
       .finally(() => {
-        setcargando(false); // Indica que la carga de eventos ha finalizado.
+        setcargando(false);
       });
-  }, [page, size]); // El efecto se vuelve a ejecutar cada vez que cambia 'page' o 'size'.
+  }, [page, size, filtroNombre, filtroHorario, filtroEstado]);
 
   // Aplica filtros a la lista de eventos basándose en los estados de los filtros.
-  const eventosFiltrados = eventos.filter((evento) => {
-    const coincideNombre = evento.nombre.toLowerCase().includes(filtroNombre.toLowerCase()); // Comprueba si el espacio del evento incluye el texto del filtro (ignorando mayúsculas/minúsculas).
-    const coincideHorario = filtroHorario === "" || evento.horario === filtroHorario; // Comprueba si el horario del evento coincide con el filtro o si no hay filtro de horario.
-    const coincideEstado = filtroEstado === "" || evento.estado === filtroEstado; // Comprueba si el estado del evento coincide con el filtro o si no hay filtro de estado.
-    
-    return coincideNombre && coincideHorario && coincideEstado; // Devuelve true si el evento cumple con todos los filtros.
-  });
+  const eventosFiltrados = eventos;
 
   // Funciones de paginación
   const manejoPaginaPrevia = () => {
@@ -175,13 +182,20 @@ export default function GestionEventos() {
     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
 
       {/* Campo de texto para filtrar por nombre. */}
-      <input
-        type="text"
-        placeholder="Buscar por nombre"
-        value={filtroNombre}
-        onChange={(e) => setFiltroNombre(e.target.value)}
-        className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:p-3"
-      />
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Buscar eventos... "
+          value={nombreTemporal}
+          onChange={(e) => debounceNombre(e.target.value)}
+          className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:p-3 w-full"
+        />
+        {cargando && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+          </div>
+        )}
+      </div>
 
       {/* Selector para filtrar por horario del evento. */}
       <select

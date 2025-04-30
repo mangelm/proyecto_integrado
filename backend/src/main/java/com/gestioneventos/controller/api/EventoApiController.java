@@ -32,11 +32,14 @@ public class EventoApiController {
     @GetMapping
     public ResponseEntity<Page<Evento>> listarEventos(
         @RequestParam(defaultValue = "0") int page, 
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String horario,
+        @RequestParam(required = false) String estado
         ) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Evento> eventos = eventoService.obtenerTodosLosEventos(pageable);
+        Page<Evento> eventos = eventoService.obtenerEventosFiltrados(pageable, nombre, horario, estado);
         
         return ResponseEntity.ok(eventos);
     }
