@@ -98,7 +98,7 @@ export default function GestionClientes() {
 
             {/* Botón para crear un nuevo cliente. */}
             <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
-                <Link to="/clientes/crear-cliente">
+                <Link to="/clientes/nuevo">
                     <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
                         Crear Cliente
                     </button>
@@ -160,7 +160,7 @@ export default function GestionClientes() {
                                     <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                                         <div className="md:hidden font-semibold text-center">Acciones</div>
                                         <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
-                                            <Link to={`/clientes/editar-cliente/${cliente.id}`}>
+                                            <Link to={`/clientes/${cliente.id}/editar`}>
                                                 <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                                                     Editar
                                                 </button>

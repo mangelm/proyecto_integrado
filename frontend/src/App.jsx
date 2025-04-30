@@ -19,33 +19,49 @@ import CalendarioEventos from './components/calendario/CalendarioEventos';
 import CrearEventoCalendario from './components/calendario/CrearEventoCalendario';
 import EditarEventoCalendario from './components/calendario/EditarEventoCalendario';
 import DetallesEventoCalendario from './components/calendario/DetallesEventoCalendario';
-import TicketProducto from './components/productos/TicketProducto';
+import SeleccionarEvento from './components/tickets/SeleccionarEvento';
+import TicketProducto from './components/tickets/TicketProducto';
+
 
 function App() {
   return (
     <Router>
       <div className="max-w-screen-2xl mx-auto p-8">
         <Routes>
+          {/* Rutas principales */}
           <Route path="/" element={<PanelAdministracion />} />
+          
+          {/* Rutas de eventos */}
           <Route path="/eventos" element={<GestionEventos />} />
-          <Route path="/eventos/detalle-evento/:id" element={<DetallesEvento />} />
-          <Route path="/eventos/editar-evento/:id" element={<EditarEvento />} /> {/* Ruta para editar */}
-          <Route path="/eventos/crear-evento/" element={<CrearEvento />} /> {/* Ruta para crear */}
-          <Route path="/eventos/:id/productos" element={<AsignarProducto />} /> {/* Ruta para crear */}
+          <Route path="/eventos/nuevo" element={<CrearEvento />} />
+          <Route path="/eventos/:id" element={<DetallesEvento />} />
+          <Route path="/eventos/:id/editar" element={<EditarEvento />} />
+          <Route path="/eventos/:id/productos" element={<AsignarProducto />} />
+          
+          {/* Rutas de productos */}
           <Route path="/productos" element={<GestionProductos />} />
-          <Route path="/productos/editar-producto/:id" element={<EditarProducto />} /> {/* Ruta para editar */}
-          <Route path="/productos/crear-producto/" element={<CrearProducto />} /> {/* Ruta para crear */}
+          <Route path="/productos/nuevo" element={<CrearProducto />} />
+          <Route path="/productos/:id/editar" element={<EditarProducto />} />
+          
+          {/* Rutas de clientes */}
           <Route path="/clientes" element={<GestionClientes />} />
-          <Route path="/clientes/editar-cliente/:id" element={<EditarCliente />} /> {/* Ruta para editar */}
-          <Route path="/clientes/crear-cliente/" element={<CrearCliente/>} /> {/* Ruta para crear */}
+          <Route path="/clientes/nuevo" element={<CrearCliente />} />
+          <Route path="/clientes/:id/editar" element={<EditarCliente />} />
+          
+          {/* Rutas de estadísticas */}
           <Route path="/estadisticas" element={<Estadisticas />} />
-          <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} /> {/* Ruta primeros gráficos */}
-          <Route path="/estadisticas/productos" element={<AnalisisConsumo />} /> {/* Ruta segundos gráficos */}
-          <Route path="/estadisticas/tickets" element={<TicketProducto />} />
-          <Route path="/calendario" element={<CalendarioEventos />} /> {/* Ruta segundos gráficos */}
-          <Route path="/calendario/crear-evento/:fecha" element={<CrearEventoCalendario />} />
-          <Route path="/calendario/editar-evento/:id" element={<EditarEventoCalendario />} />
-          <Route path="/calendario/detalle-evento/:id" element={<DetallesEventoCalendario />} />
+          <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} />
+          <Route path="/estadisticas/consumo" element={<AnalisisConsumo />} />
+          
+          {/* Rutas de calendario */}
+          <Route path="/calendario" element={<CalendarioEventos />} />
+          <Route path="/calendario/nuevo/:fecha" element={<CrearEventoCalendario />} />
+          <Route path="/calendario/:id/editar" element={<EditarEventoCalendario />} />
+          <Route path="/calendario/:id" element={<DetallesEventoCalendario />} />
+
+          {/* Rutas de tickets */}
+          <Route path="/seleccionar-evento-ticket" element={<SeleccionarEvento />} />
+          <Route path="/gestion-de-tickets" element={<TicketProducto />} />
         </Routes>
       </div>
     </Router>

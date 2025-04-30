@@ -27,11 +27,17 @@ export default function PanelAdministracion() {
                         <h2 className="text-base md:text-lg font-semibold">Consultas y Estadísticas</h2>
                     </Link>
                 </div>
-                <div className="p-3 md:p-4 bg-purple-500 hover:bg-purple-600  text-white rounded-lg shadow transition-colors">
+                <div className="p-3 md:p-4 bg-orange-500 hover:bg-orange-600  text-white rounded-lg shadow transition-colors">
                     <Link to={`/calendario`} className="block">
                         <h2 className="text-base md:text-lg font-semibold">Calendario de Eventos</h2>
                     </Link>
                 </div>
+                <div className="p-3 md:p-4 bg-purple-500 hover:bg-purple-600  text-white rounded-lg shadow transition-colors">
+                    <Link to={`/seleccionar-evento-ticket`} className="block">
+                        <h2 className="text-base md:text-lg font-semibold">Gestión de Tickets</h2>
+                    </Link>
+                </div>
+                
             </div>
         </div>
     );

@@ -31,18 +31,9 @@ export default function Estadisticas() {
             <br />
 
             {/* Enlace a la página de análisis de consumo de productos */}
-            <Link to="/estadisticas/productos" onClick={manejarError}>
+            <Link to="/estadisticas/consumo" onClick={manejarError}>
                 <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
                     Análisis de Consumo
-                </button>
-            </Link>
-            <br />
-            <br />
-
-            {/* Enlace a la página de generación de tickets */}
-            <Link to="/estadisticas/tickets" onClick={manejarError}>
-                <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300">
-                    Generación de tickets
                 </button>
             </Link>
             <br />

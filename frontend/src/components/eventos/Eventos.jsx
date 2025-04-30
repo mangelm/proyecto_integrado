@@ -171,7 +171,7 @@ export default function GestionEventos() {
       {/* Contenedor para el botón de creación de eventos*/}
       <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
         {/* Enlace a la página de creación de eventos. */}
-        <Link to="/eventos/crear-evento">
+        <Link to="/eventos/nuevo"> 
           <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
             Crear Evento
           </button>
@@ -341,7 +341,7 @@ export default function GestionEventos() {
                   {/* Contenedor para los botones de acción, con diseño de columna en pequeñas y fila en medianas. */}
                   <div className="flex flex-col md:flex-row md:gap-2 space-y-1 md:space-y-0 md:flex-wrap md:justify-center">
                     {/* Enlace a la página de edición del evento. */}
-                    <Link to={`/eventos/editar-evento/${evento.id}`}>
+                    <Link to={`/eventos/${evento.id}/editar`}>
                       <button className="bg-yellow-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-yellow-600 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                         Editar
                       </button>
@@ -354,7 +354,7 @@ export default function GestionEventos() {
                       Eliminar
                     </button>
                     {/* Botón para ver los detalles del evento. */}
-                    <Link to={`/eventos/detalle-evento/${evento.id}`}>
+                    <Link to={`/eventos/${evento.id}`}>
                       <button className="bg-gray-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-gray-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto whitespace-nowrap mb-1 md:mb-0">
                         Detalles
                       </button>
