@@ -13,7 +13,7 @@ export default function GestionEventos() {
   const [errores, setErrores] = useState([]); // Estado para manejar errores
 
   // Estados para los filtros
-  const [filtroEspacio, setFiltroEspacio] = useState(""); // Estado para almacenar el texto de filtro por espacio.
+  const [filtroNombre, setFiltroNombre] = useState(""); // Estado para almacenar el texto de filtro por espacio.
   const [filtroHorario, setFiltroHorario] = useState(""); // Estado para almacenar el valor del filtro por horario.
   const [filtroEstado, setFiltroEstado] = useState(""); // Estado para almacenar el valor del filtro por estado del evento.
 
@@ -76,11 +76,11 @@ export default function GestionEventos() {
 
   // Aplica filtros a la lista de eventos basándose en los estados de los filtros.
   const eventosFiltrados = eventos.filter((evento) => {
-    const coincideEspacio = evento.espacio.toLowerCase().includes(filtroEspacio.toLowerCase()); // Comprueba si el espacio del evento incluye el texto del filtro (ignorando mayúsculas/minúsculas).
+    const coincideNombre = evento.nombre.toLowerCase().includes(filtroNombre.toLowerCase()); // Comprueba si el espacio del evento incluye el texto del filtro (ignorando mayúsculas/minúsculas).
     const coincideHorario = filtroHorario === "" || evento.horario === filtroHorario; // Comprueba si el horario del evento coincide con el filtro o si no hay filtro de horario.
     const coincideEstado = filtroEstado === "" || evento.estado === filtroEstado; // Comprueba si el estado del evento coincide con el filtro o si no hay filtro de estado.
     
-    return coincideEspacio && coincideHorario && coincideEstado; // Devuelve true si el evento cumple con todos los filtros.
+    return coincideNombre && coincideHorario && coincideEstado; // Devuelve true si el evento cumple con todos los filtros.
   });
 
   // Funciones de paginación
@@ -174,12 +174,12 @@ export default function GestionEventos() {
     {/* Sección de Filtros */}
     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
 
-      {/* Campo de texto para filtrar por espacio. */}
+      {/* Campo de texto para filtrar por nombre. */}
       <input
         type="text"
-        placeholder="Buscar por espacio"
-        value={filtroEspacio}
-        onChange={(e) => setFiltroEspacio(e.target.value)}
+        placeholder="Buscar por nombre"
+        value={filtroNombre}
+        onChange={(e) => setFiltroNombre(e.target.value)}
         className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 md:p-3"
       />
 
