@@ -14,7 +14,8 @@ export default function CrearProducto() {
 
     const sanitizeInput = (value, type) => {
         if (type === "text") {
-            return value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ""); // Solo letras, números y espacios
+            // Permite letras, números, espacios, acentos y caracteres especiales comunes
+            return value.replace(/[<>]/g, ""); // Solo elimina caracteres que podrían ser peligrosos
         }
         if (type === "number") {
             return value.replace(/[^0-9]/g, ""); // Solo números
