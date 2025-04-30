@@ -9,5 +9,5 @@ import com.gestioneventos.model.Producto;
 // El primer parámetro es la entidad y el segundo es el tipo de dato del ID de la entidad.
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-
+    boolean existsByNombre(String nombre);
 }

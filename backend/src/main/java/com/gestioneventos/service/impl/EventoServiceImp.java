@@ -2,7 +2,8 @@ package com.gestioneventos.service.impl;
 
 import java.util.List;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +23,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import com.gestioneventos.exception.RecursoNoEncontradoException;
+import com.gestioneventos.exception.ConflictoRecursoException;
+import com.gestioneventos.exception.ValidacionException;
 
 //Implementación de los metodos de EventoService
 @Service
 public class EventoServiceImp implements EventoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventoServiceImp.class);
 
     @Autowired
     private EventoRepository eventoRepository;
@@ -42,11 +47,24 @@ public class EventoServiceImp implements EventoService {
     //Metodo para crear un evento
     @Override
     public Evento crearEvento(Evento evento) {
-    	 // Verificar si existe un evento con la misma fecha, horario y espacio
-        long eventosExistentes = eventoRepository.countEventosExistentes(evento.getFecha().toLocalDate(), evento.getHorario(), evento.getEspacio());
-    	
+        logger.info("Intentando crear evento: {}", evento.getNombre());
+        
+        if (evento.getNombre() == null || evento.getNombre().trim().isEmpty()) {
+            throw new ValidacionException("El nombre del evento no puede estar vacío");
+        }
+        
+        if (evento.getFecha() == null) {
+            throw new ValidacionException("La fecha del evento es obligatoria");
+        }
+        
+        long eventosExistentes = eventoRepository.countEventosExistentes(
+            evento.getFecha().toLocalDate(), 
+            evento.getHorario(), 
+            evento.getEspacio()
+        );
+        
         if (eventosExistentes > 0) {
-            throw new IllegalArgumentException("Horario ocupado, escoge otro horario.");
+            throw new ConflictoRecursoException("El espacio está ocupado en la fecha y horario seleccionados");
         }
         
         return eventoRepository.save(evento);
@@ -55,12 +73,14 @@ public class EventoServiceImp implements EventoService {
     //Metodo para obtener todos los eventos
     @Override
     public List<Evento> obtenerTodosLosEventos() {
+        logger.info("Obteniendo todos los eventos");
         return eventoRepository.findAll();
     }
     
     //Metodo para obtener un evento por su id
     @Override
     public Evento obtenerEventoPorId(Long id) {
+        logger.info("Buscando evento con ID: {}", id);
         return eventoRepository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado con ID: " + id));
     }
@@ -68,19 +88,27 @@ public class EventoServiceImp implements EventoService {
     //Metodo para actualizar un evento concreto
     @Override
     public Evento actualizarEvento(Long id, Evento evento) {
-        // Primero, obtenemos el evento a actualizar
+        logger.info("Actualizando evento con ID: {}", id);
+        
+        if (evento.getNombre() == null || evento.getNombre().trim().isEmpty()) {
+            throw new ValidacionException("El nombre del evento no puede estar vacío");
+        }
+        
         Evento eventoExistente = eventoRepository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado"));
+            .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado con ID: " + id));
 
-        // Verificamos si el espacio está ocupado en la misma fecha y horario, excepto si es el mismo evento
         if (evento.getId() != id) {
-            long count = eventoRepository.countEventosExistentesMismoId(evento.getFecha().toLocalDate(), evento.getHorario(), evento.getEspacio(), id);
+            long count = eventoRepository.countEventosExistentesMismoId(
+                evento.getFecha().toLocalDate(), 
+                evento.getHorario(), 
+                evento.getEspacio(), 
+                id
+            );
             if (count > 0) {
-                throw new IllegalArgumentException("El espacio está ocupado en la misma fecha y horario.");
+                throw new ConflictoRecursoException("El espacio está ocupado en la misma fecha y horario");
             }
         }
 
-        // Procedemos a actualizar el evento
         eventoExistente.setNombre(evento.getNombre());
         eventoExistente.setFecha(evento.getFecha());
         eventoExistente.setCantidadPersonas(evento.getCantidadPersonas());
@@ -96,6 +124,7 @@ public class EventoServiceImp implements EventoService {
     //Metodo para eliminar un producto por su id
     @Override
     public void eliminarEvento(Long id) {
+        logger.info("Eliminando evento con ID: {}", id);
         Evento evento = obtenerEventoPorId(id);
         eventoRepository.delete(evento);
     }
@@ -103,6 +132,7 @@ public class EventoServiceImp implements EventoService {
     //Metodo para implementar la paginacion en los eventos
     @Override
     public Page<Evento> obtenerTodosLosEventos(Pageable pageable) {
+        logger.info("Obteniendo eventos paginados");
         return eventoRepository.findAll(pageable);
     }
     
