@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.exception.ValidacionException;
 import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.dto.ConsumoPromedioDTO;
