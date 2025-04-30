@@ -14,27 +14,44 @@ export default function EditarProducto() {
     const navegar = useNavigate();
 
     useEffect(() => {
-        fetch(`http://localhost:8100/api/productos/${id}`, {
-            credentials: "include",
-        })
-            .then((response) => {
+        const cargarProducto = async () => {
+            try {
+                const response = await fetch(`http://localhost:8100/api/productos/${id}`, {
+                    credentials: "include",
+                });
+
                 if (!response.ok) {
-                    throw new Error(`Error al cargar el producto: ${response.status} ${response.statusText}`);
+                    const errorData = await response.json();
+                    if (errorData && typeof errorData === 'object') {
+                        if (Array.isArray(errorData.errors)) {
+                            setErrores(errorData.errors.map(err => err.defaultMessage));
+                        } else {
+                            setErrores([errorData.message || `Error al cargar el producto: ${response.status}`]);
+                        }
+                    } else {
+                        setErrores([`Error al cargar el producto: ${response.status}`]);
+                    }
+                    return;
                 }
-                return response.json();
-            })
-            .then((data) => {
+
+                const data = await response.json();
                 setNombre(data.nombre);
                 setDescripcion(data.descripcion);
                 setPrecio(data.precio);
                 setImpuesto(data.impuesto);
                 setDisponible(data.disponible);
                 setCategoria(data.categoria);
-            })
-            .catch((error) => {
-                console.error("Error al cargar el producto:", error.message);
-                setErrores((prevErrores) => [...prevErrores, "Error al cargar el producto. Intenta nuevamente."]);
-            });
+            } catch (error) {
+                console.error("Error al cargar el producto:", error);
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    setErrores(["Error de conexión. Verifica tu conexión a internet."]);
+                } else {
+                    setErrores(["Error inesperado al cargar el producto. Intenta nuevamente."]);
+                }
+            }
+        };
+
+        cargarProducto();
     }, [id]);
 
     const sanitizeInput = (value, type) => {

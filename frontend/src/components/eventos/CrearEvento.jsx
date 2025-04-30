@@ -76,19 +76,22 @@ export default function CrearEvento({ onSuccess }) {
     };
 
     // Manejar el envío del formulario
-    const manejarEnvio = async (evento) => {
-        evento.preventDefault();
+    const manejarEnvio = async (e) => {
+        e.preventDefault();
+        setErroresGenerales([]);
+
+        // Validar el formulario antes de enviar
         if (!validarFormulario()) {
-            return; // No se envía si hay errores
+            return;
         }
 
         const nuevoEvento = {
             nombre: limpiarInput(nombre, "texto"),
-            fecha,
-            cantidadPersonas: parseInt(cantidadPersonas) || 0,
+            fecha: fecha,
+            cantidadPersonas: parseInt(limpiarInput(cantidadPersonas, "numero")),
             espacio: limpiarInput(espacio, "texto"),
-            horario,
-            hora,
+            horario: horario,
+            hora: hora,
         };
 
         try {
@@ -105,17 +108,24 @@ export default function CrearEvento({ onSuccess }) {
                     navegar("/eventos");
                 }
             } else {
-                const textoError = await respuesta.text();
-                setErroresGenerales((prevErrores) => [
-                    ...prevErrores,
-                    textoError || "Error al crear el evento. Intenta nuevamente.",
-                ]);
+                const errorData = await respuesta.json();
+                if (errorData && typeof errorData === 'object') {
+                    if (Array.isArray(errorData.errors)) {
+                        setErroresGenerales(errorData.errors.map(err => err.defaultMessage));
+                    } else {
+                        setErroresGenerales([errorData.message || "Error al crear el evento"]);
+                    }
+                } else {
+                    setErroresGenerales(["Error al crear el evento. Intenta nuevamente."]);
+                }
             }
-        } catch (errorDeConexion) {
-            setErroresGenerales((prevErrores) => [
-                ...prevErrores,
-                `Error de conexión al crear el evento: ${errorDeConexion.message}`,
-            ]);
+        } catch (error) {
+            console.error("Error al crear el evento:", error);
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                setErroresGenerales(["Error de conexión. Verifica tu conexión a internet."]);
+            } else {
+                setErroresGenerales(["Error inesperado al crear el evento. Intenta nuevamente."]);
+            }
         }
     };
 

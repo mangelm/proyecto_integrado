@@ -51,15 +51,24 @@ export default function CrearProducto() {
             if (response.ok) {
                 navegar("/productos");
             } else {
-                const errorData = await response.text();
-                throw new Error(errorData || "Error al crear el producto");
+                const errorData = await response.json();
+                if (errorData && typeof errorData === 'object') {
+                    if (Array.isArray(errorData.errors)) {
+                        setErrores(errorData.errors.map(err => err.defaultMessage));
+                    } else {
+                        setErrores([errorData.message || "Error al crear el producto"]);
+                    }
+                } else {
+                    setErrores(["Error al crear el producto. Intenta nuevamente."]);
+                }
             }
         } catch (error) {
-            console.error("Error al crear el producto:", error.message);
-            setErrores((prevErrores) => [
-                ...prevErrores,
-                "Error al crear el producto. Intenta nuevamente más tarde.",
-            ]);
+            console.error("Error al crear el producto:", error);
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                setErrores(["Error de conexión. Verifica tu conexión a internet."]);
+            } else {
+                setErrores(["Error inesperado al crear el producto. Intenta nuevamente."]);
+            }
         }
     };
 
