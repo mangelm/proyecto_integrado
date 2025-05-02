@@ -5,9 +5,11 @@ import java.sql.Date;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit; // Necesario para fechas futuras
 
 import org.slf4j.Logger;
@@ -160,10 +162,6 @@ public class InsertarDatos implements CommandLineRunner {
             logger.info("✅ Eventos creados y guardados ({}).", eventos.size());
 
             // --- Crear consumos de productos ---
-            // Se crea una lista de consumos para almacenar los objetos ConsumoProducto generados
-            // Se utiliza un bucle para crear consumos de productos para cada evento persistido
-            // Cada consumo tiene un evento, producto, cantidad, precio unitario e impuesto generados aleatoriamente
-            // Se asigna un producto aleatorio de la lista de productos persistidos
             List<ConsumoProducto> consumos = new ArrayList<>();
             
             List<Evento> eventosPersistidos = eventoRepository.findAll();
@@ -172,10 +170,26 @@ public class InsertarDatos implements CommandLineRunner {
                 logger.warn("⚠️ No hay eventos o productos persistidos para crear consumos.");
             } else {
                 for (Evento evento : eventosPersistidos) {
-                    Collections.shuffle(productosPersistidos);
-                    int numProductosAAnadir = faker.number().numberBetween(0, Math.min(6, productosPersistidos.size()));
+                    // Crear una copia de los productos disponibles para este evento
+                    List<Producto> productosDisponibles = new ArrayList<>(productosPersistidos);
+                    Collections.shuffle(productosDisponibles);
+                    
+                    int numProductosAAnadir = faker.number().numberBetween(0, Math.min(6, productosDisponibles.size()));
+                    Set<Long> productosAsignados = new HashSet<>();
+                    
                     for (int k = 0; k < numProductosAAnadir; k++) {
-                        Producto productoSeleccionado = productosPersistidos.get(k);
+                        Producto productoSeleccionado = productosDisponibles.get(k);
+                        
+                        // Verificar si el producto ya está asignado al evento
+                        if (productosAsignados.contains(productoSeleccionado.getId())) {
+                            logger.error("❌ El producto {} ya está asignado al evento {}", 
+                                productoSeleccionado.getNombre(), evento.getNombre());
+                            throw new IllegalStateException(
+                                String.format("El producto %s ya está asignado al evento %s", 
+                                    productoSeleccionado.getNombre(), evento.getNombre()));
+                        }
+                        
+                        productosAsignados.add(productoSeleccionado.getId());
                         ConsumoProducto consumo = new ConsumoProducto();
                         consumo.setEvento(evento);
                         consumo.setProducto(productoSeleccionado);

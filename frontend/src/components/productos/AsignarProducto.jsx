@@ -3,14 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import MensajesDeErrores from "../../pages/MensajesDeErrores";
 
 export default function AsignarProducto() {
-    const { id } = useParams(); // Extrae el ID del evento de la URL
-    const [productos, setProductos] = useState([]); // Estado para almacenar los productos
-    const [productoSeleccionado, setProductoSeleccionado] = useState(""); // Estado para almacenar el producto seleccionado
-    const [evento, setEvento] = useState(null); // Estado para almacenar el evento
-    const [errores, setErrores] = useState([]); // Estado para manejar errores
-    const navegar = useNavigate(); // Hook para navegar entre rutas
+    const { id } = useParams();
+    const [productos, setProductos] = useState([]);
+    const [productosSeleccionados, setProductosSeleccionados] = useState([]);
+    const [evento, setEvento] = useState(null);
+    const [errores, setErrores] = useState([]);
+    const navegar = useNavigate();
 
-    // Cargar los productos y el evento al montar el componente
     useEffect(() => {
         // Cargar los productos
         fetch("http://localhost:8100/api/productos/todos")
@@ -49,36 +48,57 @@ export default function AsignarProducto() {
             });
     }, [id]);
 
-    const manejoAsignarProducto = () => {
-        if (!productoSeleccionado) {
-            alert("Por favor, selecciona un producto.");
+    const manejoAsignarProductos = () => {
+        if (productosSeleccionados.length === 0) {
+            alert("Por favor, selecciona al menos un producto.");
             return;
         }
 
-        const productoElegido = {
-            productoId: productoSeleccionado,
-        };
+        // Crear un array de productos para asignar
+        const productosParaAsignar = productosSeleccionados.map(productoId => ({
+            productoId: productoId
+        }));
 
+        // Enviar la solicitud para asignar los productos
         fetch(`http://localhost:8100/api/eventos/${id}/productos`, {
             method: "POST",
-            body: JSON.stringify(productoElegido),
+            body: JSON.stringify(productosParaAsignar),
             headers: {
                 "Content-Type": "application/json",
             },
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`Error al asignar producto: ${response.status} ${response.statusText}`);
+                    return response.json().then(errorData => {
+                        // Obtener el ID del producto del mensaje de error
+                        const productoId = errorData.message.match(/ID (\d+)/)[1];
+                        // Buscar el nombre del producto en la lista de productos
+                        const producto = productos.find(p => p.id === parseInt(productoId));
+                        const nombreProducto = producto ? producto.nombre : 'el producto';
+                        throw new Error(`El producto ${nombreProducto} ya está asignado a este evento`);
+                    });
                 }
                 return response.json();
             })
             .then(() => {
-                alert("Producto asignado con éxito");
+                alert("Productos asignados con éxito");
+                setProductosSeleccionados([]); // Limpiar la selección
+                setErrores([]); // Limpiar errores
             })
             .catch((error) => {
-                console.error("Error al asignar producto:", error.message);
-                setErrores((prevErrores) => [...prevErrores, "Error al asignar el producto. Intenta nuevamente."]);
+                console.error("Error al asignar productos:", error.message);
+                setErrores([error.message]);
             });
+    };
+
+    const handleSeleccionProducto = (productoId) => {
+        setProductosSeleccionados(prev => {
+            if (prev.includes(productoId)) {
+                return prev.filter(id => id !== productoId);
+            } else {
+                return [...prev, productoId];
+            }
+        });
     };
 
     return (
@@ -89,40 +109,43 @@ export default function AsignarProducto() {
             {/* Información del evento */}
             {evento && (
                 <div className="mb-4 text-center">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Asignar Producto al Evento:</h2>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Asignar Productos al Evento:</h2>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">{evento.nombre}</h2>
                 </div>
             )}
 
-            {/* Selección de producto */}
+            {/* Lista de productos */}
             <div className="mb-4">
-                <label htmlFor="producto" className="block text-sm sm:text-md font-medium mb-1">Selecciona un Producto</label>
-                <select
-                    id="producto"
-                    className="mt-1 w-full p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 text-sm sm:text-md"
-                    value={productoSeleccionado}
-                    onChange={(e) => setProductoSeleccionado(e.target.value)}
-                >
-                    <option value="">Seleccionar producto...</option>
+                <label className="block text-sm sm:text-md font-medium mb-1">Selecciona los Productos</label>
+                <div className="max-h-96 overflow-y-auto border rounded-md p-2">
                     {productos && productos.length > 0 ? (
                         productos.map((producto) => (
-                            <option key={producto.id} value={producto.id}>
-                                {producto.nombre}
-                            </option>
+                            <div key={producto.id} className="flex items-center p-2 hover:bg-gray-50">
+                                <input
+                                    type="checkbox"
+                                    id={`producto-${producto.id}`}
+                                    checked={productosSeleccionados.includes(producto.id)}
+                                    onChange={() => handleSeleccionProducto(producto.id)}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor={`producto-${producto.id}`} className="ml-2 block text-sm text-gray-900">
+                                    {producto.nombre}
+                                </label>
+                            </div>
                         ))
                     ) : (
-                        <option disabled>No hay productos disponibles</option>
+                        <p className="text-sm text-gray-500">No hay productos disponibles</p>
                     )}
-                </select>
+                </div>
             </div>
 
             {/* Botones */}
             <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <button
-                    onClick={manejoAsignarProducto}
+                    onClick={manejoAsignarProductos}
                     className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300 text-sm sm:text-md w-full sm:w-auto"
                 >
-                    Asignar Producto
+                    Asignar Productos Seleccionados
                 </button>
                 <button
                     type="button"

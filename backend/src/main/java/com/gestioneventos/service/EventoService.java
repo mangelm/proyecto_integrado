@@ -19,7 +19,7 @@ public interface EventoService {
 	Evento actualizarEvento(Long id, Evento evento);
 	void eliminarEvento(Long id);
 	Page<Evento> obtenerTodosLosEventos(Pageable pageable); // Metodo con paginacion
-	Evento agregarProducto(Long eventoId, AgregarProductosDTO productoId);
+	Evento agregarProductos(Long eventoId, List<AgregarProductosDTO> productos);
 	List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId);
 	Page<Evento> obtenerEventosFiltrados(Pageable pageable, String nombre, String horario, String estado);
 }

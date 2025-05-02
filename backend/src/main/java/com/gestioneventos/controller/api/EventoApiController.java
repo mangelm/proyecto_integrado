@@ -124,10 +124,10 @@ public class EventoApiController {
     // Se utiliza la anotación @PathVariable para recibir el ID del evento desde la URL
     // y la anotación @RequestBody para recibir el objeto AgregarProductosDTO desde el cuerpo de la solicitud.
     @PostMapping("/{id}/productos")
-    public ResponseEntity<Evento> agregarProducto(
+    public ResponseEntity<Evento> agregarProductos(
             @PathVariable("id") Long evento,
-            @RequestBody AgregarProductosDTO producto) {
-        Evento eventoActualizado = eventoService.agregarProducto(evento, producto);
+            @RequestBody List<AgregarProductosDTO> productos) {
+        Evento eventoActualizado = eventoService.agregarProductos(evento, productos);
         return ResponseEntity.ok(eventoActualizado);
     }
     

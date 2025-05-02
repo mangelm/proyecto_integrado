@@ -143,25 +143,36 @@ public class EventoServiceImp implements EventoService {
     
     //Metodo para agregar productos a un evento
 	@Override
-	public Evento agregarProducto(Long eventoId, AgregarProductosDTO productoId) {
-		Evento evento = eventoRepository.findById(eventoId)
-                .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
-
-        Producto producto = productoRepository.findById(productoId.getProductoId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        ConsumoProducto consumo = new ConsumoProducto();
-        consumo.setEvento(evento);
-        consumo.setProducto(producto);
-        consumo.setCantidad(productoId.getCantidad());
-        consumo.setPrecioUnitario(productoId.getPrecioUnitario());
-        consumo.setImpuesto(productoId.getImpuesto());
-
-        consumoProductoRepository.save(consumo);
-
-        evento.getConsumos().add(consumo); // Esto actualiza la relación en memoria
-        return eventoRepository.save(evento); // Guarda el evento actualizado
+	public Evento agregarProductos(Long eventoId, List<AgregarProductosDTO> productos) {
+		logger.info("Intentando agregar {} productos al evento: {}", productos.size(), eventoId);
 		
+		Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado con ID: " + eventoId));
+
+        for (AgregarProductosDTO productoDTO : productos) {
+            Producto producto = productoRepository.findById(productoDTO.getProductoId())
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado con ID: " + productoDTO.getProductoId()));
+
+            // Verificar si el producto ya está asignado al evento
+            boolean productoYaAsignado = evento.getConsumos().stream()
+                .anyMatch(consumo -> consumo.getProducto().getId().equals(producto.getId()));
+            
+            if (productoYaAsignado) {
+                throw new ConflictoRecursoException("El producto con ID " + producto.getId() + " ya está asignado al evento");
+            }
+
+            ConsumoProducto consumo = new ConsumoProducto();
+            consumo.setEvento(evento);
+            consumo.setProducto(producto);
+            consumo.setCantidad(productoDTO.getCantidad() != null ? productoDTO.getCantidad() : 1);
+            consumo.setPrecioUnitario(productoDTO.getPrecioUnitario() != null ? productoDTO.getPrecioUnitario() : producto.getPrecio());
+            consumo.setImpuesto(productoDTO.getImpuesto() != null ? productoDTO.getImpuesto() : producto.getImpuesto());
+
+            consumoProductoRepository.save(consumo);
+            evento.getConsumos().add(consumo);
+        }
+
+        return eventoRepository.save(evento);
 	}
 
 	@Override

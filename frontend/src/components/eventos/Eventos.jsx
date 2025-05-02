@@ -315,11 +315,9 @@ export default function GestionEventos() {
                   <div className="font-semibold text-gray-700 mb-1">Productos:</div>
                     {/* Lista no ordenada de productos consumidos en el evento. */}
                     <ul className="list-none">
-                        {/* Mapea la lista de productos para renderizar cada uno como un elemento de la lista. */}
-                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
-                            <li key={producto.nombreProducto}>{producto.nombreProducto}</li>
+                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto, index) => (
+                            <li key={`${producto.nombreProducto}_${evento.id}_${index}`}>{producto.nombreProducto}</li>
                         ))}
-                        {/* Muestra un mensaje de carga si aún no se han obtenido los productos. */}
                         {!productosEventos[evento.id] && <li>Cargando...</li>}
                     </ul>
                 </td>
@@ -327,8 +325,8 @@ export default function GestionEventos() {
                 <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
                   
                     <ul className="list-none">
-                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto) => (
-                            <li key={producto.nombreProducto} className="whitespace-nowrap">{producto.nombreProducto}</li>
+                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto, index) => (
+                            <li key={`${producto.nombreProducto}_${evento.id}_${index}`} className="whitespace-nowrap">{producto.nombreProducto}</li>
                         ))}
                         
                         {!productosEventos[evento.id] && <li>Cargando...</li>}
