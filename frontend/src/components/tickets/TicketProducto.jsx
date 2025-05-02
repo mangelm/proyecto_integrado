@@ -12,12 +12,13 @@ const TicketProducto = () => {
     const [precioUnitario, setPrecioUnitario] = useState(0);
     const [impuesto, setImpuesto] = useState(0);
     const [total, setTotal] = useState(0);
+    const [numeroTicket, setNumeroTicket] = useState(1);
 
     useEffect(() => {
         const eventoId = localStorage.getItem('eventoSeleccionadoTickets');
         
         if (!eventoId) {
-            navigate('/seleccionar-evento');
+            navigate('/seleccionar-evento-ticket');
             return;
         }
 
@@ -34,6 +35,13 @@ const TicketProducto = () => {
                 if (!productosResponse.ok) throw new Error('Error al cargar los productos');
                 const productosData = await productosResponse.json();
                 setProductos(Array.isArray(productosData) ? productosData : []);
+
+                // Obtener el último número de ticket para este evento
+                const ticketsResponse = await fetch(`http://localhost:8100/api/tickets/evento/${eventoId}/ultimo-numero`);
+                if (ticketsResponse.ok) {
+                    const ultimoNumero = await ticketsResponse.json();
+                    setNumeroTicket(ultimoNumero + 1);
+                }
             } catch (error) {
                 console.error('Error:', error);
                 setProductos([]);
@@ -77,6 +85,16 @@ const TicketProducto = () => {
         navigate('/seleccionar-evento-ticket');
     };
 
+    const formatearNombreEvento = (nombre) => {
+        // Limitar a 20 caracteres y eliminar espacios
+        return nombre.substring(0, 20).replace(/\s+/g, '_');
+    };
+
+    const formatearFecha = (fecha) => {
+        const date = new Date(fecha);
+        return `${date.getDate().toString().padStart(2, '0')}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getFullYear()}`;
+    };
+
     const handleImprimirTicket = async () => {
         if (!productoSeleccionado || cantidad < 1) return;
 
@@ -98,7 +116,8 @@ const TicketProducto = () => {
                 evento: { id: evento.id },
                 producto: { id: productoCompleto.id },
                 cantidad: cantidad,
-                precioTotal: total
+                precioTotal: total,
+                numeroTicket: numeroTicket
             };
 
             // Guardar el ticket en la base de datos
@@ -117,30 +136,72 @@ const TicketProducto = () => {
             // Crear PDF
             const doc = new jsPDF();
             
-            // Título
-            doc.setFontSize(20);
-            doc.text(`Ticket - ${evento.nombre}`, 105, 20, { align: 'center' });
+            // Configuración de colores
+            const primaryColor = [41, 128, 185]; // Azul
+            const secondaryColor = [52, 73, 94]; // Gris oscuro
             
-            // Fecha
+            // Función para dibujar línea decorativa
+            const drawDecorativeLine = (y) => {
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(0.5);
+                doc.line(20, y, 190, y);
+            };
+            
+            // Encabezado
+            doc.setFillColor(...primaryColor);
+            doc.rect(0, 0, 210, 30, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.text('TICKET', 105, 20, { align: 'center' });
+            
+            // Información del evento
+            doc.setTextColor(...secondaryColor);
+            doc.setFontSize(16);
+            doc.text(evento.nombre, 105, 45, { align: 'center' });
+            
             doc.setFontSize(12);
-            doc.text(`Fecha: ${new Date(evento.fecha).toLocaleDateString()}`, 20, 30);
+            doc.text(`Fecha: ${new Date(evento.fecha).toLocaleDateString()}`, 20, 55);
+            
+            // Línea decorativa
+            drawDecorativeLine(65);
             
             // Detalles del producto
             doc.setFontSize(14);
-            doc.text('Detalles del Producto:', 20, 50);
+            doc.setTextColor(...primaryColor);
+            doc.text('Detalles del Producto', 20, 80);
             
             doc.setFontSize(12);
-            doc.text(`Producto: ${producto.nombreProducto}`, 20, 60);
-            doc.text(`Cantidad: ${cantidad}`, 20, 70);
-            doc.text(`Precio unitario: ${precioUnitario.toFixed(2)}€`, 20, 80);
-            doc.text(`IVA (${impuesto}%): ${(total - (precioUnitario * cantidad)).toFixed(2)}€`, 20, 90);
+            doc.setTextColor(...secondaryColor);
+            doc.text(`Producto: ${producto.nombreProducto}`, 20, 90);
+            doc.text(`Cantidad: ${cantidad}`, 20, 100);
+            doc.text(`Precio unitario: ${precioUnitario.toFixed(2)}€`, 20, 110);
+            doc.text(`IVA (${impuesto}%): ${(total - (precioUnitario * cantidad)).toFixed(2)}€`, 20, 120);
+            
+            // Línea decorativa
+            drawDecorativeLine(130);
             
             // Total
-            doc.setFontSize(16);
-            doc.text(`Total: ${total.toFixed(2)}€`, 20, 110);
+            doc.setFontSize(18);
+            doc.setTextColor(...primaryColor);
+            doc.text(`Total: ${total.toFixed(2)}€`, 20, 150);
             
-            // Guardar PDF
-            doc.save(`ticket_${evento.nombre.replace(/\s+/g, '_')}.pdf`);
+            // Número de ticket
+            doc.setFontSize(10);
+            doc.setTextColor(...secondaryColor);
+            doc.text(`Ticket Nº: ${numeroTicket.toString().padStart(4, '0')}`, 20, 160);
+            
+            // Pie de página
+            doc.setFontSize(8);
+            doc.text('Gracias por su compra', 105, 280, { align: 'center' });
+            
+            // Guardar PDF con el nuevo formato de nombre
+            const nombreEventoFormateado = formatearNombreEvento(evento.nombre);
+            const fechaFormateada = formatearFecha(evento.fecha);
+            doc.save(`ticket_${nombreEventoFormateado}_${fechaFormateada}_${numeroTicket.toString().padStart(4, '0')}.pdf`);
+
+            // Incrementar el número de ticket para la próxima generación
+            setNumeroTicket(numeroTicket + 1);
         } catch (error) {
             console.error('Error:', error);
             alert('Error al generar el ticket: ' + error.message);
@@ -187,8 +248,8 @@ const TicketProducto = () => {
                     >
                         <option value="">Selecciona un producto</option>
                         {productos && productos.length > 0 ? (
-                            productos.map((producto) => (
-                                <option key={producto.nombreProducto} value={producto.nombreProducto}>
+                            productos.map((producto, index) => (
+                                <option key={`${producto.nombreProducto}_${index}`} value={producto.nombreProducto}>
                                     {producto.nombreProducto}
                                 </option>
                             ))

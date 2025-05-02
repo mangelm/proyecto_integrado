@@ -26,6 +26,7 @@ public class Ticket {
 
     private Integer cantidad;
     private BigDecimal precioTotal;
+    private Integer numeroTicket;
 	
     public Long getId() {
 		return id;
@@ -66,5 +67,12 @@ public class Ticket {
     public void setPrecioTotal(BigDecimal precioTotal) {
 		this.precioTotal = precioTotal;
 	}
-   
+	
+    public Integer getNumeroTicket() {
+        return numeroTicket;
+    }
+    
+    public void setNumeroTicket(Integer numeroTicket) {
+        this.numeroTicket = numeroTicket;
+    }
 }
