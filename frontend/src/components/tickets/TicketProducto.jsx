@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
 
 const TicketProducto = () => {
     const navigate = useNavigate();
@@ -8,6 +9,9 @@ const TicketProducto = () => {
     const [productoSeleccionado, setProductoSeleccionado] = useState('');
     const [cantidad, setCantidad] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [precioUnitario, setPrecioUnitario] = useState(0);
+    const [impuesto, setImpuesto] = useState(0);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         const eventoId = localStorage.getItem('eventoSeleccionadoTickets');
@@ -26,14 +30,13 @@ const TicketProducto = () => {
                 setEvento(eventoData);
 
                 // Obtener lista de productos
-                const productosResponse = await fetch('http://localhost:8100/api/productos');
+                const productosResponse = await fetch(`http://localhost:8100/api/eventos/${eventoId}/productos-consumidos`);
                 if (!productosResponse.ok) throw new Error('Error al cargar los productos');
                 const productosData = await productosResponse.json();
-                // Aseguramos que productosData sea un array
                 setProductos(Array.isArray(productosData) ? productosData : []);
             } catch (error) {
                 console.error('Error:', error);
-                setProductos([]); // En caso de error, establecemos un array vacío
+                setProductos([]);
             } finally {
                 setLoading(false);
             }
@@ -42,62 +45,106 @@ const TicketProducto = () => {
         fetchDatos();
     }, [navigate]);
 
+    useEffect(() => {
+        if (productoSeleccionado) {
+            const producto = productos.find(p => p.nombreProducto === productoSeleccionado);
+            if (producto) {
+                // Obtener el precio unitario y el impuesto del producto
+                fetch(`http://localhost:8100/api/productos/todos`)
+                    .then(response => response.json())
+                    .then(productosCompletos => {
+                        const productoCompleto = productosCompletos.find(p => p.nombre === productoSeleccionado);
+                        if (productoCompleto) {
+                            setPrecioUnitario(productoCompleto.precio);
+                            setImpuesto(productoCompleto.impuesto);
+                            calcularTotal(productoCompleto.precio, productoCompleto.impuesto, cantidad);
+                        }
+                    })
+                    .catch(error => console.error('Error al obtener detalles del producto:', error));
+            }
+        }
+    }, [productoSeleccionado, cantidad, productos]);
+
+    const calcularTotal = (precio, impuesto, cantidad) => {
+        const subtotal = precio * cantidad;
+        const iva = subtotal * (impuesto / 100);
+        const totalConIva = subtotal + iva;
+        setTotal(totalConIva);
+    };
+
     const handleVolverASeleccion = () => {
         localStorage.removeItem('eventoSeleccionadoTickets');
         navigate('/seleccionar-evento-ticket');
     };
 
-    const handleImprimirTicket = () => {
+    const handleImprimirTicket = async () => {
         if (!productoSeleccionado || cantidad < 1) return;
 
-        const producto = productos.find(p => p.id === parseInt(productoSeleccionado));
+        const producto = productos.find(p => p.nombreProducto === productoSeleccionado);
         if (!producto) return;
 
-        const subtotal = producto.precio * cantidad;
-        const impuesto = subtotal * (producto.impuesto / 100);
-        const total = subtotal + impuesto;
+        try {
+            // Obtener el producto completo para tener su ID
+            const productosResponse = await fetch('http://localhost:8100/api/productos/todos');
+            const productosCompletos = await productosResponse.json();
+            const productoCompleto = productosCompletos.find(p => p.nombre === productoSeleccionado);
 
-        // Crear ventana de impresión
-        const ventanaImpresion = window.open('', '_blank');
-        ventanaImpresion.document.write(`
-            <html>
-                <head>
-                    <title>Ticket de Venta</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .ticket { max-width: 300px; margin: 0 auto; }
-                        .header { text-align: center; margin-bottom: 20px; }
-                        .info { margin-bottom: 15px; }
-                        .total { font-weight: bold; margin-top: 20px; }
-                        @media print {
-                            body { padding: 0; }
-                            .ticket { max-width: 100%; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="ticket">
-                        <div class="header">
-                            <h2>Ticket de Venta</h2>
-                            <p>Evento: ${evento.nombre}</p>
-                            <p>Fecha: ${new Date(evento.fecha).toLocaleDateString()}</p>
-                        </div>
-                        <div class="info">
-                            <p>Producto: ${producto.nombre}</p>
-                            <p>Cantidad: ${cantidad}</p>
-                            <p>Precio unitario: ${producto.precio.toFixed(2)}€</p>
-                            <p>Subtotal: ${subtotal.toFixed(2)}€</p>
-                            <p>Impuesto (${producto.impuesto}%): ${impuesto.toFixed(2)}€</p>
-                        </div>
-                        <div class="total">
-                            <p>Total: ${total.toFixed(2)}€</p>
-                        </div>
-                    </div>
-                </body>
-            </html>
-        `);
-        ventanaImpresion.document.close();
-        ventanaImpresion.print();
+            if (!productoCompleto) {
+                throw new Error('No se encontró el producto completo');
+            }
+
+            // Crear el ticket para guardar en la base de datos
+            const ticketData = {
+                evento: { id: evento.id },
+                producto: { id: productoCompleto.id },
+                cantidad: cantidad,
+                precioTotal: total
+            };
+
+            // Guardar el ticket en la base de datos
+            const saveResponse = await fetch('http://localhost:8100/api/tickets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ticketData)
+            });
+
+            if (!saveResponse.ok) {
+                throw new Error('Error al guardar el ticket');
+            }
+
+            // Crear PDF
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(20);
+            doc.text(`Ticket - ${evento.nombre}`, 105, 20, { align: 'center' });
+            
+            // Fecha
+            doc.setFontSize(12);
+            doc.text(`Fecha: ${new Date(evento.fecha).toLocaleDateString()}`, 20, 30);
+            
+            // Detalles del producto
+            doc.setFontSize(14);
+            doc.text('Detalles del Producto:', 20, 50);
+            
+            doc.setFontSize(12);
+            doc.text(`Producto: ${producto.nombreProducto}`, 20, 60);
+            doc.text(`Cantidad: ${cantidad}`, 20, 70);
+            doc.text(`Precio unitario: ${precioUnitario.toFixed(2)}€`, 20, 80);
+            doc.text(`IVA (${impuesto}%): ${(total - (precioUnitario * cantidad)).toFixed(2)}€`, 20, 90);
+            
+            // Total
+            doc.setFontSize(16);
+            doc.text(`Total: ${total.toFixed(2)}€`, 20, 110);
+            
+            // Guardar PDF
+            doc.save(`ticket_${evento.nombre.replace(/\s+/g, '_')}.pdf`);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al generar el ticket: ' + error.message);
+        }
     };
 
     if (loading) {
@@ -141,8 +188,8 @@ const TicketProducto = () => {
                         <option value="">Selecciona un producto</option>
                         {productos && productos.length > 0 ? (
                             productos.map((producto) => (
-                                <option key={producto.id} value={producto.id}>
-                                    {producto.nombre} - {producto.precio.toFixed(2)}€
+                                <option key={producto.nombreProducto} value={producto.nombreProducto}>
+                                    {producto.nombreProducto}
                                 </option>
                             ))
                         ) : (
@@ -167,22 +214,9 @@ const TicketProducto = () => {
                 {productoSeleccionado && productos.length > 0 && (
                     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                         <h3 className="font-semibold mb-2">Resumen</h3>
-                        {(() => {
-                            const producto = productos.find(p => p.id === parseInt(productoSeleccionado));
-                            if (!producto) return null;
-                            
-                            const subtotal = producto.precio * cantidad;
-                            const impuesto = subtotal * (producto.impuesto / 100);
-                            const total = subtotal + impuesto;
-
-                            return (
-                                <>
-                                    <p>Subtotal: {subtotal.toFixed(2)}€</p>
-                                    <p>Impuesto ({producto.impuesto}%): {impuesto.toFixed(2)}€</p>
-                                    <p className="font-bold">Total: {total.toFixed(2)}€</p>
-                                </>
-                            );
-                        })()}
+                        <p>Subtotal: {(precioUnitario * cantidad).toFixed(2)}€</p>
+                        <p>IVA ({impuesto}%): {(total - (precioUnitario * cantidad)).toFixed(2)}€</p>
+                        <p className="font-bold">Total: {total.toFixed(2)}€</p>
                     </div>
                 )}
 
