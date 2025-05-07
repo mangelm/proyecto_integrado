@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import com.gestioneventos.model.Producto;
 import com.gestioneventos.model.enumeration.Categoria;
 import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
+import com.gestioneventos.model.enumeration.Rol;
 import com.github.javafaker.Faker;
 
 // Importante: Asegúrate de que la clase esté en el paquete correcto para que Spring la detecte como un componente.
@@ -64,6 +66,9 @@ public class InsertarDatos implements CommandLineRunner {
     @Autowired
     private ConsumoProductoRepository consumoProductoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // Faker para generar datos aleatorios
     // Se utiliza para generar datos ficticios como nombres, direcciones, correos electrónicos, etc.
     // Esto es útil para poblar la base de datos con datos de prueba durante el desarrollo o las pruebas.
@@ -82,6 +87,19 @@ public class InsertarDatos implements CommandLineRunner {
         try {
             logger.info("🔄 Iniciando la carga de datos...");
 
+            // Crear usuario administrador por defecto si no existe
+            if (!clienteRepository.existsByEmail("admin@gestioneventos.com")) {
+                Cliente admin = new Cliente();
+                admin.setNombre("Administrador");
+                admin.setApellido("Sistema");
+                admin.setEmail("admin@gestioneventos.com");
+                admin.setTelefono("123-456-789");
+                admin.setPassword(passwordEncoder.encode("admin123"));
+                admin.setRol(Rol.ADMIN);
+                clienteRepository.save(admin);
+                logger.info("✅ Usuario administrador creado.");
+            }
+
             // --- Crear clientes ---
             // Se crea una lista de clientes para almacenar los objetos Cliente generados
             // Se utiliza un bucle para crear 20 clientes con datos aleatorios
@@ -93,6 +111,7 @@ public class InsertarDatos implements CommandLineRunner {
                 cliente.setApellido(faker.name().lastName());
                 cliente.setEmail(faker.internet().emailAddress());
                 cliente.setTelefono(generarTelefonoFormato());
+                cliente.setPassword(passwordEncoder.encode("cliente123")); // Contraseña por defecto
                 clientes.add(cliente);
                 // Se añade el cliente a la lista de clientes
             }

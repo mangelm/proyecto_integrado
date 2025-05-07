@@ -65,6 +65,7 @@ export default function CrearCliente() {
             apellido,
             email,
             telefono,
+            password: "C4mb14m3", // Contraseña por defecto
         };
 
         try {

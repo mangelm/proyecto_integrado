@@ -17,4 +17,6 @@ public interface ClienteService {
 	Cliente actualizarCliente(Long id, Cliente cliente);
 	void eliminarCliente(Long id);
 	Page<Cliente> obtenerTodosLosClientes(Pageable pageable);
+	boolean existeClientePorEmail(String email);
+	Cliente obtenerClientePorEmail(String email);
 }

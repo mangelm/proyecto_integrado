@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.gestioneventos.exception.RecursoNoEncontradoException;
@@ -23,6 +24,9 @@ public class ClienteServiceImp implements ClienteService {
 	
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	//Metodo para crear un cliente
 	@Override
@@ -42,10 +46,18 @@ public class ClienteServiceImp implements ClienteService {
 			throw new ValidacionException("El email del cliente no puede estar vacío");
 		}
 		
+		// Si no se proporciona contraseña, usar la predeterminada
+		if (cliente.getPassword() == null || cliente.getPassword().trim().isEmpty()) {
+			cliente.setPassword("C4mb14m3");
+		}
+		
 		// Verificar si el email ya existe
 		if (clienteRepository.existsByEmail(cliente.getEmail())) {
 			throw new ConflictoRecursoException("Ya existe un cliente con el email: " + cliente.getEmail());
 		}
+		
+		// Cifrar la contraseña antes de guardar
+		cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
 		
 		return clienteRepository.save(cliente);
 	}
@@ -98,6 +110,11 @@ public class ClienteServiceImp implements ClienteService {
 		existente.setEmail(cliente.getEmail());
 		existente.setTelefono(cliente.getTelefono());
 		
+		// Si se proporciona una nueva contraseña, cifrarla y actualizarla
+		if (cliente.getPassword() != null && !cliente.getPassword().trim().isEmpty()) {
+			existente.setPassword(passwordEncoder.encode(cliente.getPassword()));
+		}
+		
 		if (cliente.getRol() != null) {
 			existente.setRol(cliente.getRol());
 		}
@@ -118,6 +135,17 @@ public class ClienteServiceImp implements ClienteService {
 	public Page<Cliente> obtenerTodosLosClientes(Pageable pageable) {
 		logger.info("Obteniendo clientes paginados");
 		return clienteRepository.findAll(pageable);
+	}
+
+	@Override
+	public boolean existeClientePorEmail(String email) {
+		return clienteRepository.existsByEmail(email);
+	}
+
+	@Override
+	public Cliente obtenerClientePorEmail(String email) {
+		return clienteRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("Cliente no encontrado con email: " + email));
 	}
 
 }

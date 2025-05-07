@@ -39,6 +39,10 @@ public class Cliente {
 	@Size(max = 20, message = "El teléfono no puede exceder los 20 caracteres.")
 	private String telefono;
     
+	@NotBlank(message = "La contraseña no puede estar vacía.")
+	@Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres.")
+	private String password;
+    
 	@NotNull(message = "El rol no puede ser nulo.")
     @Enumerated(EnumType.STRING)
     private Rol rol = Rol.CLIENTE;
@@ -103,6 +107,14 @@ public class Cliente {
 
 	public void setRol(Rol rol) {
 		this.rol = rol;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 }

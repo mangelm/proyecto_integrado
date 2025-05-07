@@ -68,6 +68,10 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version> <!-- Versión más reciente de MySQL Connector/J -->
         </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

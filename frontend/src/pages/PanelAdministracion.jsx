@@ -37,7 +37,6 @@ export default function PanelAdministracion() {
                         <h2 className="text-base md:text-lg font-semibold">Gestión de Tickets</h2>
                     </Link>
                 </div>
-                
             </div>
         </div>
     );

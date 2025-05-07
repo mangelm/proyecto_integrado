@@ -1,5 +1,5 @@
 import './app.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import PanelAdministracion from "./pages/PanelAdministracion";
 import GestionEventos from "./components/eventos/Eventos";
 import EditarEvento from "./components/eventos/EditarEvento";
@@ -21,47 +21,139 @@ import EditarEventoCalendario from './components/calendario/EditarEventoCalendar
 import DetallesEventoCalendario from './components/calendario/DetallesEventoCalendario';
 import SeleccionarEvento from './components/tickets/SeleccionarEvento';
 import TicketProducto from './components/tickets/TicketProducto';
+import Registro from './components/auth/Registro';
+import Login from './components/auth/Login';
 
+// Componente para proteger rutas
+const RutaProtegida = ({ children }) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return <Navigate to="/" replace />;
+    }
+    return children;
+};
 
 function App() {
   return (
     <Router>
       <div className="max-w-screen-2xl mx-auto p-8">
         <Routes>
-          {/* Rutas principales */}
-          <Route path="/" element={<PanelAdministracion />} />
+          {/* Rutas públicas */}
+          <Route path="/" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
           
-          {/* Rutas de eventos */}
-          <Route path="/eventos" element={<GestionEventos />} />
-          <Route path="/eventos/nuevo" element={<CrearEvento />} />
-          <Route path="/eventos/:id" element={<DetallesEvento />} />
-          <Route path="/eventos/:id/editar" element={<EditarEvento />} />
-          <Route path="/eventos/:id/productos" element={<AsignarProducto />} />
+          {/* Rutas protegidas */}
+          <Route path="/admin" element={
+            <RutaProtegida>
+              <PanelAdministracion />
+            </RutaProtegida>
+          } />
           
-          {/* Rutas de productos */}
-          <Route path="/productos" element={<GestionProductos />} />
-          <Route path="/productos/nuevo" element={<CrearProducto />} />
-          <Route path="/productos/:id/editar" element={<EditarProducto />} />
+          <Route path="/eventos" element={
+            <RutaProtegida>
+              <GestionEventos />
+            </RutaProtegida>
+          } />
+          <Route path="/eventos/nuevo" element={
+            <RutaProtegida>
+              <CrearEvento />
+            </RutaProtegida>
+          } />
+          <Route path="/eventos/:id" element={
+            <RutaProtegida>
+              <DetallesEvento />
+            </RutaProtegida>
+          } />
+          <Route path="/eventos/:id/editar" element={
+            <RutaProtegida>
+              <EditarEvento />
+            </RutaProtegida>
+          } />
+          <Route path="/eventos/:id/productos" element={
+            <RutaProtegida>
+              <AsignarProducto />
+            </RutaProtegida>
+          } />
           
-          {/* Rutas de clientes */}
-          <Route path="/clientes" element={<GestionClientes />} />
-          <Route path="/clientes/nuevo" element={<CrearCliente />} />
-          <Route path="/clientes/:id/editar" element={<EditarCliente />} />
+          <Route path="/productos" element={
+            <RutaProtegida>
+              <GestionProductos />
+            </RutaProtegida>
+          } />
+          <Route path="/productos/nuevo" element={
+            <RutaProtegida>
+              <CrearProducto />
+            </RutaProtegida>
+          } />
+          <Route path="/productos/:id/editar" element={
+            <RutaProtegida>
+              <EditarProducto />
+            </RutaProtegida>
+          } />
           
-          {/* Rutas de estadísticas */}
-          <Route path="/estadisticas" element={<Estadisticas />} />
-          <Route path="/estadisticas/ocupacion" element={<EstadisticasOcupacion />} />
-          <Route path="/estadisticas/consumo" element={<AnalisisConsumo />} />
+          <Route path="/clientes" element={
+            <RutaProtegida>
+              <GestionClientes />
+            </RutaProtegida>
+          } />
+          <Route path="/clientes/nuevo" element={
+            <RutaProtegida>
+              <CrearCliente />
+            </RutaProtegida>
+          } />
+          <Route path="/clientes/:id/editar" element={
+            <RutaProtegida>
+              <EditarCliente />
+            </RutaProtegida>
+          } />
           
-          {/* Rutas de calendario */}
-          <Route path="/calendario" element={<CalendarioEventos />} />
-          <Route path="/calendario/nuevo/:fecha" element={<CrearEventoCalendario />} />
-          <Route path="/calendario/:id/editar" element={<EditarEventoCalendario />} />
-          <Route path="/calendario/:id" element={<DetallesEventoCalendario />} />
+          <Route path="/estadisticas" element={
+            <RutaProtegida>
+              <Estadisticas />
+            </RutaProtegida>
+          } />
+          <Route path="/estadisticas/ocupacion" element={
+            <RutaProtegida>
+              <EstadisticasOcupacion />
+            </RutaProtegida>
+          } />
+          <Route path="/estadisticas/consumo" element={
+            <RutaProtegida>
+              <AnalisisConsumo />
+            </RutaProtegida>
+          } />
+          
+          <Route path="/calendario" element={
+            <RutaProtegida>
+              <CalendarioEventos />
+            </RutaProtegida>
+          } />
+          <Route path="/calendario/nuevo/:fecha" element={
+            <RutaProtegida>
+              <CrearEventoCalendario />
+            </RutaProtegida>
+          } />
+          <Route path="/calendario/:id/editar" element={
+            <RutaProtegida>
+              <EditarEventoCalendario />
+            </RutaProtegida>
+          } />
+          <Route path="/calendario/:id" element={
+            <RutaProtegida>
+              <DetallesEventoCalendario />
+            </RutaProtegida>
+          } />
 
-          {/* Rutas de tickets */}
-          <Route path="/seleccionar-evento-ticket" element={<SeleccionarEvento />} />
-          <Route path="/gestion-de-tickets" element={<TicketProducto />} />
+          <Route path="/seleccionar-evento-ticket" element={
+            <RutaProtegida>
+              <SeleccionarEvento />
+            </RutaProtegida>
+          } />
+          <Route path="/gestion-de-tickets" element={
+            <RutaProtegida>
+              <TicketProducto />
+            </RutaProtegida>
+          } />
         </Routes>
       </div>
     </Router>

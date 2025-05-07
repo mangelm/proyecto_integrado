@@ -18,8 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Permite CORS para todas las rutas
                 .allowedOrigins("http://localhost:5173") // El origen de tu frontend
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // Los métodos HTTP permitidos
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Los métodos HTTP permitidos
                 .allowedHeaders("*") // Permite todos los encabezados
-                .allowCredentials(true); // Permite el uso de cookies si es necesario
+                .allowCredentials(true) // Permite el uso de cookies si es necesario
+                .maxAge(3600); // Duración de la solicitud preflight en segundos
     }
 }
