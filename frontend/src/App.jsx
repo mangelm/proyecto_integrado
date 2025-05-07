@@ -24,6 +24,7 @@ import TicketProducto from './components/tickets/TicketProducto';
 import Registro from './components/auth/Registro';
 import Login from './components/auth/Login';
 import RutaProtegida from './components/auth/RutaProtegida';
+import AccesoDenegado from './components/auth/AccesoDenegado';
 
 
 function App() {
@@ -163,10 +164,14 @@ function App() {
             </RutaProtegida>
           } />
 
+          {/* Otras rutas */}
+          <Route path="/acceso-denegado" element={<AccesoDenegado />} />
+
           {/* Ruta por defecto - redirige a login si no hay ruta válida */}
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
+
       </div>
     </Router>
   );
