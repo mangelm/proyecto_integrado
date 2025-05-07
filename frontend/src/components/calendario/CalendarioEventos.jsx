@@ -83,7 +83,7 @@ export default function CalendarioEventos() {
     // Función para controlar la acción al seleccionar un día en la vista del mes o semana
     const manejoSeleccionarDia = ({ start }) => {
         const fechaSeleccionada = moment(start).format("YYYY-MM-DD");
-        navegar(`/calendario/crear-evento/${fechaSeleccionada}`);
+        navegar(`/calendario/nuevo/${fechaSeleccionada}`);
     };
 
     // Función para recargar los eventos del servidor
@@ -220,7 +220,7 @@ export default function CalendarioEventos() {
     // Función para manejar la selección de un evento en el calendario.
     const manejoSeleccionarEvento = (event) => {
         // Redirige a la página de detalles del evento, utilizando el ID del evento seleccionado.
-        navegar(`/calendario/detalle-evento/${event.id}`);
+        navegar(`/calendario/${event.id}`);
     };
 
     // Objeto con los textos personalizados para el calendario en español.
@@ -332,7 +332,7 @@ export default function CalendarioEventos() {
             
             {/* Botón para volver a la página principal */}
             <div className="mt-6 flex justify-center">
-                <Link to={`/`}> {/* Componente Link de React Router para crear un enlace navegable. */}
+                <Link to={`/panel-administracion`}> {/* Componente Link de React Router para crear un enlace navegable. */}
                     <button
                         type="button"
                         className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"

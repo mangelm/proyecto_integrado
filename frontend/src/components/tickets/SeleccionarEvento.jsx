@@ -68,7 +68,7 @@ const SeleccionarEvento = () => {
 
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg md:static md:shadow-none md:border-t-0 md:bg-transparent">
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/panel-administracion')}
                     className="w-full md:w-auto bg-green-500 text-white py-3 px-6 rounded-md hover:bg-green-600 transition-colors"
                 >
                     Volver al Inicio

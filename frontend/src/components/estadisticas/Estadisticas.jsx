@@ -40,7 +40,7 @@ export default function Estadisticas() {
             <br />
 
             {/* Enlace a la página principal */}
-            <Link to="/" onClick={manejarError}>
+            <Link to="/panel-administracion" onClick={manejarError}>
                 <button className="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition duration-300">
                     Volver
                 </button>

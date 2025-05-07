@@ -23,15 +23,7 @@ import SeleccionarEvento from './components/tickets/SeleccionarEvento';
 import TicketProducto from './components/tickets/TicketProducto';
 import Registro from './components/auth/Registro';
 import Login from './components/auth/Login';
-
-// Componente para proteger rutas
-const RutaProtegida = ({ children }) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        return <Navigate to="/" replace />;
-    }
-    return children;
-};
+import RutaProtegida from './components/auth/RutaProtegida';
 
 function App() {
   return (
@@ -42,118 +34,121 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           
-          {/* Rutas protegidas */}
-          <Route path="/admin" element={
-            <RutaProtegida>
+          {/* Rutas protegidas para administrador */}
+          <Route path="/panel-administracion" element={
+            <RutaProtegida rolRequerido="ADMIN">
               <PanelAdministracion />
             </RutaProtegida>
           } />
           
           <Route path="/eventos" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <GestionEventos />
             </RutaProtegida>
           } />
           <Route path="/eventos/nuevo" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <CrearEvento />
             </RutaProtegida>
           } />
           <Route path="/eventos/:id" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <DetallesEvento />
             </RutaProtegida>
           } />
           <Route path="/eventos/:id/editar" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <EditarEvento />
             </RutaProtegida>
           } />
           <Route path="/eventos/:id/productos" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <AsignarProducto />
             </RutaProtegida>
           } />
           
           <Route path="/productos" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <GestionProductos />
             </RutaProtegida>
           } />
           <Route path="/productos/nuevo" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <CrearProducto />
             </RutaProtegida>
           } />
           <Route path="/productos/:id/editar" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <EditarProducto />
             </RutaProtegida>
           } />
           
           <Route path="/clientes" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <GestionClientes />
             </RutaProtegida>
           } />
           <Route path="/clientes/nuevo" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <CrearCliente />
             </RutaProtegida>
           } />
           <Route path="/clientes/:id/editar" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <EditarCliente />
             </RutaProtegida>
           } />
           
           <Route path="/estadisticas" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <Estadisticas />
             </RutaProtegida>
           } />
           <Route path="/estadisticas/ocupacion" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <EstadisticasOcupacion />
             </RutaProtegida>
           } />
           <Route path="/estadisticas/consumo" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <AnalisisConsumo />
             </RutaProtegida>
           } />
           
           <Route path="/calendario" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <CalendarioEventos />
             </RutaProtegida>
           } />
           <Route path="/calendario/nuevo/:fecha" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <CrearEventoCalendario />
             </RutaProtegida>
           } />
           <Route path="/calendario/:id/editar" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <EditarEventoCalendario />
             </RutaProtegida>
           } />
           <Route path="/calendario/:id" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <DetallesEventoCalendario />
             </RutaProtegida>
           } />
 
           <Route path="/seleccionar-evento-ticket" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <SeleccionarEvento />
             </RutaProtegida>
           } />
           <Route path="/gestion-de-tickets" element={
-            <RutaProtegida>
+            <RutaProtegida rolRequerido="ADMIN">
               <TicketProducto />
             </RutaProtegida>
           } />
+
+          {/* Ruta por defecto - redirige a login si no hay ruta válida */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>

@@ -48,7 +48,8 @@ export default function Login() {
 
             if (response.ok) {
                 localStorage.setItem('token', data.token);
-                navegar("/admin");
+                localStorage.setItem('rol', data.cliente.rol);
+                navegar("/panel-administracion");
             } else {
                 if (data.error) {
                     setErroresGenerales([data.error]);
