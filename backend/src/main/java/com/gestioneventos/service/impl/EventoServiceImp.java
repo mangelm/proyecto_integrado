@@ -14,6 +14,7 @@ import com.gestioneventos.model.ConsumoProducto;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.Producto;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
+import com.gestioneventos.model.dto.ClienteInfoDTO;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
 import com.gestioneventos.model.enumeration.Estado;
 import com.gestioneventos.model.enumeration.Horario;
@@ -191,12 +192,8 @@ public class EventoServiceImp implements EventoService {
         
         if (nombre != null && !nombre.isEmpty()) {
             spec = spec.and((root, query, cb) -> {
-                // Convertimos el nombre del evento a minúsculas
                 Expression<String> nombreEvento = cb.lower(root.get("nombre"));
-                // Convertimos el término de búsqueda a minúsculas
                 String terminoBusqueda = nombre.toLowerCase();
-                
-                // Creamos una expresión para buscar coincidencias parciales
                 return cb.like(nombreEvento, "%" + terminoBusqueda + "%");
             });
         }
@@ -212,5 +209,11 @@ public class EventoServiceImp implements EventoService {
         }
         
         return eventoRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public ClienteInfoDTO obtenerClienteInfoPorEventoId(Long eventoId) {
+        logger.info("Obteniendo información del cliente para el evento con ID: {}", eventoId);
+        return eventoRepository.findClienteInfoByEventoId(eventoId);
     }
 }

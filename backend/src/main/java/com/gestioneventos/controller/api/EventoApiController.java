@@ -12,12 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import com.gestioneventos.exception.RecursoNoEncontradoException;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
+import com.gestioneventos.model.dto.ClienteInfoDTO;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
 import com.gestioneventos.service.EventoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/eventos")
 public class EventoApiController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventoApiController.class);
 
     // Inyectamos el servicio de eventos
     // para manejar la lógica de negocio relacionada con los eventos
@@ -144,5 +149,24 @@ public class EventoApiController {
         }
     }
 
+    @GetMapping("/{id}/cliente-info")
+    public ResponseEntity<?> obtenerClienteInfo(@PathVariable("id") Long eventoId) {
+        try {
+            // Primero verificamos si el evento existe
+            Evento evento = eventoService.obtenerEventoPorId(eventoId);
+            
+            // Si el evento no tiene cliente asignado
+            if (evento.getCliente() == null) {
+                return ResponseEntity.ok(new ClienteInfoDTO(null, null));
+            }
 
+            ClienteInfoDTO clienteInfo = eventoService.obtenerClienteInfoPorEventoId(eventoId);
+            return ResponseEntity.ok(clienteInfo);
+        } catch (RecursoNoEncontradoException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error al obtener la información del cliente para el evento {}: {}", eventoId, e.getMessage());
+            return ResponseEntity.internalServerError().body("Error al obtener la información del cliente: " + e.getMessage());
+        }
+    }
 }

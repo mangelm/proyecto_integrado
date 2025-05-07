@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.dto.AgregarProductosDTO;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
+import com.gestioneventos.model.dto.ClienteInfoDTO;
 
 // Esta interfaz define los métodos que se implementarán en la clase de servicio para manejar la lógica de negocio relacionada con la entidad Evento.
 // La implementación de esta interfaz se encargará de interactuar con el repositorio de Evento y realizar operaciones CRUD.
@@ -22,4 +23,7 @@ public interface EventoService {
 	Evento agregarProductos(Long eventoId, List<AgregarProductosDTO> productos);
 	List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId);
 	Page<Evento> obtenerEventosFiltrados(Pageable pageable, String nombre, String horario, String estado);
+	
+	// Método para obtener la información del cliente asociado a un evento
+	ClienteInfoDTO obtenerClienteInfoPorEventoId(Long eventoId);
 }

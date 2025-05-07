@@ -2,6 +2,7 @@ package com.gestioneventos.repository;
 
 import com.gestioneventos.model.Evento;
 import com.gestioneventos.model.dto.ProductoCantidadDTO;
+import com.gestioneventos.model.dto.ClienteInfoDTO;
 import com.gestioneventos.model.enumeration.Horario;
 
 import java.time.LocalDate;
@@ -40,5 +41,9 @@ public interface EventoRepository extends JpaRepository<Evento, Long>, JpaSpecif
     // Consulta para obtener el consumo total de productos por evento y fecha
     @Query("SELECT e.espacio, e.horario, COUNT(e), e.fecha FROM Evento e WHERE e.id = :eventoId GROUP BY e.espacio, e.horario, e.fecha ORDER BY COUNT(e) DESC")
     List<Object[]> countEventosPorEspacioYHorarioPorEvento(@Param("eventoId") Long eventoId);
+    
+    // Consulta para obtener la información del cliente asociado a un evento
+    @Query("SELECT NEW com.gestioneventos.model.dto.ClienteInfoDTO(c.email, c.telefono) FROM Evento e LEFT JOIN e.cliente c WHERE e.id = :eventoId")
+    ClienteInfoDTO findClienteInfoByEventoId(@Param("eventoId") Long eventoId);
 }
 

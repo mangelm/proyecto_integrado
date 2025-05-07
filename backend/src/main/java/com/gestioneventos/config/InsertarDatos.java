@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit; // Necesario para fechas futuras
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,33 +101,38 @@ public class InsertarDatos implements CommandLineRunner {
                 logger.info("✅ Usuario administrador creado.");
             }
 
-            // --- Crear clientes ---
-            // Se crea una lista de clientes para almacenar los objetos Cliente generados
-            // Se utiliza un bucle para crear 20 clientes con datos aleatorios
-            // Cada cliente tiene un nombre, apellido, correo electrónico y teléfono generado aleatoriamente
+            // --- Crear clientes y staff ---
             List<Cliente> clientes = new ArrayList<>();
-            for (int i = 0; i < 20; i++) {
+            
+            // Crear 5 staff aleatorios
+            for (int i = 0; i < 5; i++) {
+                Cliente staff = new Cliente();
+                staff.setNombre(faker.name().firstName());
+                staff.setApellido(faker.name().lastName());
+                staff.setEmail(faker.internet().emailAddress());
+                staff.setTelefono(generarTelefonoFormato());
+                staff.setPassword(passwordEncoder.encode("staff123"));
+                staff.setRol(Rol.STAFF);
+                clientes.add(staff);
+            }
+            
+            // Crear 15 clientes normales
+            for (int i = 0; i < 15; i++) {
                 Cliente cliente = new Cliente();
                 cliente.setNombre(faker.name().firstName());
                 cliente.setApellido(faker.name().lastName());
                 cliente.setEmail(faker.internet().emailAddress());
                 cliente.setTelefono(generarTelefonoFormato());
-                cliente.setPassword(passwordEncoder.encode("cliente123")); // Contraseña por defecto
+                cliente.setPassword(passwordEncoder.encode("cliente123"));
+                cliente.setRol(Rol.CLIENTE);
                 clientes.add(cliente);
-                // Se añade el cliente a la lista de clientes
             }
-            // Se guardan todos los clientes en la base de datos utilizando el repositorio clienteRepository
+            
             clienteRepository.saveAll(clientes);
-            // Se asegura que los cambios se persistan en la base de datos
             clienteRepository.flush();
-            logger.info("✅ Clientes creados y guardados ({}).", clientes.size());
+            logger.info("✅ Clientes y staff creados y guardados ({}).", clientes.size());
 
             // --- Crear productos ---
-            // Se crea una lista de productos para almacenar los objetos Producto generados
-            // Se utiliza un bucle para crear 15 productos con datos aleatorios
-            // Cada producto tiene un nombre, descripción, precio, impuesto y disponibilidad generados aleatoriamente
-            // Además, se asigna una categoría aleatoria de las definidas en la enumeración Categoria
-            // Se utiliza un Random para seleccionar una categoría aleatoria
             List<Producto> productos = new ArrayList<>();
             for (int i = 0; i < 15; i++) {
                 Producto producto = new Producto();
@@ -143,10 +149,6 @@ public class InsertarDatos implements CommandLineRunner {
             logger.info("✅ Productos creados y guardados ({}).", productos.size());
 
             // --- Crear eventos ---
-            // Se crea una lista de eventos para almacenar los objetos Evento generados
-            // Se utiliza un bucle para crear eventos para cada cliente persistido
-            // Cada evento tiene un nombre, fecha, cantidad de personas, espacio, hora, horario y estado generados aleatoriamente
-            // Además, se asigna un cliente aleatorio de la lista de clientes persistidos
             List<Evento> eventos = new ArrayList<>();
             List<Cliente> clientesPersistidos = clienteRepository.findAll();
             List<Producto> productosPersistidos = productoRepository.findAll();
@@ -156,56 +158,67 @@ public class InsertarDatos implements CommandLineRunner {
                 return;
             }
 
-            for (Cliente cliente : clientesPersistidos) {
-                int numEventosPorCliente = faker.number().numberBetween(1, 3);
-                for (int j = 0; j < numEventosPorCliente; j++) {
-                    Evento evento = new Evento();
-                    String nombreEvento = faker.book().title();
-                    evento.setNombre(ajustarLongitud(nombreEvento, 3, 100));
-                    java.util.Date fechaFuturaUtil = faker.date().future(60, 1, TimeUnit.DAYS);
-                    evento.setFecha(new Date(fechaFuturaUtil.getTime()));
-                    evento.setCantidadPersonas(faker.number().numberBetween(10, 200));
-                    String espacioEvento = faker.address().streetAddress();
-                    evento.setEspacio(ajustarLongitud(espacioEvento, 1, 200));
-                    evento.setHora(LocalTime.of(faker.number().numberBetween(8, 23), 0));
-                    evento.setHorario(Horario.values()[random.nextInt(Horario.values().length)]);
-                    evento.setEstado(Estado.values()[random.nextInt(Estado.values().length)]);
-                    evento.setCliente(cliente);
-                    
-                    evento.setConsumos(new ArrayList<>());
-                    eventos.add(evento);
-                }
+            // Filtrar solo los clientes (no staff ni admin)
+            List<Cliente> clientesNormales = clientesPersistidos.stream()
+                .filter(c -> c.getRol() == Rol.CLIENTE)
+                .collect(Collectors.toList());
+
+            if (clientesNormales.isEmpty()) {
+                logger.warn("⚠️ No hay clientes normales para asignar a eventos.");
+                return;
             }
+
+            // Crear eventos aleatorios y asignarlos a clientes aleatorios
+            int numEventos = faker.number().numberBetween(10, 20); // Crear entre 10 y 20 eventos
+            for (int i = 0; i < numEventos; i++) {
+                Evento evento = new Evento();
+                String nombreEvento = faker.book().title();
+                evento.setNombre(ajustarLongitud(nombreEvento, 3, 100));
+                java.util.Date fechaFuturaUtil = faker.date().future(60, 1, TimeUnit.DAYS);
+                evento.setFecha(new Date(fechaFuturaUtil.getTime()));
+                evento.setCantidadPersonas(faker.number().numberBetween(10, 200));
+                String espacioEvento = faker.address().streetAddress();
+                evento.setEspacio(ajustarLongitud(espacioEvento, 1, 200));
+                evento.setHora(LocalTime.of(faker.number().numberBetween(8, 23), 0));
+                evento.setHorario(Horario.values()[random.nextInt(Horario.values().length)]);
+                evento.setEstado(Estado.values()[random.nextInt(Estado.values().length)]);
+                
+                // Asignar un cliente aleatorio de la lista de clientes normales
+                Cliente clienteAleatorio = clientesNormales.get(random.nextInt(clientesNormales.size()));
+                evento.setCliente(clienteAleatorio);
+                
+                evento.setConsumos(new ArrayList<>());
+                eventos.add(evento);
+                
+                logger.info("✅ Evento '{}' asignado al cliente: {} {}", 
+                    evento.getNombre(), 
+                    clienteAleatorio.getNombre(), 
+                    clienteAleatorio.getApellido());
+            }
+
             eventoRepository.saveAll(eventos);
             eventoRepository.flush();
             logger.info("✅ Eventos creados y guardados ({}).", eventos.size());
 
             // --- Crear consumos de productos ---
             List<ConsumoProducto> consumos = new ArrayList<>();
-            
             List<Evento> eventosPersistidos = eventoRepository.findAll();
 
             if (eventosPersistidos.isEmpty() || productosPersistidos.isEmpty()) {
                 logger.warn("⚠️ No hay eventos o productos persistidos para crear consumos.");
             } else {
                 for (Evento evento : eventosPersistidos) {
-                    // Crear una copia de los productos disponibles para este evento
                     List<Producto> productosDisponibles = new ArrayList<>(productosPersistidos);
                     Collections.shuffle(productosDisponibles);
                     
-                    int numProductosAAnadir = faker.number().numberBetween(0, Math.min(6, productosDisponibles.size()));
+                    int numProductosAAnadir = faker.number().numberBetween(1, Math.min(6, productosDisponibles.size()));
                     Set<Long> productosAsignados = new HashSet<>();
                     
                     for (int k = 0; k < numProductosAAnadir; k++) {
                         Producto productoSeleccionado = productosDisponibles.get(k);
                         
-                        // Verificar si el producto ya está asignado al evento
                         if (productosAsignados.contains(productoSeleccionado.getId())) {
-                            logger.error("❌ El producto {} ya está asignado al evento {}", 
-                                productoSeleccionado.getNombre(), evento.getNombre());
-                            throw new IllegalStateException(
-                                String.format("El producto %s ya está asignado al evento %s", 
-                                    productoSeleccionado.getNombre(), evento.getNombre()));
+                            continue;
                         }
                         
                         productosAsignados.add(productoSeleccionado.getId());

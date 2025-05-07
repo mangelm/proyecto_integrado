@@ -11,6 +11,7 @@ export default function GestionEventos() {
   const [cargando, setcargando] = useState(true); // Estado para indicar si los datos están en proceso de carga.
   const [productosEventos, setProductosEventos] = useState({}); // Estado para almacenar los productos consumidos por cada evento. La clave es el ID del evento.
   const [errores, setErrores] = useState([]); // Estado para manejar errores
+  const [clientesInfo, setClientesInfo] = useState({});
 
   // Estados para los filtros
   const [filtroNombre, setFiltroNombre] = useState(""); // Estado para almacenar el texto de filtro por espacio.
@@ -53,30 +54,33 @@ export default function GestionEventos() {
         setTotalPages(data.totalPages);
 
         const productosPorEvento = {};
+        const clientesInfoPorEvento = {};
+
         for (const evento of data.content) {
           try {
-            const response = await fetch(`http://localhost:8100/api/eventos/${evento.id}/productos-consumidos`);
-            if (response.ok) {
-              const productosConsumidos = await response.json();
+            // Obtener productos consumidos
+            const productosResponse = await fetch(`http://localhost:8100/api/eventos/${evento.id}/productos-consumidos`);
+            if (productosResponse.ok) {
+              const productosConsumidos = await productosResponse.json();
               productosPorEvento[evento.id] = productosConsumidos;
-            } else {
-              console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, response.status);
-              productosPorEvento[evento.id] = [];
-              setErrores((prevErrores) => [
-                ...prevErrores,
-                `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
-              ]);
+            }
+
+            // Obtener información del cliente
+            const clienteResponse = await fetch(`http://localhost:8100/api/eventos/${evento.id}/cliente-info`);
+            if (clienteResponse.ok) {
+              const clienteInfo = await clienteResponse.json();
+              clientesInfoPorEvento[evento.id] = clienteInfo;
             }
           } catch (error) {
-            console.error(`Error al obtener productos consumidos para evento ${evento.id}:`, error);
-            productosPorEvento[evento.id] = [];
+            console.error(`Error al obtener datos para evento ${evento.id}:`, error);
             setErrores((prevErrores) => [
               ...prevErrores,
-              `Error al obtener productos consumidos para el evento ${evento.nombre}.`,
+              `Error al obtener datos para el evento ${evento.nombre}.`,
             ]);
           }
         }
         setProductosEventos(productosPorEvento);
+        setClientesInfo(clientesInfoPorEvento);
       })
       .catch((error) => {
         console.error("Error al obtener eventos:", error);
@@ -160,26 +164,26 @@ export default function GestionEventos() {
   return (
 
   // Contenedor principal 
-  <div className="w-full p-4 rounded-lg shadow-lg bg-white md:max-w-[768px] lg:max-w-[1280px] xl:max-w-7xl">
+  <div className="w-full p-4 rounded-lg shadow-lg bg-white md:max-w-[90%] lg:max-w-[95%] xl:max-w-[1400px] mx-auto">
 
       {/* Título de la sección con estilos para el tamaño de la fuente, peso, color y centrado. */}
-      <h1 className="text-2xl font-semibold text-gray-900 text-center mb-4 md:text-3xl">Gestión de Eventos</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 text-center mb-6 md:text-3xl">Gestión de Eventos</h1>
 
       {/* Mostrar errores */}
       {errores.length > 0 && <MensajesDeErrores messages={errores} />}
 
       {/* Contenedor para el botón de creación de eventos*/}
-      <div className="mb-4 p-2 md:p-4 w-full md:w-auto">
+      <div className="mb-6 p-2 md:p-4 w-full md:w-auto">
         {/* Enlace a la página de creación de eventos. */}
         <Link to="/eventos/nuevo"> 
-          <button className="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-4 md:py-2 w-full md:w-auto">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 md:px-6 md:py-3 w-full md:w-auto text-sm md:text-base">
             Crear Evento
           </button>
         </Link>
       </div>
 
     {/* Sección de Filtros */}
-    <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
+    <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-6">
 
       {/* Campo de texto para filtrar por nombre. */}
       <div className="relative">
@@ -224,25 +228,23 @@ export default function GestionEventos() {
     </div>
 
     {/* Tabla de Eventos */}
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border border-gray-200">
       {/* Contenedor con scroll horizontal para la tabla en pantallas pequeñas. */}
-      <table className="min-w-full bg-white table-auto rounded-lg shadow-md md:table-fixed">
+      <table className="min-w-full bg-white table-auto">
       
        {/* Encabezado de la tabla, oculto en pantallas pequeñas y mostrado como grupo de encabezado en medianas y grandes. */}
       <thead className="bg-gray-100 hidden md:table-header-group">
             <tr>
-              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Nombre</th>
-              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm whitespace-nowrap">Fecha</th>
-              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Asistentes</th>
-              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Espacio</th>
-              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Horario</th>
-              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:table-cell md:px-4 md:py-3 md:text-sm">Hora</th>
-              <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm">Estado</th>
-              {/* Encabezado para la lista de productos, oculto en pantallas pequeñas y medianas. */}
-              <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-b md:px-4 md:py-3 md:text-sm lg:hidden">Productos</th>
-              {/* Encabezado para la lista de productos (abreviado en pantallas grandes). */}
-              <th className="hidden px-2 py-2 text-left text-xs font-semibold text-gray-700 border-b lg:table-cell lg:px-4 lg:py-3 lg:text-sm">Productos</th>
-              <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-left md:text-center">Acciones</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Nombre</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b whitespace-nowrap">Fecha</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Asistentes</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Espacio</th>
+              <th className="hidden px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b md:table-cell">Horario</th>
+              <th className="hidden px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b md:table-cell">Hora</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Estado</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Cliente</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Productos</th>
+              <th className="px-4 py-3 text-sm font-semibold text-gray-700 border-b text-center">Acciones</th>
             </tr>
       </thead>
       
@@ -252,7 +254,7 @@ export default function GestionEventos() {
             eventosFiltrados.map((evento) => (
               <tr key={evento.id} className="hover:bg-gray-50 md:table-row">
                 {/* En pantallas pequeñas, muestra el nombre del campo y el valor uno al lado del otro. */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
 
                   {/* Celda para el nombre del evento, mostrada como bloque en pequeñas y como celda en medianas. */}
                   <div className="md:hidden flex justify-between">
@@ -263,15 +265,15 @@ export default function GestionEventos() {
                   <div className="hidden md:block">{evento.nombre}</div>
                 </td>
                 {/* Celda para la fecha del evento. */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell whitespace-nowrap">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Fecha</span>
-                    <span>{evento.fecha}</span>
+                    <span>{new Date(evento.fecha).toLocaleDateString()}</span>
                   </div>
-                  <div className="hidden md:block">{evento.fecha}</div>
+                  <div className="hidden md:block">{new Date(evento.fecha).toLocaleDateString()}</div>
                 </td>
                 {/* Celda para la cantidad de asistentes. */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Asistentes</span>
                     <span>{evento.cantidadPersonas}</span>
@@ -279,7 +281,7 @@ export default function GestionEventos() {
                   <div className="hidden md:block">{evento.cantidadPersonas}</div>
                 </td>
                 {/* Celda para el espacio del evento. */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Espacio</span>
                     <span>{evento.espacio}</span>
@@ -287,7 +289,7 @@ export default function GestionEventos() {
                   <div className="hidden md:block">{evento.espacio}</div>
                 </td>
                 {/* Celda para el horario del evento (oculta en pantallas pequeñas). */}
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                <td className="hidden px-4 py-3 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Horario</span>
                     <span>{evento.horario}</span>
@@ -295,7 +297,7 @@ export default function GestionEventos() {
                   <div className="hidden md:block">{evento.horario}</div>
                 </td>
                 {/* Celda para la hora del evento (oculta en pantallas pequeñas). */}
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
+                <td className="hidden px-4 py-3 text-xs font-medium text-gray-900 md:table-cell md:px-4 md:py-3 md:text-sm">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Hora</span>
                     <span>{evento.hora}</span>
@@ -303,37 +305,64 @@ export default function GestionEventos() {
                   <div className="hidden md:block">{evento.hora}</div>
                 </td>
                 {/* Celda para el estado del evento. */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   <div className="md:hidden flex justify-between">
                     <span className="font-semibold text-gray-700">Estado</span>
                     <span>{evento.estado}</span>
                   </div>
                   <div className="hidden md:block">{evento.estado}</div>
                 </td>
-                {/* Celda para la lista de productos (abreviada en pantallas grandes). */}
-                <td className="px-2 py-2 text-center text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block lg:hidden">
-                  <div className="font-semibold text-gray-700 mb-1">Productos:</div>
-                    {/* Lista no ordenada de productos consumidos en el evento. */}
-                    <ul className="list-none">
-                        {productosEventos[evento.id] && productosEventos[evento.id].map((producto, index) => (
-                            <li key={`${producto.nombreProducto}_${evento.id}_${index}`}>{producto.nombreProducto}</li>
-                        ))}
-                        {!productosEventos[evento.id] && <li>Cargando...</li>}
-                    </ul>
+                {/* Celda para el cliente asociado al evento */}
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                  <div className="md:hidden flex justify-between">
+                    <span className="font-semibold text-gray-700">Cliente</span>
+                    <span>{clientesInfo[evento.id] ? (
+                      <div>
+                        <div>{clientesInfo[evento.id].email}</div>
+                        <div className="text-gray-500 text-xs">{clientesInfo[evento.id].telefono}</div>
+                      </div>
+                    ) : (
+                      "No asignado"
+                    )}</span>
+                  </div>
+                  <div className="hidden md:block">{clientesInfo[evento.id] ? (
+                    <div>
+                      <div>{clientesInfo[evento.id].email}</div>
+                      <div className="text-gray-500 text-xs">{clientesInfo[evento.id].telefono}</div>
+                    </div>
+                  ) : (
+                    "No asignado"
+                  )}</div>
                 </td>
-                {/* Celda para la lista de productos (oculta en pantallas pequeñas y medianas). */}
-                <td className="hidden px-2 py-2 text-xs font-medium text-gray-900 lg:table-cell lg:px-4 lg:py-3 lg:text-sm">
-                  
-                    <ul className="list-none">
+                {/* Celda para la lista de productos */}
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                  <div className="md:hidden flex justify-between">
+                    <span className="font-semibold text-gray-700">Productos</span>
+                    <div>
+                      <ul className="list-none text-right">
                         {productosEventos[evento.id] && productosEventos[evento.id].map((producto, index) => (
-                            <li key={`${producto.nombreProducto}_${evento.id}_${index}`} className="whitespace-nowrap">{producto.nombreProducto}</li>
+                          <li key={`${producto.nombreProducto}_${evento.id}_${index}`}>{producto.nombreProducto}</li>
                         ))}
-                        
                         {!productosEventos[evento.id] && <li>Cargando...</li>}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="hidden md:block">
+                    <ul className="list-none space-y-1">
+                      {productosEventos[evento.id] && productosEventos[evento.id].map((producto, index) => (
+                        <li 
+                          key={`${producto.nombreProducto}_${evento.id}_${index}`}
+                          className="py-0.5 px-2 bg-gray-50 rounded-md text-sm"
+                        >
+                          {producto.nombreProducto}
+                        </li>
+                      ))}
+                      {!productosEventos[evento.id] && <li>Cargando...</li>}
                     </ul>
+                  </div>
                 </td>
                 {/* Celda para las acciones (botones de editar, eliminar, detalles, asignar producto). */}
-                <td className="px-2 py-2 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
+                <td className="px-4 py-3 text-xs font-medium text-gray-900 md:px-4 md:py-3 md:text-sm block md:table-cell">
                   {/* Título de la sección de acciones en pantallas pequeñas. */}
                   <div className="md:hidden font-semibold text-center">Acciones</div>
                   {/* Contenedor para los botones de acción, con diseño de columna en pequeñas y fila en medianas. */}
@@ -383,15 +412,15 @@ export default function GestionEventos() {
 
   {/* Paginación */}
   {/* Contenedor para los controles de paginación */}
-  <div className="mt-4 flex flex-col items-center justify-between md:flex-row">
+  <div className="mt-6 flex flex-col items-center justify-between md:flex-row gap-4">
       
       {/* Contenedor para los botones de ir a la primera página y retroceder varias páginas. */}
-      <div className="flex gap-2 mb-2 md:mb-0 w-full md:w-auto">
+      <div className="flex gap-3 w-full md:w-auto">
         {/* Botón para ir a la primera página, deshabilitado si ya está en la primera. */}
         <button
           onClick={manejoPrimeraPagina}
           disabled={page === 0}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 md:w-auto text-sm"
         >
           Primero
         </button>
@@ -399,43 +428,43 @@ export default function GestionEventos() {
         <button
           onClick={manejoValorPrevio}
           disabled={page <= 0}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 md:w-auto text-sm"
         >
           -{valorPaginacion}
         </button>
       </div>
 
       {/* Contenedor para los botones de página anterior, número de página actual y página siguiente. */}
-      <div className="flex flex-col items-center gap-2 mb-2 md:mb-0 w-full md:w-auto md:flex-row md:justify-center">
+      <div className="flex flex-col items-center gap-3 w-full md:w-auto md:flex-row md:justify-center">
         {/* Botón para ir a la página anterior, deshabilitado si está en la primera página. */}
         <button
           onClick={manejoPaginaPrevia}
           disabled={page === 0}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto text-sm"
         >
           Anterior
         </button>
         {/* Muestra el número de página actual y el total de páginas. */}
-        <span className="text-xs font-medium text-gray-700 md:text-sm">
+        <span className="text-sm font-medium text-gray-700">
           Página {page + 1} de {totalPages}
         </span>
         {/* Botón para ir a la página siguiente, deshabilitado si está en la última página. */}
         <button
           onClick={manejoSiguentePagina}
           disabled={page === totalPages - 1}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-full md:w-auto"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-full md:w-auto text-sm"
         >
           Siguiente
         </button>
       </div>
       
        {/* Contenedor para los botones de avanzar varias páginas e ir a la última página. */}
-      <div className="flex gap-2 w-full md:w-auto">
+      <div className="flex gap-3 w-full md:w-auto">
         {/* Botón para avanzar 'valorPaginacion' páginas, deshabilitado si está en la última página o cerca. */}
         <button
           onClick={manejoSiguienteValor}
           disabled={page >= totalPages - 1}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 md:w-auto text-sm"
         >
           +{valorPaginacion}
         </button>
@@ -443,7 +472,7 @@ export default function GestionEventos() {
         <button
           onClick={manejoUltimaPagina}
           disabled={page === totalPages - 1}
-          className="bg-gray-300 text-black px-3 py-1 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 md:px-4 md:py-2 w-1/2"
+          className="bg-gray-300 text-black px-4 py-2 rounded-md shadow-sm disabled:opacity-50 hover:bg-gray-400 transition duration-300 w-1/2 md:w-auto text-sm"
         >
           Último
         </button>
@@ -451,10 +480,10 @@ export default function GestionEventos() {
     </div>
     
     {/* Contenedor para el botón de volver a la página principal. */}
-    <div className="mt-6 text-center w-full md:w-auto">
+    <div className="mt-8 text-center w-full md:w-auto">
       <Link to={`/panel-administracion`}>
         {/* Botón estilizado para volver a la página principal. */}
-        <button className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full md:w-auto">
+        <button className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full md:w-auto text-sm md:text-base">
           Volver a la página principal
         </button>
       </Link>
