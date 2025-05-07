@@ -67,6 +67,7 @@ export default function Registro() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('rol', data.cliente.rol);
+                localStorage.setItem('userId', data.cliente.id);
                 navegar("/admin");
             } else {
                 if (data.error) {

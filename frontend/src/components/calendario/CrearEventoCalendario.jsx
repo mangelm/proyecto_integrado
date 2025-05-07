@@ -103,12 +103,13 @@ export default function CrearEventoCalendario({ onSuccess }) {
 
         // Crea un objeto con los datos del nuevo evento
         const nuevoEvento = {
-            nombre: limpiarInput(nombre, "texto"), // Limpia el nombre antes de enviarlo.
+            nombre: limpiarInput(nombre, "texto"),
             fecha,
-            cantidadPersonas: parseInt(cantidadPersonas) || 0, // Convierte la cantidad de personas a número o usa 0 si no es un número válido.
-            espacio: limpiarInput(espacio, "texto"), // Limpia el espacio antes de enviarlo.
+            cantidadPersonas: parseInt(cantidadPersonas) || 0,
+            espacio: limpiarInput(espacio, "texto"),
             horario,
             hora,
+            clienteId: localStorage.getItem('userId')
         };
 
         try {
@@ -125,8 +126,7 @@ export default function CrearEventoCalendario({ onSuccess }) {
                 if (onSuccess) {
                     onSuccess();
                 } else {
-                    // Si no hay onSuccess, navega a la página de eventos.
-                    navegar("/eventos");
+                    navegar("/calendario");
                 }
             } else {
                 const textoError = await respuesta.text(); // Obtiene el mensaje de error de la respuesta.

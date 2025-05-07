@@ -49,6 +49,7 @@ export default function Login() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('rol', data.cliente.rol);
+                localStorage.setItem('userId', data.cliente.id);
                 navegar("/panel-administracion");
             } else {
                 if (data.error) {

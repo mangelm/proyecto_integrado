@@ -92,6 +92,7 @@ export default function CrearEvento({ onSuccess }) {
             espacio: limpiarInput(espacio, "texto"),
             horario: horario,
             hora: hora,
+            clienteId: localStorage.getItem('userId')
         };
 
         try {
