@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import MensajesDeErrores from "../../pages/MensajesDeErrores"; // Importa el componente para mostrar errores generales.
 
 export default function DetallesEventoCalendario() {
@@ -12,6 +12,7 @@ export default function DetallesEventoCalendario() {
     const [hora, setHora] = useState(""); // Estado para la hora específica del evento, inicializado como una cadena vacía.
     const [estado, setEstado] = useState(""); // Estado para el estado del evento, inicializado como una cadena vacía.
     const [erroresGenerales, setErroresGenerales] = useState([]); // Estado para manejar errores generales.
+    const navigate = useNavigate(); // Hook para navegar entre rutas en la aplicación.
 
     // useEffect se ejecuta después de cada renderizado del componente.
     useEffect(() => {
@@ -90,6 +91,13 @@ export default function DetallesEventoCalendario() {
             </div>
 
             <div className="mt-6 flex justify-center">
+                <button
+                    type="button"
+                    onClick={() => navigate(`/calendario/${id}/editar`)} // Navega al componente EditarEventoCalendario
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                >
+                    Editar
+                </button>
                 <button
                     type="button"
                     onClick={() => window.history.back()} // Utiliza la API del navegador para volver a la página anterior en el historial.
