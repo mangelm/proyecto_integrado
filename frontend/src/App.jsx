@@ -25,13 +25,20 @@ import Registro from './components/auth/Registro';
 import Login from './components/auth/Login';
 import RutaProtegida from './components/auth/RutaProtegida';
 import AccesoDenegado from './components/auth/AccesoDenegado';
-
+import Footer from './components/common/footer';
+import Header from './components/common/Header';
 
 function App() {
+  
   return (
+    <>
+    
+    <Header />
+
     <Router>
       <div className="max-w-screen-2xl mx-auto p-8">
         <Routes>
+          
           {/* Rutas públicas */}
           <Route path="/" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
@@ -172,8 +179,12 @@ function App() {
 
         </Routes>
 
+        
       </div>
     </Router>
+
+    <Footer />
+    </>
   );
 }
 

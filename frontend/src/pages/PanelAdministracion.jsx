@@ -15,6 +15,7 @@ export default function PanelAdministracion() {
 
     return (
         <>
+            
             <div className="w-full md:max-w-[768px] xl:max-w-7xl p-4 md:p-6 xl:p-3 bg-white rounded-lg shadow-md mx-auto text-center">
                 <h1 className="text-xl md:text-2xl font-bold mb-4">Panel de Administración</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
