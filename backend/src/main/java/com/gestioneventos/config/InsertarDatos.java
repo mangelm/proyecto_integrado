@@ -99,6 +99,24 @@ public class InsertarDatos implements CommandLineRunner {
                 admin.setRol(Rol.ADMIN);
                 clienteRepository.save(admin);
                 logger.info("✅ Usuario administrador creado.");
+                Cliente staff = new Cliente();
+                staff.setNombre("Encarna");
+                staff.setApellido("Concepcion");
+                staff.setEmail("concepcion.anguiano@hotmail.com");
+                staff.setTelefono("123-456-789");
+                staff.setPassword(passwordEncoder.encode("staff123"));
+                staff.setRol(Rol.STAFF);
+                clienteRepository.save(staff);
+                logger.info("✅ Usuario staff creado.");
+                Cliente cliente = new Cliente();
+                cliente.setNombre("Lola");
+                cliente.setApellido("Aranda");
+                cliente.setEmail("lola.aranda@hotmail.com");
+                cliente.setTelefono("123-456-789");
+                cliente.setPassword(passwordEncoder.encode("cliente123"));
+                cliente.setRol(Rol.CLIENTE);
+                clienteRepository.save(cliente);
+                logger.info("✅ Usuario cliente creado.");
             }
 
             // --- Crear clientes y staff ---

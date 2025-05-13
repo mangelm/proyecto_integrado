@@ -1,4 +1,4 @@
-import './app.css';
+import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import PanelAdministracion from "./pages/PanelAdministracion";
 import GestionEventos from "./components/eventos/Eventos";
@@ -25,7 +25,7 @@ import Registro from './components/auth/Registro';
 import Login from './components/auth/Login';
 import RutaProtegida from './components/auth/RutaProtegida';
 import AccesoDenegado from './components/auth/AccesoDenegado';
-import Footer from './components/common/footer';
+import Footer from './components/common/Footer';
 import Header from './components/common/Header';
 
 function App() {
