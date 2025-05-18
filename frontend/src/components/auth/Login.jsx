@@ -43,7 +43,7 @@ export default function Login() {
                 setErroresGenerales([data.error || "Error al iniciar sesión."]);
             } catch {
                 setErroresGenerales(["Error al iniciar sesión."]);
-            }
+            } 
             return;
         }
 
