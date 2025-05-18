@@ -32,8 +32,6 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(error);
             }
 
-            cliente.setPassword(passwordEncoder.encode(cliente.getPassword()));
-
             Cliente clienteCreado = clienteService.crearCliente(cliente);
             String token = "token_" + System.currentTimeMillis();
 

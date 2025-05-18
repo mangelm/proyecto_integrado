@@ -14,73 +14,92 @@ export default function Registro() {
     const navegar = useNavigate();
 
     const manejoEnvio = async (e) => {
-        e.preventDefault();
-        setErrores({});
-        setErroresGenerales([]);
+    e.preventDefault();
+    setErrores({});
+    setErroresGenerales([]);
 
-        let formularioValido = true;
-        let erroresVista = {};
+    // Trim de todos los campos de texto antes de validar y enviar
+    const nombreTrim = nombre.trim();
+    const apellidoTrim = apellido.trim();
+    const emailTrim = email.trim();
+    const telefonoTrim = telefono.trim();
+    const passwordTrim = password.trim();
+    const confirmPasswordTrim = confirmPassword.trim();
 
-        // Validaciones
-        if (!nombre) erroresVista.nombre = "El nombre es obligatorio.";
-        if (!apellido) erroresVista.apellido = "El apellido es obligatorio.";
-        
-        if (!email) erroresVista.email = "El email es obligatorio.";
-        else if (!/\S+@\S+\.\S+/.test(email)) erroresVista.email = "El formato del email no es válido.";
-        
-        if (!telefono) erroresVista.telefono = "El teléfono es obligatorio.";
-        else if (!/^\d{3}-\d{3}-\d{3}$/.test(telefono)) erroresVista.telefono = "El teléfono debe tener el formato XXX-XXX-XXX.";
-        
-        if (!password) erroresVista.password = "La contraseña es obligatoria.";
-        else if (password.length < 6) erroresVista.password = "La contraseña debe tener al menos 6 caracteres.";
-        
-        if (!confirmPassword) erroresVista.confirmPassword = "Debes confirmar la contraseña.";
-        else if (password !== confirmPassword) erroresVista.confirmPassword = "Las contraseñas no coinciden.";
+    let formularioValido = true;
+    let erroresVista = {};
 
-        if (Object.keys(erroresVista).length > 0) {
-            setErrores(erroresVista);
-            formularioValido = false;
-        }
+    // Validaciones usando los valores "trim"
+    if (!nombreTrim) erroresVista.nombre = "El nombre es obligatorio.";
+    if (!apellidoTrim) erroresVista.apellido = "El apellido es obligatorio.";
 
-        if (!formularioValido) {
-            return;
-        }
+    if (!emailTrim) erroresVista.email = "El email es obligatorio.";
+    else if (!/\S+@\S+\.\S+/.test(emailTrim)) erroresVista.email = "El formato del email no es válido.";
 
-        try {
-            const response = await fetch("http://localhost:8100/api/auth/registro", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nombre,
-                    apellido,
-                    email,
-                    telefono,
-                    password
-                }),
-                credentials: 'include'
-            });
+    if (!telefonoTrim) erroresVista.telefono = "El teléfono es obligatorio.";
+    else if (!/^\d{3}-\d{3}-\d{3}$/.test(telefonoTrim)) erroresVista.telefono = "El teléfono debe tener el formato XXX-XXX-XXX.";
 
-            const data = await response.json();
+    if (!passwordTrim) erroresVista.password = "La contraseña es obligatoria.";
+    else if (passwordTrim.length < 6) erroresVista.password = "La contraseña debe tener al menos 6 caracteres.";
 
-            if (response.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('rol', data.cliente.rol);
-                localStorage.setItem('userId', data.cliente.id);
-                navegar("/admin");
+    if (!confirmPasswordTrim) erroresVista.confirmPassword = "Debes confirmar la contraseña.";
+    else if (passwordTrim !== confirmPasswordTrim) erroresVista.confirmPassword = "Las contraseñas no coinciden.";
+
+    if (Object.keys(erroresVista).length > 0) {
+        setErrores(erroresVista);
+        formularioValido = false;
+    }
+
+    if (!formularioValido) {
+        return;
+    }
+
+    const confirmacion = window.confirm(
+        `¿Deseas registrarte con los siguientes datos?\n
+        Nombre: ${nombreTrim}
+        Apellido: ${apellidoTrim}
+        Email: ${emailTrim}
+        Teléfono: ${telefonoTrim}`
+            );
+
+    if (!confirmacion) return;
+
+    try {
+        const response = await fetch("http://localhost:8100/api/auth/registro", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre: nombreTrim,
+                apellido: apellidoTrim,
+                email: emailTrim,
+                telefono: telefonoTrim,
+                password: passwordTrim
+            }),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('rol', data.cliente.rol);
+            localStorage.setItem('userId', data.cliente.id);
+            navegar("/admin");
+        } else {
+            if (data.error) {
+                setErroresGenerales([data.error]);
             } else {
-                if (data.error) {
-                    setErroresGenerales([data.error]);
-                } else {
-                    setErroresGenerales(["Error al registrarse. Por favor, inténtalo de nuevo."]);
-                }
+                setErroresGenerales(["Error al registrarse. Por favor, inténtalo de nuevo."]);
             }
-        } catch (error) {
-            console.error("Error en fetch o procesando la respuesta:", error);
-            setErroresGenerales(["No se pudo conectar con el servidor. Por favor, inténtalo de nuevo."]);
         }
-    };
+    } catch (error) {
+        console.error("Error en fetch o procesando la respuesta:", error);
+        setErroresGenerales(["No se pudo conectar con el servidor. Por favor, inténtalo de nuevo."]);
+    }
+};
+
 
     const manejoCambioInput = (setter, nombreCampo) => (e) => {
         setter(e.target.value);
