@@ -9,5 +9,6 @@ export default defineConfig({
   ],
   optimizeDeps: {
     include: ['moment', 'moment/locale/es'] // 👈 fuerza a incluir el locale
-  }
+  },
+  base: '/proyecto_integrado'
 })
