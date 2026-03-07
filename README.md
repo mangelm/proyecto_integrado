@@ -1,26 +1,26 @@
-# Gestor de Eventos - Proyecto Integrado DAW
+# 📅 Gestor de Eventos - Proyecto Integrado DAW
 
 Proyecto final del ciclo formativo de Desarrollo de Aplicaciones Web (DAW). Esta aplicación permite la gestión integral de eventos mediante un sistema robusto, funcional y escalable, combinando un backend sólido con un frontend moderno.
 
-## 🛠 Tecnologías Utilizadas
+## 🛠 Stack Tecnológico
 
-### Backend
-* **Java** con **Spring Boot**.
-* **Spring Security** para la gestión de autenticación y autorización.
-* **MySQL** como sistema de gestión de base de datos relacional.
-* **Maven** para la gestión de dependencias.
+La aplicación está construida bajo una arquitectura cliente-servidor, utilizando las siguientes herramientas:
 
-### Frontend
-* **React** para la construcción de interfaces dinámicas.
-* **Tailwind CSS** para el diseño de la interfaz, priorizando la eficiencia, la funcionalidad y la capacidad de respuesta (responsive design).
+| Capa | Tecnología | Propósito |
+| :--- | :--- | :--- |
+| **Frontend** | ⚛️ React + 🎨 Tailwind CSS | Interfaz dinámica, responsiva y funcional. |
+| **Backend** | ☕ Java + 🍃 Spring Boot | Motor lógico y servicios RESTful. |
+| **Seguridad** | 🔐 Spring Security | Autenticación y protección de endpoints. |
+| **Base de Datos**| 🐬 MySQL | Persistencia y gestión de relaciones. |
+| **Herramientas** | 🏗️ Maven | Gestión de dependencias y build. |
 
 ## 🚀 Funcionalidades Principales
 
-* **Autenticación Segura:** Control de acceso y gestión de sesiones mediante Spring Security.
-* **Gestión CRUD:** Operaciones completas de creación, lectura, actualización y eliminación para la administración de eventos.
-* **Calendario Interactivo:** Visualización cronológica de eventos para una gestión eficiente del tiempo.
-* **Panel de Analítica:** Representación visual de datos mediante gráficos, permitiendo un seguimiento claro de la información.
-* **Diseño Funcional:** Interfaz desarrollada con Tailwind CSS, enfocada en la usabilidad y la carga rápida de datos.
+* 🔐 **Autenticación Segura:** Control de acceso y gestión de sesiones mediante Spring Security.
+* 📝 **Gestión CRUD:** Operaciones completas de creación, lectura, actualización y eliminación para la administración de eventos.
+* 📅 **Calendario Interactivo:** Visualización cronológica de eventos para una gestión eficiente del tiempo.
+* 📊 **Panel de Analítica:** Representación visual mediante gráficos, permitiendo un seguimiento claro de la información.
+* ⚡ **Diseño Funcional:** Interfaz desarrollada con Tailwind CSS, enfocada en la usabilidad y la carga rápida.
 
 ## 📋 Requisitos Previos
 
