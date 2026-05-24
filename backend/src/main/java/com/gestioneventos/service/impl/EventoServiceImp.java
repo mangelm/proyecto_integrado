@@ -177,7 +177,7 @@ public class EventoServiceImp implements EventoService {
 	}
 
 	@Override
-	 public List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId) {
+	public List<ProductoCantidadDTO> obtenerProductosConCantidadPorEvento(Long eventoId) {
         if (!eventoRepository.existsById(eventoId)) {
             throw new RecursoNoEncontradoException("Evento no encontrado con ID: " + eventoId);
         }
@@ -188,7 +188,7 @@ public class EventoServiceImp implements EventoService {
     public Page<Evento> obtenerEventosFiltrados(Pageable pageable, String nombre, String horario, String estado) {
         logger.info("Obteniendo eventos filtrados - nombre: {}, horario: {}, estado: {}", nombre, horario, estado);
         
-        Specification<Evento> spec = Specification.where(null);
+        Specification<Evento> spec = Specification.allOf();;
         
         if (nombre != null && !nombre.isEmpty()) {
             spec = spec.and((root, query, cb) -> {
