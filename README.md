@@ -26,7 +26,7 @@ La aplicación está construida bajo una arquitectura cliente-servidor, utilizan
 
 Para ejecutar este proyecto, asegúrate de tener instalado:
 * **JDK 17** o superior.
-* **Node.js** (versión LTS).
+* **Node.js** (versión LTS). 
 * **MySQL Server**.
 
 ## ⚙️ Instalación y Ejecución
